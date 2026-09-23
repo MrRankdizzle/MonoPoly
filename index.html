@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MonoPoly: Build Macromolecules</title>
+<title>MonoPoly: Build the Cell</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#eef1ec; --panel:#ffffff; --ink:#1d2a28; --muted:#566762; --line:#d2dbd6;
   --mat:#1f5a52; --mat-grid:rgba(255,255,255,.07); --mat-ink:#e8f3ef; --mat-muted:#acd0c7;
   --carbs:#e8a33d; --proteins:#d94f6a; --lipids:#c2b12c; --nucleic:#5a7fe0;
-  --accent:var(--carbs); --on-accent:#1b2422;
+  --accent:var(--mat); --on-accent:#fff;
   --good:#23804f; --good-bg:#e1f3e8; --warn:#a4481a; --warn-bg:#fbe9dd;
+  --atp:#f2c14e; --atp-ink:#5c3d0a;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
@@ -28,10 +29,11 @@
   --mat:#16403a; --good:#6fd29d; --good-bg:#183a2a; --warn:#f0a070; --warn-bg:#3d2517;
   color-scheme:dark;
 }
-body[data-tab="carbs"]{--accent:var(--carbs)}
+body[data-tab="carbs"]{--accent:var(--carbs); --on-accent:#1b2422}
 body[data-tab="proteins"]{--accent:var(--proteins); --on-accent:#fff}
-body[data-tab="lipids"]{--accent:var(--lipids)}
+body[data-tab="lipids"]{--accent:var(--lipids); --on-accent:#1b2422}
 body[data-tab="nucleic"]{--accent:var(--nucleic); --on-accent:#fff}
+body[data-tab="board"]{--accent:var(--mat); --on-accent:#fff}
 
 *{box-sizing:border-box}
 :root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -41,34 +43,112 @@ svg text{font-family:'Lexend',system-ui,-apple-system,'Segoe UI',Roboto,sans-ser
 button{font:inherit; color:inherit}
 :focus-visible{outline:3px solid var(--accent); outline-offset:2px}
 img,svg{max-width:100%}
+h1,h2,h3{margin:0}
+p{margin:0}
+ul{margin:0;padding:0}
 
 .wrap{max-width:1200px; margin:0 auto; padding:22px 18px 48px}
+.hidden{display:none !important}
+.sr{position:absolute; left:-9999px}
 
-/* Header */
-.top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px 24px; margin-bottom:18px}
-h1{font-size:clamp(2rem,4.4vw,3rem); line-height:1.05; font-weight:700; letter-spacing:-.02em; margin:0}
-.tag{margin:.35rem 0 0; font-size:1.05rem; font-weight:500}
-.tag2{margin:.15rem 0 0; color:var(--muted); font-size:.92rem}
-.ledger{display:flex; gap:10px; flex-wrap:wrap}
-.chip{display:flex; align-items:center; gap:10px; background:var(--panel); border:1.5px solid var(--line); border-radius:14px; padding:8px 14px 8px 10px}
-.chip .n{font-size:1.5rem; font-weight:700; line-height:1; min-width:1.2ch}
-.chip .l{font-size:.8rem; color:var(--muted); line-height:1.25; max-width:10.5em}
-.chip.bump{animation:bump .5s ease}
-@keyframes bump{40%{transform:scale(1.07)}}
+/* ---------- Buttons shared ---------- */
+.btn{font-size:.82rem; padding:.42rem .8rem; border-radius:999px; border:1.5px solid var(--line); background:var(--panel); cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.btn[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn-primary{background:var(--accent); color:var(--on-accent); border-color:var(--accent); font-weight:600}
+.btn-big{font-size:1rem; padding:.75rem 1.4rem; border-radius:14px; font-weight:700}
 
-/* Tabs */
-.tabs{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:16px}
-.tab{display:flex; align-items:center; gap:9px; flex:none; border:1.5px solid var(--line); background:var(--panel); border-radius:12px; padding:9px 16px 9px 12px; cursor:pointer; font-weight:500}
-.tab svg{flex:none}
-.tab[aria-selected="true"]{border-color:var(--accent); box-shadow:inset 0 -4px 0 var(--accent); font-weight:600}
-.tab:hover{border-color:var(--accent)}
+/* ================= ONBOARDING ================= */
+.onboard{min-height:100svh; display:flex; align-items:center; justify-content:center; padding:24px}
+.onboard-card{background:var(--panel); border:1.5px solid var(--line); border-radius:22px; padding:32px 28px; max-width:440px; width:100%; text-align:center}
+.onboard-card h1{font-size:clamp(1.8rem,6vw,2.4rem); font-weight:800; letter-spacing:-.02em}
+.onboard-card p{color:var(--muted); margin-top:10px; font-size:.96rem}
+.onboard-card input[type=text]{width:100%; margin-top:20px; padding:.8rem 1rem; border-radius:12px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); font:inherit; font-size:1.05rem}
+.onboard-card .btn-primary{width:100%; margin-top:14px}
+.player-list{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:16px}
+.player-chip{border:1.5px solid var(--line); background:var(--bg); border-radius:999px; padding:.4rem .9rem; cursor:pointer; font-weight:600; font-size:.88rem}
+.player-chip:hover{border-color:var(--accent)}
+.onboard-note{margin-top:18px; font-size:.78rem; color:var(--muted)}
 
-/* Layout */
+/* ================= HEADER ================= */
+.top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 18px; margin-bottom:16px}
+.brand h1{font-size:clamp(1.6rem,4vw,2.2rem); font-weight:800; letter-spacing:-.02em; line-height:1}
+.brand p{color:var(--muted); font-size:.85rem; margin-top:3px}
+.hdr-right{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.wallet{display:flex; align-items:center; gap:10px; background:var(--panel); border:1.5px solid var(--atp); border-radius:14px; padding:8px 16px 8px 10px}
+.wallet .ic{display:flex}
+.wallet .n{font-size:1.5rem; font-weight:800; line-height:1; color:var(--atp-ink)}
+:root[data-theme="dark"] .wallet .n,
+@media (prefers-color-scheme: dark){.wallet .n{color:var(--atp)}}
+.wallet .l{font-size:.72rem; color:var(--muted); line-height:1.15}
+.wallet.bump{animation:bump .5s ease}
+@keyframes bump{40%{transform:scale(1.12)}}
+.iconbtn{width:38px; height:38px; border-radius:50%; border:1.5px solid var(--line); background:var(--panel); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.05rem}
+.iconbtn:hover{border-color:var(--accent)}
+.iconbtn[aria-pressed="true"]{background:var(--accent); color:var(--on-accent); border-color:var(--accent)}
+
+/* ================= BOARD ================= */
+.board-shell{display:flex; flex-direction:column; align-items:center; gap:16px}
+.board{width:min(96vw,640px); aspect-ratio:1; display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(6,1fr); gap:4px; background:var(--line); border-radius:18px; padding:4px}
+.sq{border:0; border-radius:10px; background:var(--panel); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2px; position:relative; overflow:hidden; gap:2px}
+.sq .ic{display:flex; align-items:center; justify-content:center}
+.sq .lbl{font-size:clamp(.44rem,1.4vw,.66rem); font-weight:700; line-height:1.05; max-width:100%}
+.sq.corner{border-radius:12px}
+.sq.corner .lbl{font-size:clamp(.5rem,1.6vw,.72rem)}
+.sq.prop{border-top:5px solid var(--gc,var(--line))}
+.sq.prop.owned{background:color-mix(in srgb, var(--gc,var(--accent)) 22%, var(--panel))}
+.sq.prop.owned::after{content:"\2713"; position:absolute; top:2px; right:4px; font-size:.6rem; font-weight:900; color:var(--good)}
+.sq.enzyme{background:color-mix(in srgb, var(--atp) 30%, var(--panel))}
+.sq.go{background:color-mix(in srgb, var(--good) 25%, var(--panel))}
+.sq.jail{background:color-mix(in srgb, var(--proteins) 18%, var(--panel))}
+.sq.park{background:color-mix(in srgb, var(--nucleic) 18%, var(--panel))}
+.sq.bonus{background:color-mix(in srgb, var(--atp) 40%, var(--panel))}
+.sq[data-here="true"]::before{content:""; position:absolute; inset:2px; border-radius:8px; border:3px solid var(--ink); pointer-events:none}
+.token-chip{position:absolute; bottom:1px; left:50%; transform:translateX(-50%); font-size:1rem; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.4)); z-index:2}
+.sq.setdone .lbl{color:var(--good)}
+.board-center{grid-column:2 / 6; grid-row:2 / 6; background:var(--mat); border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:12px; color:var(--mat-ink); text-align:center}
+.token{font-size:clamp(1.6rem,5vw,2.2rem); line-height:1}
+.die-face{font-size:clamp(2.6rem,9vw,3.6rem); line-height:1}
+.roll-row{display:flex; flex-direction:column; align-items:center; gap:8px}
+.pos-note{font-size:.74rem; color:var(--mat-muted); max-width:22ch}
+.die-face.rolling{animation:spin .55s steps(6) infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.die-face.rolling{animation:none}}
+.progress-line{font-size:.78rem; color:var(--mat-muted)}
+
+.board-legend{display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:center; font-size:.78rem; color:var(--muted); max-width:640px}
+.board-legend span{display:flex; align-items:center; gap:6px}
+.board-legend i{width:12px; height:12px; border-radius:4px; flex:none}
+
+@media (max-width:520px){
+  .sq .lbl{font-size:.4rem}
+  .sq.corner .lbl{font-size:.46rem}
+}
+
+/* ================= OVERLAY (module + challenge) ================= */
+.overlay-back{position:fixed; inset:0; background:rgba(10,16,15,.55); z-index:40; display:flex; align-items:flex-start; justify-content:center; overflow-y:auto; padding:18px 10px 40px}
+.overlay-card{background:var(--bg); border-radius:22px; max-width:1080px; width:100%; padding:20px 18px 30px; position:relative; margin-top:10px}
+.overlay-close{position:absolute; top:14px; right:14px; width:36px; height:36px; border-radius:50%; border:1.5px solid var(--line); background:var(--panel); cursor:pointer; font-size:1.1rem}
+.lo-head{padding-right:44px; margin-bottom:6px}
+.lo-kicker{font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent)}
+.lo-title{font-size:clamp(1.4rem,4vw,1.9rem); font-weight:800; margin-top:2px}
+.lo-hook{margin-top:8px; font-size:.94rem; max-width:70ch; background:color-mix(in srgb, var(--accent) 12%, transparent); border-radius:12px; padding:10px 12px}
+.lo-goals{list-style:none; margin:14px 0 0; display:flex; flex-direction:column; gap:6px}
+.lo-goals li{display:grid; grid-template-columns:22px 1fr; gap:8px; align-items:start; font-size:.9rem}
+.lo-goals .box{width:20px; height:20px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:.72rem; margin-top:1px; flex:none}
+.lo-goals li.done .box{background:var(--good); border-color:var(--good); color:#fff}
+.lo-goals li.done .tx{color:var(--muted); text-decoration:line-through; text-decoration-color:var(--good)}
+.lo-timerwrap{margin:12px 0 0}
+.lo-timerbar{height:12px; border-radius:999px; background:var(--line); overflow:hidden}
+.lo-timerbar i{display:block; height:100%; background:var(--atp); transition:width .18s linear}
+.lo-timer-txt{font-size:.8rem; color:var(--muted); margin-top:4px}
+
+/* Lab (reused bench UI) */
+.lab-wrap{margin-top:16px}
 .lab{display:grid; grid-template-columns:290px 1fr; gap:16px; align-items:start}
 .panel{background:var(--panel); border:1.5px solid var(--line); border-radius:18px; padding:16px 18px}
-h2{font-size:1.1rem; font-weight:600; margin:0 0 10px}
-
-/* Shelf */
+h2.pt{font-size:1.1rem; font-weight:600; margin:0 0 10px}
 .shelf-list{display:flex; flex-direction:column; gap:8px}
 .item{display:grid; grid-template-columns:50px 1fr; align-items:center; gap:10px; text-align:left; width:100%; background:transparent; border:1.5px solid var(--line); border-radius:12px; padding:7px 10px 7px 7px; cursor:pointer}
 .item:hover{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, transparent)}
@@ -83,17 +163,10 @@ h2{font-size:1.1rem; font-weight:600; margin:0 0 10px}
 .seg{display:flex; border:1.5px solid var(--line); border-radius:12px; padding:3px; gap:3px; margin-bottom:12px}
 .seg button{flex:1; border:0; border-radius:9px; background:transparent; padding:7px 8px; cursor:pointer; font-weight:500; font-size:.9rem}
 .seg button[aria-pressed="true"]{background:var(--accent); color:var(--on-accent); font-weight:600}
-
-/* Bench */
 .bench-head{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 12px; margin-bottom:6px}
-.bench-head h2{margin:0}
 .tools{display:flex; flex-wrap:wrap; gap:6px}
-.btn{font-size:.82rem; padding:.42rem .8rem; border-radius:999px; border:1.5px solid var(--line); background:var(--panel); cursor:pointer}
-.btn:hover:not(:disabled){border-color:var(--accent)}
-.btn:disabled{opacity:.45; cursor:not-allowed}
-.btn[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
 .howto{margin:0 0 12px; font-size:.88rem; color:var(--muted)}
-.mat{position:relative; background-color:var(--mat); background-image:linear-gradient(var(--mat-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mat-grid) 1px,transparent 1px); background-size:24px 24px; border-radius:16px; min-height:330px; padding:18px; overflow:hidden; color:var(--mat-ink)}
+.mat{position:relative; background-color:var(--mat); background-image:linear-gradient(var(--mat-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mat-grid) 1px,transparent 1px); background-size:24px 24px; border-radius:16px; min-height:300px; padding:18px; overflow:hidden; color:var(--mat-ink)}
 .empty{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; color:var(--mat-muted); font-size:1rem}
 .empty p{max-width:26em; margin:0}
 .mols{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-start}
@@ -107,39 +180,35 @@ h2{font-size:1.1rem; font-weight:600; margin:0 0 10px}
 .cap .kd{font-size:.78rem; color:var(--mat-muted)}
 .sel{font-size:.74rem; border:1px solid rgba(255,255,255,.4); background:transparent; color:var(--mat-ink); border-radius:999px; padding:2px 10px; cursor:pointer}
 .mol.active .sel{background:var(--accent); color:var(--on-accent); border-color:transparent; font-weight:600}
-
 .bond{appearance:none; border:0; background:transparent; width:24px; height:var(--tile-h,64px); position:relative; padding:0; cursor:pointer; flex:none; margin:0 -1px}
 .bond::before{content:""; position:absolute; left:-3px; right:-3px; top:calc(var(--bond-y,32px) - 3px); height:6px; background:#f1f5f3; border-radius:3px; border:1px solid #1b2422}
 .bond.o::after{content:""; position:absolute; left:50%; top:var(--bond-y,32px); width:11px; height:11px; margin:-5.5px 0 0 -5.5px; border-radius:50%; background:#e0463c; border:1.5px solid #1b2422}
 .bond:hover::before,.bond:focus-visible::before{background:repeating-linear-gradient(90deg,#ffb4ab 0 4px,#1b2422 4px 6px)}
 .bond:focus-visible{outline-offset:0}
-
 .lipid-svg{display:block; width:100%; max-width:560px; height:auto}
 .lbond{cursor:pointer}
 .lbond:hover .bline,.lbond:focus-visible .bline{stroke:#ffb4ab; stroke-dasharray:5 3}
 .lbond:focus-visible{outline:none}
 .lbond:focus-visible .bhit{stroke:var(--accent); stroke-width:3}
-
 .hint{min-height:1.5em; margin:10px 2px 0; font-size:.88rem; color:var(--muted)}
 .hint.warn{color:var(--warn); background:var(--warn-bg); border-radius:10px; padding:6px 10px}
 .selected{margin-top:10px; border-left:4px solid var(--accent); padding:4px 0 4px 14px}
 .selected .t{font-weight:600}
 .selected .k{color:var(--muted); font-size:.85rem; margin-left:6px}
 .selected p{margin:4px 0 0; font-size:.92rem; max-width:62ch}
-.selected .sq{font-size:.88rem; letter-spacing:.02em; margin-top:4px; overflow-wrap:anywhere}
-
-/* Water */
+.selected .sq2{font-size:.88rem; letter-spacing:.02em; margin-top:4px; overflow-wrap:anywhere}
 .h2o{position:absolute; pointer-events:none; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:2px; font-size:.72rem; font-weight:700; color:#fff; z-index:5; text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .h2o.out{animation:wout 1.6s ease-out forwards}
 .h2o.in{animation:win 1.1s ease-in forwards}
 @keyframes wout{0%{opacity:0; transform:translate(-50%,-50%) scale(.3)} 15%{opacity:1; transform:translate(-50%,-60%) scale(1.2)} 100%{opacity:0; transform:translate(-50%,-240%) scale(1)}}
 @keyframes win{0%{opacity:0; transform:translate(-50%,-260%) scale(1)} 65%{opacity:1; transform:translate(-50%,-55%) scale(1.1)} 100%{opacity:0; transform:translate(-50%,-50%) scale(.2)}}
-@media (prefers-reduced-motion:reduce){.h2o{display:none}.chip.bump{animation:none}}
-
-/* Lower */
+@media (prefers-reduced-motion:reduce){.h2o{display:none}.bump{animation:none}}
 .lower{display:grid; grid-template-columns:1.25fr 1fr 1fr; gap:16px; margin-top:16px; align-items:start}
-.toast{display:none; background:var(--good-bg); color:var(--good); border-radius:10px; padding:8px 12px; font-weight:600; font-size:.9rem; margin-bottom:10px}
-.toast.show{display:block}
+.lower.lower-2col{grid-template-columns:1.25fr 1fr}
+.ledger{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px}
+.chip{display:flex; align-items:center; gap:8px; background:var(--bg); border:1.5px solid var(--line); border-radius:12px; padding:6px 12px 6px 8px}
+.chip .n{font-size:1.15rem; font-weight:700; line-height:1; min-width:1.2ch}
+.chip .l{font-size:.72rem; color:var(--muted); line-height:1.2; max-width:11em}
 .log{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px}
 .log li{border-top:1px solid var(--line); padding-top:10px; font-size:.88rem; color:var(--muted)}
 .log li:first-child{border-top:0; padding-top:0; color:var(--ink); font-size:1rem}
@@ -151,109 +220,110 @@ h2{font-size:1.1rem; font-weight:600; margin:0 0 10px}
 .wi{display:inline-flex; align-items:center; gap:3px; white-space:nowrap; font-weight:600}
 .arrow{font-weight:700; padding:0 2px}
 .log-empty{color:var(--muted); font-size:.92rem; margin:0}
+.facts dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:.88rem}
+.facts dt{font-weight:600; color:var(--muted)}
+.facts dd{margin:0}
+.factshook{margin:12px 0 0; font-size:.9rem; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--accent) 12%, transparent)}
 
+/* Learn Lab: tabs, challenges list, learning targets, toast (restored from the original prototype) */
+.tabs{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin:0 0 16px}
+.tab{display:flex; align-items:center; gap:9px; flex:none; border:1.5px solid var(--line); background:var(--panel); border-radius:12px; padding:9px 16px 9px 12px; cursor:pointer; font-weight:500}
+.tab svg{flex:none}
+.tab[aria-selected="true"]{border-color:var(--accent); box-shadow:inset 0 -4px 0 var(--accent); font-weight:600}
+.tab:hover{border-color:var(--accent)}
+.toast{display:none; background:var(--good-bg); color:var(--good); border-radius:10px; padding:8px 12px; font-weight:600; font-size:.9rem; margin-bottom:10px}
+.toast.show{display:block}
 .prog{margin:-4px 0 10px; font-size:.85rem; color:var(--muted)}
 .chal{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
 .chal li{display:grid; grid-template-columns:24px 1fr; gap:10px; align-items:start; font-size:.92rem}
 .chal .box{width:22px; height:22px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:.8rem; margin-top:1px}
 .chal li.done .box{background:var(--good); border-color:var(--good); color:var(--panel)}
 .chal li.done .tx{color:var(--muted); text-decoration:line-through; text-decoration-color:var(--good)}
-
-.facts dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:.88rem}
-.facts dt{font-weight:600; color:var(--muted)}
-.facts dd{margin:0}
-.hook{margin:12px 0 0; font-size:.9rem; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--accent) 12%, transparent)}
-
 .targets{margin-top:16px}
 .targets ul{margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(3,1fr); gap:10px 18px; font-size:.9rem}
 .targets li{padding-left:14px; border-left:3px solid var(--line)}
+@media (max-width:820px){ .targets ul{grid-template-columns:1fr} }
+
+/* Home screen + shared screen nav */
+.home-cards{display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:820px; margin:40px auto}
+.home-card{background:var(--panel); border:1.5px solid var(--line); border-radius:22px; padding:32px 24px; text-align:center; cursor:pointer}
+.home-card:hover{border-color:var(--accent)}
+.home-card .hc-ic{font-size:2.6rem}
+.home-card h2{font-size:1.3rem; margin-top:8px}
+.home-card p{color:var(--muted); margin-top:8px; font-size:.92rem}
+@media (max-width:640px){ .home-cards{grid-template-columns:1fr} }
+.scr-nav{display:flex; gap:8px; flex-wrap:wrap}
+.navpill{border:1.5px solid var(--line); background:var(--panel); border-radius:999px; padding:.5rem 1rem; cursor:pointer; font-weight:600; font-size:.88rem}
+.navpill:hover{border-color:var(--accent)}
+.navpill.active{background:var(--accent); color:var(--on-accent); border-color:var(--accent)}
+
+/* Quiz */
+.quiz{margin-top:18px; border-top:2px dashed var(--line); padding-top:16px}
+.quiz-prog{font-size:.8rem; color:var(--muted); margin-bottom:8px; font-weight:600}
+.quiz-q{font-size:1.05rem; font-weight:700; margin-bottom:12px}
+.quiz-opts{display:flex; flex-direction:column; gap:8px}
+.qopt{text-align:left; border:1.5px solid var(--line); background:var(--panel); border-radius:12px; padding:.7rem .9rem; cursor:pointer; font-size:.94rem}
+.qopt:hover:not(:disabled){border-color:var(--accent)}
+.qopt.correct{border-color:var(--good); background:var(--good-bg); font-weight:600}
+.qopt.wrong{border-color:var(--warn); background:var(--warn-bg)}
+.qopt:disabled{cursor:not-allowed}
+.quiz-fb{margin-top:12px; font-size:.9rem; padding:10px 12px; border-radius:12px}
+.quiz-fb.good{background:var(--good-bg); color:var(--good)}
+.quiz-fb.warn{background:var(--warn-bg); color:var(--warn)}
+.quiz-next{margin-top:14px}
+.module-done{text-align:center; padding:28px 10px}
+.module-done .big{font-size:2.4rem}
+.module-done h3{font-size:1.5rem; margin-top:8px}
+.module-done p{color:var(--muted); margin-top:6px}
+.atp-pop{color:var(--atp-ink); font-weight:800; font-size:1.3rem; margin-top:10px}
+@media (prefers-color-scheme: dark){.atp-pop{color:var(--atp)}}
+
+/* Popup (small info/confirm) */
+.popup-card{max-width:460px}
+.popup-emoji{font-size:2.4rem; text-align:center}
+.popup-txt{text-align:center; margin-top:8px; font-size:.98rem}
+.popup-actions{display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap}
 
 @media (max-width:1020px){
   .lower{grid-template-columns:1fr 1fr}
-  .readout{grid-column:1 / -1}
+  .lower.lower-2col{grid-template-columns:1fr}
+  .lower > .challenges{grid-column:1 / -1}
 }
 @media (max-width:820px){
   .lab{grid-template-columns:1fr}
   .shelf-list{display:grid; grid-template-columns:1fr 1fr}
-  .targets ul{grid-template-columns:1fr}
+  .lower{grid-template-columns:1fr}
 }
 @media (max-width:560px){
-  .wrap{padding:16px 12px 40px}
+  .wrap{padding:14px 10px 40px}
   .shelf-list{grid-template-columns:1fr}
-  .lower{grid-template-columns:1fr}
-  .mat{padding:12px; min-height:280px}
+  .mat{padding:12px; min-height:260px}
   .item .ds{display:none}
   .shelf-list{grid-template-columns:1fr 1fr}
+  .overlay-card{padding:16px 12px 24px; border-radius:16px}
 }
+
+/* Particle celebration */
+.burst{position:fixed; inset:0; pointer-events:none; z-index:60}
+.burst i{position:absolute; width:9px; height:9px; border-radius:3px; top:50%; left:50%; animation:burst .9s ease-out forwards}
+@keyframes burst{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity:0}}
 </style>
 </head>
-<body data-tab="carbs">
-<div class="wrap">
-  <header class="top">
-    <div>
-      <h1>MonoPoly</h1>
-      <p class="tag">Build monomers into polymers. Do not pass GO without releasing a water.</p>
-      <p class="tag2">Build up with dehydration synthesis. Break down with hydrolysis.</p>
-    </div>
-    <div class="ledger">
-      <div class="chip" id="chipOut"><span id="wIconOut"></span><span class="n" id="wOut">0</span><span class="l">water molecules released by building</span></div>
-      <div class="chip" id="chipIn"><span id="wIconIn"></span><span class="n" id="wIn">0</span><span class="l">water molecules used up by breaking</span></div>
-    </div>
-  </header>
-
-  <nav class="tabs" role="tablist" id="tabs" aria-label="Macromolecule type"></nav>
-
-  <main class="lab">
-    <section class="panel shelf" aria-labelledby="shelfTitle">
-      <h2 id="shelfTitle">Monomer shelf</h2>
-      <div id="shelfBody"></div>
-    </section>
-
-    <section class="panel bench" aria-labelledby="benchTitle">
-      <div class="bench-head">
-        <h2 id="benchTitle">Your bench</h2>
-        <div class="tools" id="tools"></div>
-      </div>
-      <p class="howto" id="howto"></p>
-      <div class="mat" id="mat"></div>
-      <p class="hint" id="hint" aria-live="polite"></p>
-      <div class="selected" id="selected"></div>
-    </section>
-  </main>
-
-  <section class="lower">
-    <section class="panel readout" aria-labelledby="rxTitle">
-      <h2 id="rxTitle">What just happened</h2>
-      <div class="toast" id="toast" aria-live="polite"></div>
-      <div id="logWrap" aria-live="polite"></div>
-    </section>
-    <section class="panel challenges" aria-labelledby="chTitle">
-      <h2 id="chTitle">Challenges</h2>
-      <p class="prog" id="prog"></p>
-      <ul class="chal" id="chal"></ul>
-    </section>
-    <section class="panel facts" aria-labelledby="factsTitle">
-      <h2 id="factsTitle">Cheat sheet</h2>
-      <dl id="facts"></dl>
-      <p class="hook" id="hook"></p>
-    </section>
-  </section>
-
-  <section class="panel targets" aria-labelledby="tgTitle">
-    <h2 id="tgTitle">Learning targets</h2>
-    <ul>
-      <li>I can explain how monomers bond into polymers by dehydration synthesis, which releases a water molecule for every bond.</li>
-      <li>I can explain how polymers break back into monomers by hydrolysis, which uses up a water molecule for every bond.</li>
-      <li>I can identify the monomer, polymer, bond, and main job of carbohydrates, proteins, lipids, and nucleic acids.</li>
-    </ul>
-  </section>
-</div>
+<body data-tab="board">
+<div id="app"></div>
 
 <script>
 (function(){
+'use strict';
 const INK = '#1b2422';
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------- Data ---------- */
+/* ============================================================
+   PART 1: shared macromolecule data + SVG tile builders
+   (kept intact from the original MonoPoly lab engine)
+============================================================ */
 const CARB = {
   glu:{name:'Glucose', code:'Glu', n:6, color:'#f2b441', note:'Blood sugar. The fuel your cells burn in cellular respiration.'},
   fru:{name:'Fructose', code:'Fru', n:5, color:'#ef8a3c', note:'Fruit sugar. The sweetest of the three.'},
@@ -271,10 +341,10 @@ const AA = {
   ala:{name:'Alanine', code:'Ala', cls:'np', note:'Nonpolar. Tends to hide inside a folded protein, away from water.'},
   val:{name:'Valine', code:'Val', cls:'np', note:'Nonpolar. Swapping one of these into hemoglobin causes sickle cell disease.'},
   phe:{name:'Phenylalanine', code:'Phe', cls:'np', note:'Nonpolar, with a bulky ring. It is the reason diet soda cans carry a PKU warning.'},
-  ser:{name:'Serine', code:'Ser', cls:'po', note:'Polar. Gets along with water, so it often sits on a protein\u2019s surface.'},
-  cys:{name:'Cysteine', code:'Cys', cls:'po', note:'Polar. Two cysteines can link with a sulfur bridge that locks a protein\u2019s shape.'},
+  ser:{name:'Serine', code:'Ser', cls:'po', note:'Polar. Gets along with water, so it often sits on a protein’s surface.'},
+  cys:{name:'Cysteine', code:'Cys', cls:'po', note:'Polar. Two cysteines can link with a sulfur bridge that locks a protein’s shape.'},
   lys:{name:'Lysine', code:'Lys', cls:'pos', note:'Positively charged side chain. Attracted to negative charges.'},
-  glu:{name:'Glutamic acid', code:'Glu', cls:'neg', note:'Negatively charged side chain. It is the \u201cglutamate\u201d in MSG.'}
+  glu:{name:'Glutamic acid', code:'Glu', cls:'neg', note:'Negatively charged side chain. It is the “glutamate” in MSG.'}
 };
 const BASES = {
   A:{name:'Adenine', color:'#ec6f62'},
@@ -309,25 +379,12 @@ const FACTS = {
   proteins:{rows:[['Monomer','Amino acid (20 kinds)'],['Polymer','Polypeptide, which folds into a protein'],['Bond','Peptide bond'],['Job','Enzymes, muscle, antibodies, transport, signals'],['Elements','C, H, O, N (some S)']],
     hook:'Twenty amino acids can make endless proteins, the way 26 letters make endless words. Change the order and you change the shape, and the shape decides the job.'},
   lipids:{rows:[['Building blocks','Glycerol + fatty acids'],['A polymer?','Not really. Lipids are not long chains of one repeating monomer.'],['Bond','Ester bond'],['Job','Long-term energy storage, insulation, cell membranes, some hormones'],['Elements','C, H, O (plus P in phospholipids)']],
-    hook:'Butter sits in a stick and olive oil pours. Same basic build, but straight tails pack tightly and kinked tails can\u2019t.'},
+    hook:'Butter sits in a stick and olive oil pours. Same basic build, but straight tails pack tightly and kinked tails can’t.'},
   nucleic:{rows:[['Monomer','Nucleotide: phosphate + 5-carbon sugar + nitrogen base'],['Polymer','DNA and RNA'],['Bond','Phosphodiester bond (the sugar-phosphate backbone)'],['Job','Store and pass on genetic instructions, and help build proteins'],['Elements','C, H, O, N, P']],
     hook:'DNA uses deoxyribose sugar and thymine. RNA uses ribose sugar and swaps thymine for uracil.'}
 };
 
-/* ---------- State ---------- */
-let UID = 1; const uid = () => 'm' + (UID++);
-const S = {
-  tab:'carbs',
-  water:{released:0, used:0},
-  tabs:{
-    carbs:{mols:[], active:null, log:[], done:new Set()},
-    proteins:{mols:[], active:null, log:[], done:new Set()},
-    lipids:{glycerol:false, slots:[null,null,null], wasTri:false, log:[], done:new Set()},
-    nucleic:{mols:[], active:null, log:[], done:new Set(), mode:'DNA', complement:false}
-  }
-};
-
-/* ---------- Naming ---------- */
+/* ---------- naming ---------- */
 function nameCarb(u){
   const n = u.length;
   if(n === 1){ const m = CARB[u[0]]; return {name:m.name, kind:'Monosaccharide', note:m.note, eq:m.name}; }
@@ -339,13 +396,13 @@ function nameCarb(u){
       'gal+glu':['Lactose','Milk sugar. People who are lactose intolerant are short on lactase, the enzyme that runs hydrolysis on this bond.']
     };
     if(map[k]) return {name:map[k][0], kind:'Disaccharide', note:map[k][1], eq:map[k][0]};
-    return {name:'Disaccharide', kind:'Two sugars', note:'Two sugars joined by one glycosidic bond. Not one you\u2019ll find on a nutrition label, but the chemistry works.', eq:'Disaccharide'};
+    return {name:'Disaccharide', kind:'Two sugars', note:'Two sugars joined by one glycosidic bond.', eq:'Disaccharide'};
   }
   if(u.every(x => x === 'glu')) return {name:'Polysaccharide', kind:n + ' glucose', note:'A glucose chain. Starch (plants), glycogen (your liver and muscles), and cellulose (plant cell walls) are all built from glucose. The real ones run thousands long.', eq:'Polysaccharide (' + n + ' glucose)'};
-  return {name:'Polysaccharide', kind:n + ' mixed sugars', note:'A mixed sugar chain. The famous polysaccharides are pure glucose, but mixed chains exist too.', eq:'Polysaccharide (' + n + ' sugars)'};
+  return {name:'Polysaccharide', kind:n + ' mixed sugars', note:'A mixed sugar chain.', eq:'Polysaccharide (' + n + ' sugars)'};
 }
 function nameProt(u){
-  const n = u.length, seq = u.map(k => AA[k].code).join('\u2013');
+  const n = u.length, seq = u.map(k => AA[k].code).join('–');
   if(n === 1){ const a = AA[u[0]]; return {name:a.name, kind:'Amino acid', note:a.note, eq:a.name}; }
   if(n === 2) return {name:'Dipeptide', kind:'2 amino acids', note:'Two amino acids joined by one peptide bond.', seq, eq:'Dipeptide (' + seq + ')'};
   return {name:'Polypeptide', kind:n + ' amino acids', seq, eq:'Polypeptide (' + n + ' amino acids)',
@@ -358,7 +415,7 @@ function nameNuc(u){
     return {name:B.name + ' nucleotide', kind:s + ' nucleotide', note:'Phosphate + ' + (s === 'DNA' ? 'deoxyribose' : 'ribose') + ' + ' + B.name.toLowerCase() + '. Every nucleotide has the same three parts.', eq:B.name + ' nucleotide'};
   }
   const seq = u.map(x => x.b).join('');
-  return {name:s + ' strand', kind:n + ' nucleotides', seq:'5\u2032-' + seq + '-3\u2032', eq:s + ' strand (' + n + ' nucleotides)',
+  return {name:s + ' strand', kind:n + ' nucleotides', seq:'5′-' + seq + '-3′', eq:s + ' strand (' + n + ' nucleotides)',
     note: s === 'DNA' ? 'One strand of DNA. Real DNA pairs two strands into a double helix. Try showing the matching strand.' : 'A strand of RNA. RNA is usually single-stranded and carries a working copy of a gene.'};
 }
 function describe(tab, u){ return tab === 'carbs' ? nameCarb(u) : tab === 'proteins' ? nameProt(u) : nameNuc(u); }
@@ -378,41 +435,11 @@ function nameLipid(L){
   }
   if(fa.length === 1) return {name:'Monoglyceride', kind:'1 fatty acid', note:'Glycerol with one tail. Two spots still open.', eq:'Monoglyceride'};
   if(fa.length === 2) return {name:'Diglyceride', kind:'2 fatty acids', note:'Glycerol with two tails. One spot still open.', eq:'Diglyceride'};
-  if(fa.every(x => x === 'sat')) return {name:'Saturated fat', kind:'Triglyceride', note:'Straight tails stack tightly, so it\u2019s solid at room temperature. Think butter or lard.', eq:'Triglyceride (saturated fat)'};
-  if(fa.every(x => x === 'unsat')) return {name:'Unsaturated fat (oil)', kind:'Triglyceride', note:'Kinked tails can\u2019t pack tightly, so it stays liquid at room temperature. Think olive or canola oil.', eq:'Triglyceride (oil)'};
+  if(fa.every(x => x === 'sat')) return {name:'Saturated fat', kind:'Triglyceride', note:'Straight tails stack tightly, so it’s solid at room temperature. Think butter or lard.', eq:'Triglyceride (saturated fat)'};
+  if(fa.every(x => x === 'unsat')) return {name:'Unsaturated fat (oil)', kind:'Triglyceride', note:'Kinked tails can’t pack tightly, so it stays liquid at room temperature. Think olive or canola oil.', eq:'Triglyceride (oil)'};
   return {name:'Mixed triglyceride', kind:'Triglyceride', note:'Most real fats are a blend of saturated and unsaturated tails.', eq:'Triglyceride (mixed)'};
 }
-
-/* ---------- Challenges ---------- */
 const anyMol = (T, f) => T.mols.some(m => f(m.units));
-const CHALLENGES = {
-  carbs:[
-    {t:'Build table sugar (sucrose).', test:T => anyMol(T, u => nameCarb(u).name === 'Sucrose')},
-    {t:'Build milk sugar (lactose).', test:T => anyMol(T, u => nameCarb(u).name === 'Lactose')},
-    {t:'Build maltose.', test:T => anyMol(T, u => nameCarb(u).name === 'Maltose')},
-    {t:'Build a starch-style chain of 5 or more glucose.', test:T => anyMol(T, u => u.length >= 5 && u.every(x => x === 'glu'))},
-    {t:'Digest it: hydrolyze a disaccharide back into two monosaccharides.', test:(T, ev) => ev && ev.type === 'hyd' && ev.len === 2}
-  ],
-  proteins:[
-    {t:'Build any dipeptide.', test:T => anyMol(T, u => u.length === 2)},
-    {t:'Build a polypeptide with 6 or more amino acids.', test:T => anyMol(T, u => u.length >= 6)},
-    {t:'Build this exact sequence: Met\u2013Gly\u2013Lys\u2013Phe.', test:T => anyMol(T, u => u.join('-') === 'met-gly-lys-phe')},
-    {t:'Same parts, new order: build Phe\u2013Lys\u2013Gly\u2013Met. Is it the same protein?', test:T => anyMol(T, u => u.join('-') === 'phe-lys-gly-met')},
-    {t:'Digest it: break a peptide bond in a chain of 3 or more.', test:(T, ev) => ev && ev.type === 'hyd' && ev.len >= 3}
-  ],
-  lipids:[
-    {t:'Build a butter-style fat with 3 saturated tails.', test:T => { const d = nameLipid(T); return d && d.name === 'Saturated fat'; }},
-    {t:'Build an olive-oil-style fat with 3 unsaturated tails.', test:T => { const d = nameLipid(T); return d && d.name === 'Unsaturated fat (oil)'; }},
-    {t:'Build a phospholipid for a cell membrane.', test:T => { const d = nameLipid(T); return d && d.name === 'Phospholipid'; }},
-    {t:'Digest a triglyceride all the way back to glycerol + 3 fatty acids.', test:(T, ev) => ev && ev.type === 'digestedTri'}
-  ],
-  nucleic:[
-    {t:'Build a DNA strand with 6 or more nucleotides.', test:T => anyMol(T, u => u[0].s === 'DNA' && u.length >= 6)},
-    {t:'Build an RNA strand (2 or more) that includes uracil.', test:T => anyMol(T, u => u[0].s === 'RNA' && u.length >= 2 && u.some(x => x.b === 'U'))},
-    {t:'Build DNA containing ATGC, then show its matching strand.', test:T => T.complement && anyMol(T, u => u[0].s === 'DNA' && u.map(x => x.b).join('').includes('ATGC'))},
-    {t:'Break a phosphodiester bond in the backbone.', test:(T, ev) => ev && ev.type === 'hyd'}
-  ]
-};
 
 /* ---------- SVG builders ---------- */
 function polyPts(cx, cy, r, n, rot){
@@ -421,7 +448,6 @@ function polyPts(cx, cy, r, n, rot){
   return p;
 }
 const ptsStr = P => P.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
-
 function waterSVG(w){
   w = w || 34; const h = Math.round(w * 30 / 40);
   return '<svg viewBox="0 0 40 30" width="' + w + '" height="' + h + '" aria-hidden="true">' +
@@ -445,7 +471,7 @@ function carbTile(id, size){
 function aaTile(id, size){
   size = size || 64;
   const a = AA[id], c = AACLS[a.cls];
-  const charge = a.cls === 'pos' ? '+' : a.cls === 'neg' ? '\u2212' : '';
+  const charge = a.cls === 'pos' ? '+' : a.cls === 'neg' ? '−' : '';
   return '<svg class="tile" viewBox="0 0 64 64" width="' + size + '" height="' + size + '" aria-hidden="true">' +
     '<circle cx="32" cy="32" r="25" fill="' + c.color + '" stroke="' + INK + '" stroke-width="2.5"/>' +
     '<ellipse cx="23" cy="20" rx="8" ry="4.5" fill="#fff" opacity=".45"/>' +
@@ -513,7 +539,7 @@ function lipidMini(kind){
     const off = i % 2 === 0 ? -4 : 4;
     pts.push([bx - Math.sin(ang) * off, by + Math.cos(ang) * off]);
   }
-  return open + '<rect x="0" y="0" width="60" height="40" rx="8" fill="' + '#1f5a52' + '"/><polyline points="' + ptsStr(pts) + '" fill="none" stroke="#f5f0dc" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  return open + '<rect x="0" y="0" width="60" height="40" rx="8" fill="#1f5a52"/><polyline points="' + ptsStr(pts) + '" fill="none" stroke="#f5f0dc" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>';
 }
 function lipidSVG(L, d){
   const rows = [48, 128, 208], W = 460, H = 262;
@@ -559,67 +585,225 @@ function tabIcon(k){
   if(k === 'lipids') return o + '<polyline points="2,8 6,14 10,8 14,14 18,8 21,12" fill="none" stroke="#c2b12c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>';
   return o + '<circle cx="5" cy="7" r="4" fill="#f2c14e" stroke="' + INK + '" stroke-width="1.4"/><polygon points="' + ptsStr(polyPts(14, 7, 5.5, 5, -90)) + '" fill="#c9d4f5" stroke="' + INK + '" stroke-width="1.4"/><rect x="10" y="13" width="8" height="8" rx="2" fill="#ec6f62" stroke="' + INK + '" stroke-width="1.4"/></svg>';
 }
-const wi = n => '<span class="wi">' + waterSVG(22) + (n > 1 ? n + ' ' : '') + 'H\u2082O</span>';
-const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wi = n => '<span class="wi">' + waterSVG(22) + (n > 1 ? n + ' ' : '') + 'H₂O</span>';
 
-/* ---------- Rendering ---------- */
-const $ = id => document.getElementById(id);
+/* ============================================================
+   PART 2: lab engine state + build/break actions + rendering
+   (this is the reused "bench" mechanic — every module and every
+   enzyme challenge mounts this same component, scoped to one tab)
+============================================================ */
+let UID = 1; const uid = () => 'm' + (UID++);
+function freshTabs(){
+  return {
+    carbs:{mols:[], active:null, log:[]},
+    proteins:{mols:[], active:null, log:[]},
+    lipids:{glycerol:false, slots:[null,null,null], wasTri:false, log:[]},
+    nucleic:{mols:[], active:null, log:[], mode:'DNA', complement:false}
+  };
+}
+const LAB = { tab:'carbs', tabs: freshTabs(), water:{released:0, used:0}, active:false, onGoalProgress:null };
 
-function renderTabs(){
-  $('tabs').innerHTML = Object.keys(TABS).map(k =>
-    '<button class="tab" role="tab" data-tab="' + k + '" data-fk="tab-' + k + '" aria-selected="' + (S.tab === k) + '">' + tabIcon(k) + TABS[k].label + '</button>'
-  ).join('');
+function pushLog(e){ const T = LAB.tabs[LAB.tab]; T.log.unshift(e); if(T.log.length > 12) T.log.pop(); }
+function bump(id){ const el = $(id); if(!el) return; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+
+function centerOf(el){
+  if(!el) return null;
+  const matEl = $('mat'); if(!matEl) return null;
+  const m = matEl.getBoundingClientRect(), r = el.getBoundingClientRect();
+  let cy = r.top + r.height / 2;
+  if(el.classList && el.classList.contains('bond')){
+    const by = parseFloat(getComputedStyle(el).getPropertyValue('--bond-y')) || r.height / 2;
+    cy = r.top + by;
+  }
+  return {x:r.left + r.width / 2 - m.left, y:cy - m.top};
+}
+function spawnWater(pos, dir, delay){
+  if(!pos || reduceMotion) return;
+  setTimeout(() => {
+    const matEl = $('mat'); if(!matEl) return;
+    const w = document.createElement('div');
+    w.className = 'h2o ' + dir;
+    w.style.left = pos.x + 'px'; w.style.top = pos.y + 'px';
+    w.innerHTML = waterSVG(38) + '<span>H₂O</span>';
+    matEl.appendChild(w);
+    setTimeout(() => w.remove(), 1800);
+  }, delay || 0);
 }
 
+/* ---------- actions: linear polymers (carbs / proteins / nucleic) ---------- */
+function addLinear(key){
+  const t = LAB.tab, T = LAB.tabs[t];
+  const unit = t === 'nucleic' ? {b:key, s:T.mode} : key;
+  let mol = T.mols.find(m => m.id === T.active);
+  if(!mol){
+    if(T.mols.length >= 6){ warnLab('The bench holds 6 molecules. Remove one or clear the bench to make room.'); return; }
+    mol = {id:uid(), units:[unit]}; T.mols.push(mol); T.active = mol.id;
+    renderLab(); afterAction({type:'place'}); return;
+  }
+  if(t === 'nucleic' && mol.units[0].s !== unit.s){ warnLab('DNA and RNA nucleotides don’t mix in one strand. Tap “Start a new molecule” first.'); return; }
+  if(mol.units.length >= 12){ warnLab('That chain hit the bench limit of 12. Start a new molecule to keep building.'); return; }
+  const before = describe(t, mol.units).eq;
+  mol.units.push(unit);
+  const after = describe(t, mol.units).eq;
+  LAB.water.released++;
+  pushLog({type:'syn', left:[before, monoName(t, unit)], right:[after], n:1});
+  renderLab(); bump('chipOut'); playSfx('build');
+  spawnWater(centerOf(document.querySelector('[data-bond="' + mol.id + '-' + (mol.units.length - 2) + '"]')), 'out');
+  afterAction({type:'syn'});
+}
+function breakBond(molId, i){
+  const t = LAB.tab, T = LAB.tabs[t];
+  const idx = T.mols.findIndex(m => m.id === molId); if(idx < 0) return;
+  const mol = T.mols[idx];
+  const pos = centerOf(document.querySelector('[data-bond="' + molId + '-' + i + '"]'));
+  const len = mol.units.length;
+  const before = describe(t, mol.units).eq;
+  const left = mol.units.slice(0, i + 1), right = mol.units.slice(i + 1);
+  if(T.mols.length >= 10){ warnLab('The bench is crowded. Remove a molecule before breaking more apart.'); return; }
+  mol.units = left;
+  T.mols.splice(idx + 1, 0, {id:uid(), units:right});
+  LAB.water.used++;
+  pushLog({type:'hyd', left:[before], right:[describe(t, left).eq, describe(t, right).eq], n:1});
+  renderLab(); bump('chipIn'); spawnWater(pos, 'in'); playSfx('break');
+  afterAction({type:'hyd', len});
+}
+function breakAllLinear(){
+  const t = LAB.tab, T = LAB.tabs[t];
+  const idx = T.mols.findIndex(m => m.id === T.active); if(idx < 0) return;
+  const mol = T.mols[idx], n = mol.units.length - 1; if(n < 1) return;
+  if(T.mols.length + n > 16){ warnLab('Breaking every bond would overflow the bench. Remove a molecule first.'); return; }
+  const positions = [];
+  for(let i = 0; i < n; i++) positions.push(centerOf(document.querySelector('[data-bond="' + mol.id + '-' + i + '"]')));
+  const before = describe(t, mol.units).eq;
+  const len = mol.units.length;
+  const pieces = mol.units.map(u => ({id:uid(), units:[u]}));
+  T.mols.splice(idx, 1, ...pieces);
+  T.active = pieces[0].id;
+  LAB.water.used += n;
+  const names = mol.units.map(u => monoName(t, u));
+  pushLog({type:'hyd', left:[before], right:names.length > 4 ? [names.length + ' monomers'] : names, n});
+  renderLab(); bump('chipIn'); playSfx('break');
+  positions.forEach((p, k) => spawnWater(p, 'in', k * 110));
+  afterAction({type:'hyd', len});
+}
+
+/* ---------- actions: lipids ---------- */
+function addLipid(key){
+  const L = LAB.tabs.lipids;
+  if(key === 'glycerol'){
+    if(L.glycerol){ warnLab('One glycerol at a time. Clear the bench to start a new lipid.'); return; }
+    L.glycerol = true; renderLab(); afterAction({type:'place'}); return;
+  }
+  if(!L.glycerol){ warnLab('Start with a glycerol backbone. Fatty acids and phosphates need something to bond to.'); return; }
+  let slot;
+  if(key === 'phos'){
+    if(L.slots[2]){ warnLab('Carbon 3 is taken, and phosphate only bonds to carbon 3. Break that bond first.'); return; }
+    slot = 2;
+  } else {
+    slot = L.slots.findIndex(s => !s);
+    if(slot < 0){ warnLab('All three carbons are bonded. Break a bond to swap a piece.'); return; }
+  }
+  const before = nameLipid(L).eq;
+  L.slots[slot] = key;
+  const after = nameLipid(L);
+  if(L.slots.filter(s => s === 'sat' || s === 'unsat').length === 3) L.wasTri = true;
+  LAB.water.released++;
+  pushLog({type:'syn', left:[before, LIPID_PARTS[key].name], right:[after.eq], n:1});
+  renderLab(); bump('chipOut'); playSfx('build');
+  spawnWater(centerOf(document.querySelector('[data-lbond="' + slot + '"] circle')), 'out');
+  afterAction({type:'syn'});
+}
+function breakLipid(i){
+  const L = LAB.tabs.lipids; if(!L.slots[i]) return;
+  const pos = centerOf(document.querySelector('[data-lbond="' + i + '"] circle'));
+  const before = nameLipid(L).eq, piece = L.slots[i];
+  L.slots[i] = null;
+  LAB.water.used++;
+  pushLog({type:'hyd', left:[before], right:[nameLipid(L).eq, LIPID_PARTS[piece].name], n:1});
+  renderLab(); bump('chipIn'); spawnWater(pos, 'in'); playSfx('break');
+  lipidDigestCheck();
+}
+function breakAllLipid(){
+  const L = LAB.tabs.lipids;
+  const filled = L.slots.map((s, i) => s ? i : -1).filter(i => i >= 0); if(!filled.length) return;
+  const positions = filled.map(i => centerOf(document.querySelector('[data-lbond="' + i + '"] circle')));
+  const before = nameLipid(L).eq, parts = filled.map(i => LIPID_PARTS[L.slots[i]].name);
+  L.slots = [null, null, null];
+  LAB.water.used += filled.length;
+  pushLog({type:'hyd', left:[before], right:['Glycerol'].concat(parts), n:filled.length});
+  renderLab(); bump('chipIn'); playSfx('break');
+  positions.forEach((p, k) => spawnWater(p, 'in', k * 110));
+  lipidDigestCheck();
+}
+function lipidDigestCheck(){
+  const L = LAB.tabs.lipids;
+  if(L.wasTri && !L.slots.some(Boolean)){ L.wasTri = false; afterAction({type:'digestedTri'}); }
+  else afterAction({type:'hyd'});
+}
+function afterAction(ev){ if(typeof LAB.onGoalProgress === 'function') LAB.onGoalProgress(ev); }
+
+/* ---------- lab rendering ---------- */
+function defaultHint(){
+  const t = LAB.tab, T = LAB.tabs[t];
+  if(t === 'lipids') return T.glycerol ? 'Every part you attach releases one water molecule. Three tails means three waters.' : '';
+  if(!T.mols.length) return '';
+  if(!T.active) return 'No molecule selected. The next monomer you tap will start a new molecule.';
+  return 'The outlined molecule is selected. New monomers bond onto its end.';
+}
+let hintTimer = null;
+function renderHint(){ const el = $('hint'); if(!el) return; el.className = 'hint'; el.textContent = defaultHint(); }
+function warnLab(msg){
+  const el = $('hint'); if(!el) return; clearTimeout(hintTimer);
+  el.className = 'hint warn'; el.textContent = msg;
+  hintTimer = setTimeout(renderHint, 4200);
+}
 function renderShelf(){
-  const t = S.tab, T = S.tabs[t];
-  $('shelfTitle').textContent = TABS[t].shelf;
+  const t = LAB.tab, T = LAB.tabs[t];
+  const titleEl = $('shelfTitle'); if(titleEl) titleEl.textContent = TABS[t].shelf;
   let h = '';
   if(t === 'carbs'){
     h = '<div class="shelf-list">' + Object.keys(CARB).map(k =>
-      '<button class="item" data-add="' + k + '" data-fk="add-' + k + '"><span class="ic">' + carbTile(k, 44) + '</span><span><span class="nm">' + CARB[k].name + '</span><span class="ds">' + CARB[k].note + '</span></span></button>'
+      '<button class="item" data-add="' + k + '"><span class="ic">' + carbTile(k, 44) + '</span><span><span class="nm">' + CARB[k].name + '</span><span class="ds">' + CARB[k].note + '</span></span></button>'
     ).join('') + '</div><p class="shelf-note">The red dot is the oxygen in each sugar ring. Glucose and galactose are 6-sided rings; fructose is a 5-sided ring.</p>';
   } else if(t === 'proteins'){
     h = '<div class="shelf-list">' + Object.keys(AA).map(k =>
-      '<button class="item" data-add="' + k + '" data-fk="add-' + k + '"><span class="ic">' + aaTile(k, 42) + '</span><span><span class="nm">' + AA[k].name + ' (' + AA[k].code + ')</span><span class="ds">' + AACLS[AA[k].cls].short + ' side chain</span></span></button>'
+      '<button class="item" data-add="' + k + '"><span class="ic">' + aaTile(k, 42) + '</span><span><span class="nm">' + AA[k].name + ' (' + AA[k].code + ')</span><span class="ds">' + AACLS[AA[k].cls].short + ' side chain</span></span></button>'
     ).join('') + '</div><div class="legend">' + Object.keys(AACLS).map(c => '<span><i style="background:' + AACLS[c].color + '"></i>' + AACLS[c].short + '</span>').join('') + '</div>' +
     '<p class="shelf-note">Your body uses 20 amino acids. Here are 9 of them, colored by what their side chain (R group) does around water.</p>';
   } else if(t === 'lipids'){
     h = '<div class="shelf-list">' + Object.keys(LIPID_PARTS).map(k =>
-      '<button class="item" data-add="' + k + '" data-fk="add-' + k + '"><span class="ic">' + lipidMini(k) + '</span><span><span class="nm">' + LIPID_PARTS[k].name + '</span><span class="ds">' + LIPID_PARTS[k].note + '</span></span></button>'
-    ).join('') + '</div><p class="shelf-note">Lipids are the odd one out: they aren\u2019t built as long chains of repeating monomers, but they still bond by dehydration synthesis.</p>';
+      '<button class="item" data-add="' + k + '"><span class="ic">' + lipidMini(k) + '</span><span><span class="nm">' + LIPID_PARTS[k].name + '</span><span class="ds">' + LIPID_PARTS[k].note + '</span></span></button>'
+    ).join('') + '</div><p class="shelf-note">Lipids are the odd one out: they aren’t built as long chains of repeating monomers, but they still bond by dehydration synthesis.</p>';
   } else {
     const bases = T.mode === 'DNA' ? ['A','T','G','C'] : ['A','U','G','C'];
     h = '<div class="seg" role="group" aria-label="Nucleotide type">' +
-      ['DNA','RNA'].map(m => '<button data-mode="' + m + '" data-fk="mode-' + m + '" aria-pressed="' + (T.mode === m) + '">' + m + ' nucleotides</button>').join('') + '</div>' +
+      ['DNA','RNA'].map(m => '<button data-mode="' + m + '" aria-pressed="' + (T.mode === m) + '">' + m + ' nucleotides</button>').join('') + '</div>' +
       '<div class="shelf-list">' + bases.map(b =>
-        '<button class="item" data-add="' + b + '" data-fk="add-' + b + '"><span class="ic">' + nucTile({b, s:T.mode}, false, 36) + '</span><span><span class="nm">' + BASES[b].name + ' (' + b + ')</span><span class="ds">Phosphate + ' + (T.mode === 'DNA' ? 'deoxyribose (dR)' : 'ribose (R)') + ' + ' + BASES[b].name.toLowerCase() + '</span></span></button>'
+        '<button class="item" data-add="' + b + '"><span class="ic">' + nucTile({b, s:T.mode}, false, 36) + '</span><span><span class="nm">' + BASES[b].name + ' (' + b + ')</span><span class="ds">Phosphate + ' + (T.mode === 'DNA' ? 'deoxyribose (dR)' : 'ribose (R)') + ' + ' + BASES[b].name.toLowerCase() + '</span></span></button>'
       ).join('') + '</div><p class="shelf-note">' + (T.mode === 'DNA' ? 'DNA uses thymine (T). Switch to RNA to swap in uracil (U).' : 'RNA uses uracil (U) where DNA uses thymine (T).') + '</p>';
   }
-  $('shelfBody').innerHTML = h;
+  const body = $('shelfBody'); if(body) body.innerHTML = h;
 }
-
 function renderTools(){
-  const t = S.tab, T = S.tabs[t];
+  const t = LAB.tab, T = LAB.tabs[t];
   let h = '';
   if(t === 'lipids'){
     const any = T.slots.some(Boolean);
-    h = '<button class="btn" data-act="breakall" data-fk="act-breakall"' + (any ? '' : ' disabled') + '>Break every bond</button>' +
-        '<button class="btn" data-act="clear" data-fk="act-clear"' + (T.glycerol ? '' : ' disabled') + '>Clear the bench</button>';
+    h = '<button class="btn" data-act="breakall"' + (any ? '' : ' disabled') + '>Break every bond</button>' +
+        '<button class="btn" data-act="clear"' + (T.glycerol ? '' : ' disabled') + '>Clear the bench</button>';
   } else {
     const act = T.mols.find(m => m.id === T.active);
-    h = '<button class="btn" data-act="new" data-fk="act-new"' + (T.active ? '' : ' disabled') + '>Start a new molecule</button>' +
-        '<button class="btn" data-act="breakall" data-fk="act-breakall"' + (act && act.units.length > 1 ? '' : ' disabled') + '>Break every bond</button>' +
-        '<button class="btn" data-act="remove" data-fk="act-remove"' + (act ? '' : ' disabled') + '>Remove selected</button>' +
-        '<button class="btn" data-act="clear" data-fk="act-clear"' + (T.mols.length ? '' : ' disabled') + '>Clear the bench</button>';
-    if(t === 'nucleic') h += '<button class="btn" data-act="comp" data-fk="act-comp" aria-pressed="' + T.complement + '">Show matching strand</button>';
+    h = '<button class="btn" data-act="new"' + (T.active ? '' : ' disabled') + '>Start a new molecule</button>' +
+        '<button class="btn" data-act="breakall"' + (act && act.units.length > 1 ? '' : ' disabled') + '>Break every bond</button>' +
+        '<button class="btn" data-act="remove"' + (act ? '' : ' disabled') + '>Remove selected</button>' +
+        '<button class="btn" data-act="clear"' + (T.mols.length ? '' : ' disabled') + '>Clear the bench</button>';
+    if(t === 'nucleic') h += '<button class="btn" data-act="comp" aria-pressed="' + T.complement + '">Show matching strand</button>';
   }
-  $('tools').innerHTML = h;
-  $('howto').textContent = TABS[t].howto;
+  const tools = $('tools'); if(tools) tools.innerHTML = h;
+  const howto = $('howto'); if(howto) howto.textContent = TABS[t].howto;
 }
-
 function renderMat(){
-  const t = S.tab, T = S.tabs[t], mat = $('mat');
+  const t = LAB.tab, T = LAB.tabs[t], mat = $('mat'); if(!mat) return;
   if(t === 'lipids'){
     if(!T.glycerol){ mat.innerHTML = '<div class="empty"><p>Start with a glycerol backbone from the shelf. Fatty acids need something to hold onto.</p></div>'; return; }
     mat.innerHTML = lipidSVG(T, nameLipid(T));
@@ -649,9 +833,8 @@ function renderMat(){
   });
   mat.innerHTML = h + '</div>';
 }
-
 function renderSelected(){
-  const t = S.tab, T = S.tabs[t], box = $('selected');
+  const t = LAB.tab, T = LAB.tabs[t], box = $('selected'); if(!box) return;
   let d = null, extra = '';
   if(t === 'lipids') d = nameLipid(T);
   else {
@@ -660,282 +843,1160 @@ function renderSelected(){
       d = describe(t, m.units);
       if(t === 'nucleic' && T.complement && m.units[0].s === 'DNA' && m.units.length > 1) d = Object.assign({}, d, {note:'One strand of DNA, shown with its matching strand. Together they twist into the double helix.'});
       if(t === 'nucleic' && T.complement && m.units[0].s === 'RNA') extra = '<p>RNA is usually single-stranded, so there is no matching strand to show.</p>';
-      if(t === 'nucleic' && T.complement && m.units[0].s === 'DNA' && m.units.length > 1) extra = '<p class="sq">Matching strand: 3\u2032-' + m.units.map(u => PAIR[u.b]).join('') + '-5\u2032. A pairs with T (2 hydrogen bonds), G pairs with C (3).</p>';
+      if(t === 'nucleic' && T.complement && m.units[0].s === 'DNA' && m.units.length > 1) extra = '<p class="sq2">Matching strand: 3′-' + m.units.map(u => PAIR[u.b]).join('') + '-5′. A pairs with T (2 hydrogen bonds), G pairs with C (3).</p>';
     }
   }
   if(!d){ box.style.display = 'none'; return; }
   box.style.display = '';
   box.innerHTML = '<span class="t">' + esc(d.name) + '</span><span class="k">' + esc(d.kind) + '</span>' +
-    (d.seq ? '<div class="sq">' + esc(d.seq) + '</div>' : '') + '<p>' + esc(d.note) + '</p>' + extra;
+    (d.seq ? '<div class="sq2">' + esc(d.seq) + '</div>' : '') + '<p>' + esc(d.note) + '</p>' + extra;
 }
-
-function defaultHint(){
-  const t = S.tab, T = S.tabs[t];
-  if(t === 'lipids') return T.glycerol ? 'Every part you attach releases one water molecule. Three tails means three waters.' : '';
-  if(!T.mols.length) return '';
-  if(!T.active) return 'No molecule selected. The next monomer you tap will start a new molecule.';
-  return 'The outlined molecule is selected. New monomers bond onto its end.';
-}
-let hintTimer = null;
-function renderHint(){ const el = $('hint'); el.className = 'hint'; el.textContent = defaultHint(); }
-function warn(msg){
-  const el = $('hint'); clearTimeout(hintTimer);
-  el.className = 'hint warn'; el.textContent = msg;
-  hintTimer = setTimeout(renderHint, 4200);
-}
-
 function renderLog(){
-  const T = S.tabs[S.tab], bond = TABS[S.tab].bond;
-  if(!T.log.length){ $('logWrap').innerHTML = '<p class="log-empty">Every reaction you run shows up here as an equation. Build something to see your first one.</p>'; return; }
-  $('logWrap').innerHTML = '<ol class="log">' + T.log.slice(0, 5).map(e => {
+  const T = LAB.tabs[LAB.tab], bond = TABS[LAB.tab].bond, wrap = $('logWrap'); if(!wrap) return;
+  if(!T.log.length){ wrap.innerHTML = '<p class="log-empty">Every reaction you run shows up here as an equation. Build something to see your first one.</p>'; return; }
+  wrap.innerHTML = '<ol class="log">' + T.log.slice(0, 5).map(e => {
     const L = e.left.map(esc).join(' + '), R = e.right.map(esc).join(' + ');
     if(e.type === 'syn'){
-      return '<li><span class="rx">Dehydration synthesis</span><span class="eq">' + L + ' <span class="arrow">\u2192</span> ' + R + ' + ' + wi(e.n) + '</span>' +
+      return '<li><span class="rx">Dehydration synthesis</span><span class="eq">' + L + ' <span class="arrow">→</span> ' + R + ' + ' + wi(e.n) + '</span>' +
         '<span class="why">' + (e.n > 1 ? e.n + ' water molecules were' : 'A water molecule was') + ' removed to form ' + (e.n > 1 ? e.n + ' ' + bond + 's' : (/^[aeiou]/.test(bond) ? 'an ' : 'a ') + bond) + '.</span></li>';
     }
-    return '<li><span class="rx">Hydrolysis</span><span class="eq">' + L + ' + ' + wi(e.n) + ' <span class="arrow">\u2192</span> ' + R + '</span>' +
+    return '<li><span class="rx">Hydrolysis</span><span class="eq">' + L + ' + ' + wi(e.n) + ' <span class="arrow">→</span> ' + R + '</span>' +
       '<span class="why">' + (e.n > 1 ? e.n + ' water molecules were' : 'A water molecule was') + ' added to break ' + (e.n > 1 ? e.n + ' ' + bond + 's' : 'the ' + bond) + '.</span></li>';
   }).join('') + '</ol>';
 }
+function renderFacts(){
+  const f = FACTS[LAB.tab];
+  const t1 = $('factsTitle'); if(t1) t1.textContent = TABS[LAB.tab].label + ' cheat sheet';
+  const fb = $('facts'); if(fb) fb.innerHTML = f.rows.map(r => '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>').join('');
+  const hk = $('factshook'); if(hk) hk.textContent = f.hook;
+}
+function renderLedger(){
+  const a = $('wOut'), b = $('wIn'); if(a) a.textContent = LAB.water.released; if(b) b.textContent = LAB.water.used;
+}
+function renderLab(){
+  document.body.dataset.tab = LAB.tab;
+  renderShelf(); renderTools(); renderMat(); renderSelected(); renderHint();
+  renderLog(); renderFacts(); renderLedger();
+}
 
-function renderChallenges(){
-  const t = S.tab, T = S.tabs[t], list = CHALLENGES[t];
-  $('prog').textContent = T.done.size + ' of ' + list.length + ' complete';
-  $('chal').innerHTML = list.map((c, i) => {
-    const done = T.done.has(i);
-    return '<li class="' + (done ? 'done' : '') + '"><span class="box" aria-hidden="true">' + (done ? '\u2713' : '') + '</span><span class="tx">' + c.t + (done ? '<span class="sr" style="position:absolute;left:-9999px"> (done)</span>' : '') + '</span></li>';
+/* ============================================================
+   PART 3: game config — ATP economy, board layout, modules,
+   quizzes, enzyme challenges, and corner-square content
+============================================================ */
+// Teacher Settings passcode — change any time, this is the only place it lives.
+const TEACHER_PASSCODE = 'mustangs';
+
+const CFG = {
+  ATP_PASS_GO: 60, ATP_LAND_GO_BONUS: 25,
+  ATP_WATER_BREAK: 20, ATP_CORNER_BONUS: 20, ATP_DENATURE: 15,
+  ATP_GOAL_STEP: 10, ATP_QUIZ_FIRST: 15, ATP_QUIZ_RETRY: 5,
+  ATP_MODULE_BONUS: 25, ATP_SET_BONUS: 50,
+  ATP_ENZYME_WIN: 30, ATP_ENZYME_LOSE: 5, ENZYME_MS: 13000,
+  ATP_LAB_CHALLENGE: 20,
+  LAB_BASICS_THRESHOLD: 3 // # of a tab's Lab challenges needed to unlock that color group on the board
+};
+
+/* 20-square board loop, clockwise from GO. Grid coords are 1-based
+   row/col on a 6x6 perimeter (see squareGrid()). */
+const SQUARES = [
+  {id:'go', type:'go', label:'GO: ATP Hub'},
+  {id:'glugrove', type:'prop', group:'carbs'},
+  {id:'sucrosest', type:'prop', group:'carbs'},
+  {id:'starchblvd', type:'prop', group:'carbs'},
+  {id:'enz-carbs', type:'enzyme', group:'carbs', label:'Enzyme Alert!'},
+  {id:'denature', type:'jail', label:'Denaturation Station'},
+  {id:'aminoave', type:'prop', group:'proteins'},
+  {id:'peptideplace', type:'prop', group:'proteins'},
+  {id:'foldingfalls', type:'prop', group:'proteins'},
+  {id:'enz-proteins', type:'enzyme', group:'proteins', label:'Enzyme Alert!'},
+  {id:'waterbreak', type:'park', label:'Water Break'},
+  {id:'glycerolgardens', type:'prop', group:'lipids'},
+  {id:'saturationsquare', type:'prop', group:'lipids'},
+  {id:'membranemarina', type:'prop', group:'lipids'},
+  {id:'enz-lipids', type:'enzyme', group:'lipids', label:'Enzyme Alert!'},
+  {id:'atpspin', type:'bonus', label:'ATP Synthase Spin'},
+  {id:'nucleotideknoll', type:'prop', group:'nucleic'},
+  {id:'backbonebay', type:'prop', group:'nucleic'},
+  {id:'helixheights', type:'prop', group:'nucleic'},
+  {id:'enz-nucleic', type:'enzyme', group:'nucleic', label:'Enzyme Alert!'}
+];
+const SQ_GRID = [
+  [6,6],[6,5],[6,4],[6,3],[6,2],[6,1],
+  [5,1],[4,1],[3,1],[2,1],[1,1],
+  [1,2],[1,3],[1,4],[1,5],[1,6],
+  [2,6],[3,6],[4,6],[5,6]
+];
+const GROUPS = {
+  carbs:{label:'Carbohydrates', props:['glugrove','sucrosest','starchblvd']},
+  proteins:{label:'Proteins', props:['aminoave','peptideplace','foldingfalls']},
+  lipids:{label:'Lipids', props:['glycerolgardens','saturationsquare','membranemarina']},
+  nucleic:{label:'Nucleic acids', props:['nucleotideknoll','backbonebay','helixheights']}
+};
+
+/* Restored from the original MonoPoly lab prototype (commit 6c4979f), unchanged.
+   This is the Learn Lab's open-ended challenge list, one array per tab — distinct
+   from MODULES' per-property guided goals above. Completing one now also earns
+   ATP (see labChallengeCheck) and counts toward unlocking that tab's board group
+   (CFG.LAB_BASICS_THRESHOLD). `anyMol` is defined in Part 1. */
+const CHALLENGES = {
+  carbs:[
+    {t:'Build table sugar (sucrose).', test:T => anyMol(T, u => nameCarb(u).name === 'Sucrose')},
+    {t:'Build milk sugar (lactose).', test:T => anyMol(T, u => nameCarb(u).name === 'Lactose')},
+    {t:'Build maltose.', test:T => anyMol(T, u => nameCarb(u).name === 'Maltose')},
+    {t:'Build a starch-style chain of 5 or more glucose.', test:T => anyMol(T, u => u.length >= 5 && u.every(x => x === 'glu'))},
+    {t:'Digest it: hydrolyze a disaccharide back into two monosaccharides.', test:(T, ev) => ev && ev.type === 'hyd' && ev.len === 2}
+  ],
+  proteins:[
+    {t:'Build any dipeptide.', test:T => anyMol(T, u => u.length === 2)},
+    {t:'Build a polypeptide with 6 or more amino acids.', test:T => anyMol(T, u => u.length >= 6)},
+    {t:'Build this exact sequence: Met–Gly–Lys–Phe.', test:T => anyMol(T, u => u.join('-') === 'met-gly-lys-phe')},
+    {t:'Same parts, new order: build Phe–Lys–Gly–Met. Is it the same protein?', test:T => anyMol(T, u => u.join('-') === 'phe-lys-gly-met')},
+    {t:'Digest it: break a peptide bond in a chain of 3 or more.', test:(T, ev) => ev && ev.type === 'hyd' && ev.len >= 3}
+  ],
+  lipids:[
+    {t:'Build a butter-style fat with 3 saturated tails.', test:T => { const d = nameLipid(T); return d && d.name === 'Saturated fat'; }},
+    {t:'Build an olive-oil-style fat with 3 unsaturated tails.', test:T => { const d = nameLipid(T); return d && d.name === 'Unsaturated fat (oil)'; }},
+    {t:'Build a phospholipid for a cell membrane.', test:T => { const d = nameLipid(T); return d && d.name === 'Phospholipid'; }},
+    {t:'Digest a triglyceride all the way back to glycerol + 3 fatty acids.', test:(T, ev) => ev && ev.type === 'digestedTri'}
+  ],
+  nucleic:[
+    {t:'Build a DNA strand with 6 or more nucleotides.', test:T => anyMol(T, u => u[0].s === 'DNA' && u.length >= 6)},
+    {t:'Build an RNA strand (2 or more) that includes uracil.', test:T => anyMol(T, u => u[0].s === 'RNA' && u.length >= 2 && u.some(x => x.b === 'U'))},
+    {t:'Build DNA containing ATGC, then show its matching strand.', test:T => T.complement && anyMol(T, u => u[0].s === 'DNA' && u.map(x => x.b).join('').includes('ATGC'))},
+    {t:'Break a phosphodiester bond in the backbone.', test:(T, ev) => ev && ev.type === 'hyd'}
+  ]
+};
+
+const MODULES = {
+  glugrove:{tab:'carbs', title:'Glucose Grove', sub:'Monosaccharides',
+    hook:'Every candy bar, banana, and mid-race energy gel owes its buzz to one tiny ring: glucose. It’s the single sugar your cells burn for fuel, and it’s the starting block for basically every carb on this board.',
+    goals:[{text:'Place any single monosaccharide (glucose, fructose, or galactose) on the bench.', test:T=>T.mols.some(m=>m.units.length===1)}],
+    quiz:[
+      {q:'What is a monosaccharide?', choices:['A single simple sugar unit','A chain of many sugars','A type of fat','A protein building block'], correct:0,
+        explain:'Mono- means one, and -saccharide means sugar. A monosaccharide is just one simple sugar ring, like glucose.'},
+      {q:'Which of these is NOT a monosaccharide?', choices:['Glucose','Fructose','Sucrose','Galactose'], correct:2,
+        explain:'Sucrose is table sugar — glucose and fructose already bonded together, so it’s a disaccharide, not a monosaccharide.'}
+    ]},
+  sucrosest:{tab:'carbs', title:'Sucrose Street', sub:'Disaccharides + dehydration synthesis',
+    hook:'Table sugar isn’t a monomer at all — it’s glucose and fructose holding hands. Every time two sugars link together, a water molecule gets kicked out. That’s dehydration synthesis: molecular chemistry’s version of packing light.',
+    goals:[{text:'Build sucrose: bond a fructose to a glucose (either order).', test:T=>anyMol(T,u=>nameCarb(u).name==='Sucrose')}],
+    quiz:[
+      {q:'Building sucrose from glucose and fructose releases a...', choices:['Water molecule','Oxygen molecule','Glucose molecule','Nothing'], correct:0,
+        explain:'Joining two monomers with a glycosidic bond is dehydration synthesis — “dehydration” because a water molecule is removed.'},
+      {q:'Lactose (milk sugar) is made from which two monosaccharides?', choices:['Glucose + Fructose','Galactose + Glucose','Fructose + Fructose','Galactose + Fructose'], correct:1,
+        explain:'Lactose = galactose + glucose. Sucrose = glucose + fructose. Maltose = glucose + glucose.'}
+    ]},
+  starchblvd:{tab:'carbs', title:'Starch Boulevard', sub:'Polysaccharides + hydrolysis',
+    hook:'Crackers taste bland at first — then chew one for 30 seconds and it turns sweet. Saliva enzymes are hydrolyzing the starch’s glycosidic bonds, snapping a giant glucose chain into sugary maltose right in your mouth.',
+    goals:[
+      {text:'Build a chain of 5 or more glucose (starch-style).', test:T=>anyMol(T,u=>u.length>=5&&u.every(x=>x==='glu'))},
+      {text:'Digest it — break a bond in the chain (hydrolysis).', test:T=>T.log.some(e=>e.type==='hyd')}
+    ],
+    quiz:[
+      {q:'Starch, glycogen, and cellulose are all polysaccharides built from repeating...', choices:['Glucose','Fructose','Amino acids','Nucleotides'], correct:0,
+        explain:'All three are long chains of glucose monomers — they just branch and bond a little differently from each other.'},
+      {q:'Digesting starch back into sugars is an example of...', choices:['Hydrolysis','Dehydration synthesis','Denaturation','Saturation'], correct:0,
+        explain:'Hydrolysis uses a water molecule to break a bond apart — the reverse of the dehydration synthesis that built the chain.'}
+    ]},
+  aminoave:{tab:'proteins', title:'Amino Avenue', sub:'Amino acids + R groups',
+    hook:'Twenty different amino acids are the entire alphabet your body uses to spell out every protein you own — collagen, hemoglobin, the keratin in your hair. Swap the R group side chain and you get a totally different letter.',
+    goals:[{text:'Place any amino acid on the bench.', test:T=>T.mols.some(m=>m.units.length===1)}],
+    quiz:[
+      {q:'What part of an amino acid changes from one amino acid to the next?', choices:['The R group (side chain)','The central carbon','The amino group','The carboxyl group'], correct:0,
+        explain:'Every amino acid shares the same core. The R group is the only part that differs, and it decides whether the amino acid is polar, nonpolar, or charged.'},
+      {q:'A nonpolar R group tends to...', choices:['Avoid water and hide inside a folded protein','Dissolve easily in water','Carry a permanent positive charge','Be identical to every other R group'], correct:0,
+        explain:'Nonpolar R groups are hydrophobic (water-fearing), so they usually end up tucked inside a protein’s folded core.'}
+    ]},
+  peptideplace:{tab:'proteins', title:'Peptide Place', sub:'Peptide bonds — order matters',
+    hook:'A peptide bond is just one water molecule’s worth of chemistry, but line up thousands in the right order and you get spider silk or the antibodies fighting off your last cold. Get the order wrong, and the whole thing falls apart.',
+    goals:[
+      {text:'Build a dipeptide (bond two amino acids).', test:T=>anyMol(T,u=>u.length===2)},
+      {text:'Build a second, different dipeptide to compare sequences.', test:T=>{const d=T.mols.filter(m=>m.units.length===2).map(m=>m.units.join('-')); return new Set(d).size>=2;}}
+    ],
+    quiz:[
+      {q:'Two amino acids joined by a peptide bond form a...', choices:['Dipeptide','Disaccharide','Monoglyceride','Nucleotide'], correct:0,
+        explain:'Two amino acids = a dipeptide, just like two sugars = a disaccharide.'},
+      {q:'Met–Gly–Lys and Lys–Gly–Met use the same three amino acids. Are they the same protein?', choices:['No — the sequence changes the protein entirely','Yes, order never matters','Yes, they have the same mass','No, they’re made of different elements'], correct:0,
+        explain:'Sequence is everything — change the order and you change how the chain folds, which changes (or destroys) its function.'}
+    ]},
+  foldingfalls:{tab:'proteins', title:'Folding Falls', sub:'Shape = function, denaturation',
+    hook:'Fry an egg and the clear, runny white turns opaque and firm — forever. That’s not cooking magic, it’s denaturation: heat ripping apart the folds that gave the protein its shape (and its job). Lose the fold, lose the function.',
+    goals:[{text:'Build a polypeptide with 6 or more amino acids.', test:T=>anyMol(T,u=>u.length>=6)}],
+    quiz:[
+      {q:'A protein’s function depends most directly on its...', choices:['3D shape','Color','Weight','Number of carbons'], correct:0,
+        explain:'Structure determines function — a protein folds into a specific shape, and that shape is what lets it do its job.'},
+      {q:'What is denaturation?', choices:['A protein losing its shape, usually from heat or pH','A protein gaining new amino acids','Two proteins bonding together','A protein turning into a carbohydrate'], correct:0,
+        explain:'Denaturation unfolds a protein’s shape without changing its amino acid sequence — and once unfolded, most proteins can’t do their job anymore.'}
+    ]},
+  glycerolgardens:{tab:'lipids', title:'Glycerol Gardens', sub:'Building a triglyceride',
+    hook:'Every stick of butter and bottle of olive oil starts the exact same way: a 3-carbon glycerol backbone waiting for fatty acids to bond on. Attach one tail and you’ve got a monoglyceride.',
+    goals:[{text:'Add glycerol, then attach one fatty acid (build a monoglyceride).', test:T=>{const d=nameLipid(T); return d && d.name==='Monoglyceride';}}],
+    quiz:[
+      {q:'What is the 3-carbon backbone every triglyceride is built on?', choices:['Glycerol','Glucose','A fatty acid','A phosphate group'], correct:0,
+        explain:'Glycerol is the 3-carbon backbone. Each carbon has a spot where a fatty acid (or a phosphate) can bond on.'},
+      {q:'What kind of bond attaches a fatty acid to glycerol?', choices:['An ester bond, formed by dehydration synthesis','A peptide bond','A glycosidic bond','A phosphodiester bond'], correct:0,
+        explain:'Lipids use ester bonds. Like every macromolecule on this board, forming that bond releases a water molecule.'}
+    ]},
+  saturationsquare:{tab:'lipids', title:'Saturation Square', sub:'Saturated vs. unsaturated',
+    hook:'Butter sits solid in the fridge door. Olive oil pools in a bottle at room temperature. Same basic ingredients — glycerol plus fatty acids — but one has straight, saturated tails that stack like firewood, and the other doesn’t.',
+    goals:[
+      {text:'Build a fat with 3 saturated tails (butter-style).', test:T=>{const d=nameLipid(T); return d && d.name==='Saturated fat';}},
+      {text:'Build a fat with 3 unsaturated tails (oil-style).', test:T=>{const d=nameLipid(T); return d && d.name==='Unsaturated fat (oil)';}}
+    ],
+    quiz:[
+      {q:'Why is butter solid at room temperature while olive oil is liquid?', choices:['Butter’s straight, saturated tails pack tightly; oil’s kinked tails can’t','Butter has no fatty acids','Oil has more glycerol than butter','Butter is a protein and oil is a carbohydrate'], correct:0,
+        explain:'Saturated tails are straight and pack tightly together. Unsaturated tails have a kink from a double bond, so they can’t stack as neatly.'},
+      {q:'A “saturated” fatty acid is saturated with...', choices:['Hydrogen','Water','Oxygen','Nitrogen'], correct:0,
+        explain:'Saturated means saturated with hydrogen: no carbon-carbon double bonds, so every carbon holds as many hydrogens as possible.'}
+    ]},
+  membranemarina:{tab:'lipids', title:'Membrane Marina', sub:'Phospholipids + the bilayer',
+    hook:'Every one of your trillions of cells is wrapped in a wall built from phospholipids: water-loving heads facing out, water-fearing tails hiding in the middle. Basically a self-assembling membrane made of molecular popsicles.',
+    goals:[{text:'Build a phospholipid (glycerol + 2 fatty acid tails + a phosphate).', test:T=>{const d=nameLipid(T); return d && d.name==='Phospholipid';}}],
+    quiz:[
+      {q:'A phospholipid has a water-loving head and water-fearing tails. What are those called?', choices:['Hydrophilic head, hydrophobic tails','Hydrophobic head, hydrophilic tails','Both hydrophilic','Both hydrophobic'], correct:0,
+        explain:'The phosphate head is hydrophilic (water-loving) and the fatty acid tails are hydrophobic (water-fearing).'},
+      {q:'Why do phospholipids in water form a bilayer, tails inward?', choices:['So hydrophobic tails hide from water while hydrophilic heads face it','So the tails can face outward toward water','Glycerol pushes them apart','Phosphate groups repel each other'], correct:0,
+        explain:'Tails point inward, away from water, while heads face outward into the watery environment on both sides — that’s every cell membrane.'}
+    ]},
+  nucleotideknoll:{tab:'nucleic', title:'Nucleotide Knoll', sub:'The 3 parts of a nucleotide',
+    hook:'Your entire genetic blueprint is spelled out using just a handful of copies of one small molecule: the nucleotide. Phosphate, sugar, base — three parts, repeated billions of times, is the whole secret behind DNA.',
+    goals:[{text:'Place a single nucleotide on the bench.', test:T=>T.mols.some(m=>m.units.length===1)}],
+    quiz:[
+      {q:'What three parts make up every nucleotide?', choices:['A phosphate group, a 5-carbon sugar, and a nitrogen base','A glycerol, a fatty acid, and a phosphate','An amino group, a carboxyl group, and an R group','Two sugars and a bond'], correct:0,
+        explain:'Phosphate + sugar + nitrogen base = one nucleotide, every time, whether it’s DNA or RNA.'},
+      {q:'What’s the key sugar difference between a DNA and an RNA nucleotide?', choices:['DNA uses deoxyribose; RNA uses ribose','DNA uses glucose; RNA uses fructose','They use the exact same sugar','DNA has no sugar'], correct:0,
+        explain:'Deoxyribose (DNA) is missing one oxygen compared to ribose (RNA) — that’s where the “deoxy” in DNA’s name comes from.'}
+    ]},
+  backbonebay:{tab:'nucleic', title:'Backbone Bay', sub:'Phosphodiester bonds',
+    hook:'Snip the sugar-phosphate backbone anywhere along a DNA strand and the whole structure falls apart. Phosphodiester bonds are the zipper teeth holding every strand of DNA and RNA together, one water molecule at a time.',
+    goals:[
+      {text:'Build a strand of 4 or more nucleotides.', test:T=>anyMol(T,u=>u.length>=4)},
+      {text:'Break a bond in the backbone (hydrolysis).', test:T=>T.log.some(e=>e.type==='hyd')}
+    ],
+    quiz:[
+      {q:'What bond links one nucleotide to the next in a strand?', choices:['A phosphodiester bond','A peptide bond','A glycosidic bond','An ester bond'], correct:0,
+        explain:'Phosphodiester bonds link the phosphate of one nucleotide to the sugar of the next, building the sugar-phosphate backbone.'},
+      {q:'Breaking a phosphodiester bond in a strand is an example of...', choices:['Hydrolysis — it uses a water molecule','Dehydration synthesis — it releases a water molecule','Denaturation','Saturation'], correct:0,
+        explain:'Breaking any bond built by dehydration synthesis takes hydrolysis, which uses a water molecule to split it back apart.'}
+    ]},
+  helixheights:{tab:'nucleic', title:'Helix Heights', sub:'Base pairing, DNA vs. RNA',
+    hook:'A always finds T, and G always finds C — a pairing rule so reliable your cells use it to copy your entire genome every time a cell divides. Miss the pattern and you’ve basically got a genetic dropped call.',
+    goals:[{text:'Build a DNA strand (2+ nucleotides) and reveal its matching strand.', test:T=>T.complement && anyMol(T,u=>u[0] && u[0].s==='DNA' && u.length>=2)}],
+    quiz:[
+      {q:'In DNA, adenine always pairs with...', choices:['Thymine','Guanine','Cytosine','Another adenine'], correct:0,
+        explain:'A pairs with T (2 hydrogen bonds), and G pairs with C (3 hydrogen bonds) — that predictable pairing is why DNA can be copied accurately.'},
+      {q:'What’s a key difference between DNA and RNA?', choices:['DNA is usually double-stranded and uses thymine; RNA is usually single-stranded and uses uracil','DNA is single-stranded and RNA is double-stranded','DNA has no nitrogen bases','RNA can’t pair bases at all'], correct:0,
+        explain:'DNA pairs into a double helix and uses thymine. RNA usually works as a single strand and swaps in uracil wherever DNA uses thymine.'}
+    ]}
+};
+
+const ENZYME_POOL = {
+  carbs:[
+    {prompt:'Lactase appeared! Build lactose (galactose + glucose) before time runs out.', test:e=>e && e.type==='syn' && e.right[0]==='Lactose'},
+    {prompt:'Amylase alert! Break any glycosidic bond before time runs out.', test:e=>e && e.type==='hyd'}
+  ],
+  proteins:[
+    {prompt:'Protease patrol! Bond two amino acids into a dipeptide before time runs out.', test:e=>e && e.type==='syn' && /Dipeptide/.test(e.right[0])},
+    {prompt:'Peptidase pop quiz! Break a peptide bond before time runs out.', test:e=>e && e.type==='hyd'}
+  ],
+  lipids:[
+    {prompt:'Lipase rush! Break a bond on your lipid before time runs out.', test:e=>e && e.type==='hyd'},
+    {prompt:'Synthase surge! Bond a new part onto your lipid before time runs out.', test:e=>e && e.type==='syn'}
+  ],
+  nucleic:[
+    {prompt:'Polymerase power! Bond two nucleotides together before time runs out.', test:e=>e && e.type==='syn'},
+    {prompt:'Helicase hustle! Reveal a DNA strand’s matching strand before time runs out.', test:(e,T,toggled)=>toggled===true}
+  ]
+};
+
+const DENATURE_QUESTIONS = [
+  {q:'You fry an egg. The clear, runny white turns solid and white. What happened to its proteins?', choices:['They denatured — heat unfolded their shape','They turned into a carbohydrate','They were digested by hydrolysis','Nothing changed, only the color did'], correct:0,
+    explain:'Heat broke the bonds holding the protein’s folded shape, so it unfolded (denatured) and lost its original function — that’s why it can’t go back to raw.'},
+  {q:'Why can extreme heat or pH make an enzyme stop working?', choices:['It denatures, changing its shape so it no longer fits its target','It turns into a lipid','It gains more amino acids','It converts to a monosaccharide'], correct:0,
+    explain:'An enzyme’s job depends entirely on its 3D shape. Denature that shape and the active site no longer fits — shape decides function.'},
+  {q:'Which best describes denaturation?', choices:['A protein loses its shape (and function) without its amino acid sequence changing','A protein’s amino acid sequence is rearranged','A protein is broken into individual amino acids','A protein gains a brand-new function'], correct:0,
+    explain:'Denaturation unfolds a protein’s shape. The sequence of amino acids stays the same, but without the right shape, it can’t do its job.'},
+  {q:'Sickle cell disease comes from swapping one amino acid in hemoglobin. Why does that matter?', choices:['Even one wrong amino acid can change the protein’s shape and function','Amino acid order never affects shape','It only changes the protein’s color','It turns hemoglobin into a carbohydrate'], correct:0,
+    explain:'Order matters — one swapped amino acid can misfold hemoglobin into a rigid shape that distorts red blood cells into a sickle shape.'}
+];
+const WATERBREAK_FLAVOR = [
+  'Your cells are about 70% water — go ahead and “drink up” some bonus ATP.',
+  'Water is the universal solvent, and the reason “dehydration synthesis” has “hydration” baked right into its name.',
+  'Every hydrolysis reaction on this board needs H₂O as a reactant. Never forget the unsung molecule.'
+];
+const CORNER_FLAVOR = [
+  'ATP synthase spins like a tiny turbine in your mitochondria, cranking out ATP with every rotation. Give it a spin!',
+  'Your body recycles roughly its own body weight in ATP every single day — one molecule, used and remade over and over.',
+  'ATP stands for adenosine triphosphate — “tri” for the three phosphates that store the energy your cells spend.'
+];
+
+/* ============================================================
+   PART 4: persistence (localStorage, wrapped in try/catch) + sound
+============================================================ */
+const SAVE_KEY = 'monopoly_bioquest_v1';
+const SOUND_KEY = 'monopoly_bioquest_sound';
+
+function loadStore(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    return raw ? JSON.parse(raw) : {players:{}, current:null};
+  }catch(e){ return {players:{}, current:null}; }
+}
+function saveStore(store){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(store)); }catch(e){ /* private mode / storage full — progress just won't persist */ }
+}
+function loadSoundPref(){
+  try{ return localStorage.getItem(SOUND_KEY) === '1'; }catch(e){ return false; }
+}
+function saveSoundPref(on){
+  try{ localStorage.setItem(SOUND_KEY, on ? '1' : '0'); }catch(e){}
+}
+
+function freshPlayer(name){
+  return {
+    name, atp:0, pos:0, laps:0,
+    owned:{}, goalsDone:{}, quizDone:{}, setBonus:{},
+    labChallenges:{}, timerSetting:'off', teacherUnlock:false,
+    showdown:{stars:{}, badge:false},
+    createdAt: Date.now(), lastPlayed: Date.now()
+  };
+}
+function normalizePlayer(p){
+  // Migration: fills in fields added after a player's save was first created.
+  // Never touches atp/owned/pos/etc — existing progress is preserved as-is.
+  p.goalsDone = p.goalsDone || {};
+  p.quizDone = p.quizDone || {};
+  p.owned = p.owned || {};
+  p.setBonus = p.setBonus || {};
+  p.labChallenges = p.labChallenges || {};
+  p.timerSetting = p.timerSetting || 'off';
+  if(typeof p.teacherUnlock !== 'boolean') p.teacherUnlock = false;
+  p.showdown = p.showdown || {stars:{}, badge:false};
+  if(typeof p.pos !== 'number') p.pos = 0;
+  return p;
+}
+let STORE = loadStore();
+let PLAYER = null; // active player object (reference into STORE.players)
+let SOUND_ON = loadSoundPref();
+
+function persist(){ if(PLAYER) PLAYER.lastPlayed = Date.now(); saveStore(STORE); }
+
+/* ---------- sound (WebAudio synth, no audio files, off by default) ---------- */
+let audioCtx = null;
+function ensureAudio(){
+  if(audioCtx) return audioCtx;
+  try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+  return audioCtx;
+}
+function tone(freq, start, dur, type, gain){
+  const ctx = ensureAudio(); if(!ctx) return;
+  const osc = ctx.createOscillator(), g = ctx.createGain();
+  osc.type = type || 'sine'; osc.frequency.value = freq;
+  g.gain.value = 0;
+  osc.connect(g); g.connect(ctx.destination);
+  const t0 = ctx.currentTime + start;
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(gain || 0.12, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.start(t0); osc.stop(t0 + dur + 0.02);
+}
+function playSfx(kind){
+  if(!SOUND_ON) return;
+  if(kind === 'build') tone(520, 0, .12, 'sine');
+  else if(kind === 'break') tone(220, 0, .14, 'sawtooth', .08);
+  else if(kind === 'dice') tone(300, 0, .08, 'square', .07);
+  else if(kind === 'move') tone(440, 0, .05, 'square', .05);
+  else if(kind === 'atp'){ tone(660, 0, .09, 'sine'); tone(880, .07, .12, 'sine'); }
+  else if(kind === 'correct'){ tone(523, 0, .1, 'sine'); tone(784, .09, .16, 'sine'); }
+  else if(kind === 'wrong') tone(160, 0, .22, 'sawtooth', .09);
+  else if(kind === 'buy'){ tone(523, 0, .1, 'sine'); tone(659, .09, .1, 'sine'); tone(784, .18, .22, 'sine'); }
+  else if(kind === 'open') tone(392, 0, .08, 'triangle', .06);
+}
+
+/* ============================================================
+   PART 5: app shell — onboarding, header, board, dice + movement
+============================================================ */
+const UI = { screen:'onboard', overlay:null, popup:null, rolling:false };
+const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+function cornerIcon(type){
+  if(type === 'go') return '⚡';
+  if(type === 'jail') return '🌀';
+  if(type === 'park') return '💧';
+  if(type === 'bonus') return '♻️';
+  if(type === 'enzyme') return '🧪';
+  return '•';
+}
+function squareLabel(sq){
+  if(sq.type === 'prop') return MODULES[sq.id].title;
+  return sq.label;
+}
+
+function ownedCount(){ return Object.keys(PLAYER.owned).length; }
+function groupOwnedCount(g){ return GROUPS[g].props.filter(id => PLAYER.owned[id]).length; }
+let pendingGroupPopup = null;
+function checkGroupBonus(group){
+  // Deferred rather than popped immediately: completeModule() may still be showing
+  // the purchase-celebration screen inside the module overlay, and opening a popup
+  // here would force a full re-render that wipes it. We flag it and show it once
+  // the overlay actually closes (see closeOverlay()) so nothing gets lost.
+  if(!PLAYER.setBonus[group] && groupOwnedCount(group) === 3){
+    PLAYER.setBonus[group] = true;
+    persist();
+    pendingGroupPopup = group;
+  }
+}
+
+/* ---------- ATP wallet ---------- */
+function awardATP(n){
+  PLAYER.atp += n;
+  const chip = $('walletN'); if(chip) chip.textContent = PLAYER.atp;
+  bump('walletChip');
+  playSfx('atp');
+}
+
+/* ---------- root render ---------- */
+function renderApp(){
+  const app = $('app');
+  if(UI.screen === 'onboard'){ document.body.dataset.tab = 'board'; app.innerHTML = onboardHTML(); return; }
+  if(UI.screen === 'home'){
+    document.body.dataset.tab = 'board';
+    app.innerHTML = homeHTML() + (UI.popup ? popupHTML() : '');
+    return;
+  }
+  if(UI.screen === 'lab'){
+    document.body.dataset.tab = LAB.tab;
+    app.innerHTML = labScreenHTML() + (UI.popup ? popupHTML() : '');
+    LAB.onGoalProgress = labChallengeCheck;
+    renderLab();
+    renderLabChal();
+    return;
+  }
+  document.body.dataset.tab = UI.overlay ? (UI.overlay.tab || 'board') : 'board';
+  app.innerHTML = boardScreenHTML() + (UI.overlay ? overlayHTML() : '') + (UI.popup ? popupHTML() : '');
+  paintBoardOwnership();
+  placeToken();
+  if(UI.overlay && UI.overlay.mode === 'module') mountModuleDom();
+  if(UI.overlay && UI.overlay.mode === 'challenge') mountChallengeDom();
+}
+
+/* ---------- onboarding ---------- */
+function onboardHTML(){
+  const names = Object.keys(STORE.players).sort((a,b)=> STORE.players[b].lastPlayed - STORE.players[a].lastPlayed);
+  return '<div class="onboard"><div class="onboard-card">' +
+    '<h1>MonoPoly</h1><p>Build the cell, one macromolecule at a time. Roll around the board, run the build/break lab, and bank ATP as you learn.</p>' +
+    '<input type="text" id="nameInput" maxlength="24" placeholder="Type your name to play" autocomplete="off">' +
+    '<button class="btn btn-primary btn-big" id="startBtn">Let’s go</button>' +
+    (names.length ? '<p class="onboard-note">Played before? Tap your name:</p><div class="player-list">' + names.map(n => '<button class="player-chip" data-continue="' + esc(n) + '">' + esc(n) + ' · ' + STORE.players[n].atp + ' ATP</button>').join('') + '</div>' : '') +
+    '<p class="onboard-note">Progress saves in this browser, under whatever name you enter. No accounts, no data leaves your device.</p>' +
+    '</div></div>';
+}
+
+/* ---------- board screen ---------- */
+function boardScreenHTML(){
+  let sqHtml = '';
+  SQUARES.forEach((sq, i) => {
+    const [r,c] = SQ_GRID[i];
+    const corner = sq.type !== 'prop' && sq.type !== 'enzyme';
+    const owned = sq.type === 'prop' && PLAYER.owned[sq.id];
+    const groupColor = sq.group ? 'var(--' + sq.group + ')' : '';
+    let icon;
+    if(sq.type === 'prop') icon = tabIcon(sq.group);
+    else icon = '<span style="font-size:1.3rem">' + cornerIcon(sq.type) + '</span>';
+    const gridStyle = 'grid-row:' + r + ';grid-column:' + c + ';' + (groupColor ? '--gc:' + groupColor + ';' : '');
+    sqHtml += '<button class="sq ' + sq.type + (sq.type==='prop'?' prop':'') + (owned?' owned':'') + (corner?' corner':'') + '" data-idx="' + i + '" data-sqid="' + sq.id + '" style="' + gridStyle + '" aria-label="' + esc(squareLabel(sq)) + (owned?' (owned)':'') + '">' +
+      '<span class="ic">' + icon + '</span><span class="lbl">' + esc(squareLabel(sq)) + '</span></button>';
+  });
+  const setBadges = Object.keys(GROUPS).map(g => PLAYER.setBonus[g] ? '<span style="color:var(--' + g + ')">★ ' + GROUPS[g].label + '</span>' : '').filter(Boolean).join(' &nbsp; ');
+  return '<div class="wrap">' +
+    headerHTML('board') +
+    '<div class="board-shell">' +
+      '<div class="board">' + sqHtml +
+        '<div class="board-center">' +
+          '<div class="roll-row">' +
+            '<div class="die-face" id="dieFace">' + DICE_FACES[Math.max(0,PLAYER.lastRoll?PLAYER.lastRoll-1:0)] + '</div>' +
+            '<button class="btn btn-primary btn-big" id="rollBtn">Roll the die</button>' +
+            '<p class="pos-note">Land on a property to unlock a lesson. You can also tap any property directly, any time.</p>' +
+          '</div>' +
+          '<p class="progress-line">' + ownedCount() + ' of 12 properties owned' + (setBadges ? '<br>' + setBadges : '') + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="board-legend">' +
+        Object.keys(GROUPS).map(g => '<span><i style="background:var(--' + g + ')"></i>' + GROUPS[g].label + '</span>').join('') +
+        '<span><i style="background:var(--atp)"></i>Enzyme &amp; bonus squares</span>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+function atpIcon(size){
+  size = size || 26;
+  return '<svg viewBox="0 0 26 26" width="' + size + '" height="' + size + '" aria-hidden="true">' +
+    '<circle cx="13" cy="13" r="11.5" fill="' + INK + '"/>' +
+    '<circle cx="13" cy="13" r="11.5" fill="var(--atp)" stroke="' + INK + '" stroke-width="2"/>' +
+    '<text x="13" y="17.5" text-anchor="middle" font-size="11" font-weight="800" fill="' + INK + '">ATP</text></svg>';
+}
+function paintBoardOwnership(){
+  SQUARES.forEach((sq,i) => {
+    if(sq.type !== 'prop') return;
+    const el = document.querySelector('.sq[data-idx="' + i + '"]');
+    if(el) el.classList.toggle('owned', !!PLAYER.owned[sq.id]);
+  });
+}
+function placeToken(){
+  document.querySelectorAll('.token-chip').forEach(t => t.remove());
+  document.querySelectorAll('.sq[data-here]').forEach(el => el.removeAttribute('data-here'));
+  const el = document.querySelector('.sq[data-idx="' + PLAYER.pos + '"]');
+  if(!el) return;
+  const t = document.createElement('span');
+  t.className = 'token-chip'; t.textContent = '🧬'; t.setAttribute('aria-hidden','true');
+  el.appendChild(t);
+  el.setAttribute('data-here','true');
+}
+
+/* ---------- dice + movement ---------- */
+function rollDice(){
+  if(UI.rolling || UI.overlay || UI.popup) return;
+  UI.rolling = true;
+  const btn = $('rollBtn'); if(btn) btn.disabled = true;
+  const face = $('dieFace');
+  playSfx('dice');
+  const finalRoll = 1 + Math.floor(Math.random() * 6);
+  if(reduceMotion){ settleDie(finalRoll); return; }
+  if(face) face.classList.add('rolling');
+  let ticks = 0;
+  const spin = setInterval(() => {
+    if(face) face.textContent = DICE_FACES[Math.floor(Math.random()*6)];
+    ticks++;
+    if(ticks > 9){ clearInterval(spin); if(face) face.classList.remove('rolling'); settleDie(finalRoll); }
+  }, 60);
+}
+function settleDie(roll){
+  const face = $('dieFace'); if(face) face.textContent = DICE_FACES[roll-1];
+  PLAYER.lastRoll = roll;
+  stepToken(roll, 0);
+}
+function stepToken(remaining, passedGo){
+  if(remaining <= 0){ UI.rolling = false; const btn = $('rollBtn'); if(btn) btn.disabled = false; landOn(PLAYER.pos, passedGo); return; }
+  const next = (PLAYER.pos + 1) % SQUARES.length;
+  if(next === 0) passedGo++;
+  PLAYER.pos = next;
+  playSfx('move');
+  if(reduceMotion){ placeToken(); stepToken(remaining - 1, passedGo); return; }
+  placeToken();
+  setTimeout(() => stepToken(remaining - 1, passedGo), 160);
+}
+function landOn(idx, passedGo){
+  const sq = SQUARES[idx];
+  if(passedGo > 0) awardATP(CFG.ATP_PASS_GO * passedGo);
+  persist();
+  if(sq.type === 'go'){ awardATP(CFG.ATP_LAND_GO_BONUS); persist(); renderApp();
+    openPopup({emoji:'⚡', title:'Welcome to the ATP Hub!', body:'Landing right on GO powers you up with a bonus, on top of anything you earned passing it.', atp:CFG.ATP_LAND_GO_BONUS, actions:[{label:'Keep rolling', act:'closePopup'}]}); return; }
+  if(sq.type === 'prop'){ openModule(sq.id); return; }
+  if(sq.type === 'enzyme'){ openChallenge(sq.id); return; }
+  if(sq.type === 'jail'){ openDenature(); return; }
+  if(sq.type === 'park'){ openWaterBreak(); return; }
+  if(sq.type === 'bonus'){ openCornerBonus(); return; }
+  renderApp();
+}
+
+/* ============================================================
+   PART 6: module overlay (guided build + quiz) and
+   enzyme timed-challenge overlay — both mount the same lab DOM
+============================================================ */
+let challengeInterval = null;
+
+function ledgerHTML(){
+  return '<div class="ledger">' +
+      '<div class="chip"><span class="ic">' + waterSVG(22) + '</span><span class="n" id="wOut">0</span><span class="l">water released (building)</span></div>' +
+      '<div class="chip"><span class="ic">' + waterSVG(22) + '</span><span class="n" id="wIn">0</span><span class="l">water used (breaking)</span></div>' +
+    '</div>';
+}
+function shelfBenchHTML(){
+  return '<div class="lab">' +
+      '<section class="panel shelf"><h2 class="pt" id="shelfTitle">Shelf</h2><div id="shelfBody"></div></section>' +
+      '<section class="panel bench"><div class="bench-head"><h2 class="pt">Your bench</h2><div class="tools" id="tools"></div></div>' +
+        '<p class="howto" id="howto"></p><div class="mat" id="mat"></div>' +
+        '<p class="hint" id="hint" aria-live="polite"></p><div class="selected" id="selected"></div></section>' +
+    '</div>';
+}
+function readoutFactsHTML(){
+  return '<div class="lower lower-2col">' +
+      '<section class="panel"><h2 class="pt">What just happened</h2><div id="logWrap" aria-live="polite"></div></section>' +
+      '<section class="panel facts"><h2 class="pt" id="factsTitle">Cheat sheet</h2><dl id="facts"></dl><p class="factshook" id="factshook"></p></section>' +
+    '</div>';
+}
+function labBenchHTML(){
+  return '<div class="lab-wrap">' + ledgerHTML() + shelfBenchHTML() + readoutFactsHTML() + '</div>';
+}
+
+function overlayHTML(){
+  const o = UI.overlay;
+  if(o.mode === 'module') return moduleOverlayHTML();
+  return challengeOverlayHTML();
+}
+
+function moduleOverlayHTML(){
+  const o = UI.overlay, mod = MODULES[o.squareId], owned = !!PLAYER.owned[o.squareId];
+  const goalsArr = PLAYER.goalsDone[o.squareId] || mod.goals.map(()=>false);
+  const goalsHtml = '<ul class="lo-goals" id="loGoals">' + mod.goals.map((g,i) =>
+    '<li class="' + (goalsArr[i] ? 'done' : '') + '"><span class="box">' + (goalsArr[i] ? '✓' : '') + '</span><span class="tx">' + esc(g.text) + '</span></li>'
+  ).join('') + '</ul>';
+  return '<div class="overlay-back" id="overlayBack"><div class="overlay-card">' +
+    '<button class="overlay-close" id="closeOverlayBtn" aria-label="Back to board">✕</button>' +
+    '<div class="lo-head"><p class="lo-kicker">' + esc(TABS[mod.tab].label) + ' · ' + esc(mod.sub) + '</p>' +
+      '<h2 class="lo-title">' + esc(mod.title) + (owned ? ' <span style="color:var(--good);font-size:1rem">· owned ✓</span>' : '') + '</h2>' +
+      '<p class="lo-hook">' + esc(mod.hook) + '</p>' +
+      (owned ? '<p class="quiz-fb good" style="margin-top:12px">You already own this property — feel free to keep experimenting in the lab below, or head back to the board.</p>' : goalsHtml) +
+    '</div>' +
+    labBenchHTML() +
+    (owned ? '' : '<div class="quiz hidden" id="quizBlock"><div id="quizBody"></div></div>') +
+  '</div></div>';
+}
+function challengeOverlayHTML(){
+  const o = UI.overlay;
+  const untimed = effectiveEnzymeMs() === null;
+  const timerBlock = untimed
+    ? '<p class="lo-timer-txt">⏳ Untimed (your Settings timer is Off) — take your time, full ATP bonus either way.</p>'
+    : '<div class="lo-timerwrap"><div class="lo-timerbar"><i id="chTimerBar" style="width:100%"></i></div><p class="lo-timer-txt" id="chTimerTxt">' + Math.ceil(effectiveEnzymeMs()/1000) + 's left</p></div>';
+  return '<div class="overlay-back" id="overlayBack"><div class="overlay-card">' +
+    '<button class="overlay-close" id="closeOverlayBtn" aria-label="Back to board">✕</button>' +
+    '<div class="lo-head"><p class="lo-kicker">Enzyme Alert</p>' +
+      '<h2 class="lo-title">⚡ Timed challenge!</h2>' +
+      '<p class="lo-hook">' + esc(o.challenge.prompt) + ' Success doubles your ATP for this square — a miss still pays out a small consolation.</p>' +
+      timerBlock +
+    '</div>' +
+    labBenchHTML() +
+    '<p style="text-align:center;margin-top:16px"><button class="btn" id="giveUpBtn">Give up</button></p>' +
+  '</div></div>';
+}
+
+function mountModuleDom(){
+  const o = UI.overlay, mod = MODULES[o.squareId];
+  LAB.tab = mod.tab; o.tab = mod.tab;
+  renderLab(); playSfx('open');
+  if(!PLAYER.goalsDone[o.squareId]) PLAYER.goalsDone[o.squareId] = mod.goals.map(()=>false);
+  if(!PLAYER.quizDone[o.squareId]) PLAYER.quizDone[o.squareId] = mod.quiz.map(()=>false);
+  if(PLAYER.owned[o.squareId]){ LAB.onGoalProgress = null; return; }
+  LAB.onGoalProgress = refreshModuleGoals;
+  refreshModuleGoals();
+}
+function refreshModuleGoals(){
+  const o = UI.overlay; if(!o || o.mode !== 'module') return;
+  const mod = MODULES[o.squareId], T = LAB.tabs[mod.tab];
+  const arr = PLAYER.goalsDone[o.squareId];
+  let changed = false;
+  mod.goals.forEach((g,i) => {
+    if(!arr[i] && g.test(T)){ arr[i] = true; changed = true; awardATP(CFG.ATP_GOAL_STEP); }
+  });
+  if(changed) persist();
+  const list = $('loGoals');
+  if(list) list.innerHTML = mod.goals.map((g,i) =>
+    '<li class="' + (arr[i] ? 'done' : '') + '"><span class="box">' + (arr[i] ? '✓' : '') + '</span><span class="tx">' + esc(g.text) + '</span></li>'
+  ).join('');
+  if(arr.every(Boolean)){
+    const qb = $('quizBlock');
+    if(qb && qb.classList.contains('hidden')){
+      qb.classList.remove('hidden');
+      const doneArr = PLAYER.quizDone[o.squareId];
+      const nextIdx = doneArr.indexOf(false);
+      if(nextIdx === -1){ completeModule(); return; }
+      o.quiz = {idx:nextIdx, attempts:0};
+      renderQuizQuestion();
+      qb.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'nearest'});
+    }
+  }
+}
+
+/* ---------- quiz ---------- */
+function renderQuizQuestion(){
+  const o = UI.overlay, mod = MODULES[o.squareId], q = mod.quiz[o.quiz.idx];
+  const body = $('quizBody'); if(!body) return;
+  body.innerHTML = '<p class="quiz-prog">Check ' + (o.quiz.idx+1) + ' of ' + mod.quiz.length + '</p>' +
+    '<p class="quiz-q">' + esc(q.q) + '</p>' +
+    '<div class="quiz-opts" id="quizOpts">' + q.choices.map((c,i) => '<button class="qopt" data-qopt="' + i + '">' + esc(c) + '</button>').join('') + '</div>' +
+    '<div id="quizFb"></div>';
+  o.quiz.attempts = 0;
+}
+function quizAnswer(i){
+  const o = UI.overlay, mod = MODULES[o.squareId], q = mod.quiz[o.quiz.idx];
+  const opts = document.querySelectorAll('#quizOpts .qopt');
+  const fb = $('quizFb');
+  if(i === q.correct){
+    opts.forEach((el,idx) => { el.disabled = true; if(idx===i) el.classList.add('correct'); });
+    const earned = o.quiz.attempts === 0 ? CFG.ATP_QUIZ_FIRST : CFG.ATP_QUIZ_RETRY;
+    awardATP(earned);
+    PLAYER.quizDone[o.squareId][o.quiz.idx] = true;
+    persist(); playSfx('correct');
+    const isLast = PLAYER.quizDone[o.squareId].every(Boolean);
+    fb.innerHTML = '<div class="quiz-fb good">Correct! ' + esc(q.explain) + '</div>' +
+      '<button class="btn btn-primary quiz-next" id="quizNextBtn">' + (isLast ? 'Finish this property' : 'Next question') + '</button>';
+  } else {
+    opts[i].disabled = true; opts[i].classList.add('wrong');
+    o.quiz.attempts++;
+    playSfx('wrong');
+    fb.innerHTML = '<div class="quiz-fb warn">Not quite. ' + esc(q.explain) + ' Try another answer.</div>';
+  }
+}
+function quizNext(){
+  const o = UI.overlay, mod = MODULES[o.squareId];
+  const doneArr = PLAYER.quizDone[o.squareId];
+  const nextIdx = doneArr.indexOf(false);
+  if(nextIdx === -1){ completeModule(); return; }
+  o.quiz.idx = nextIdx; renderQuizQuestion();
+}
+function completeModule(){
+  const o = UI.overlay, mod = MODULES[o.squareId];
+  PLAYER.owned[o.squareId] = true;
+  awardATP(CFG.ATP_MODULE_BONUS);
+  persist(); playSfx('buy');
+  celebrate();
+  const card = document.querySelector('.overlay-card');
+  if(card) card.insertAdjacentHTML('beforeend', '<div class="module-done"><div class="big">🏗️</div><h3>' + esc(mod.title) + ' — property purchased!</h3>' +
+    '<p>Goal ATP + check ATP + a ' + CFG.ATP_MODULE_BONUS + ' ATP purchase bonus, all banked.</p>' +
+    '<p class="atp-pop">+' + CFG.ATP_MODULE_BONUS + ' ATP bonus</p>' +
+    '<button class="btn btn-primary btn-big" id="backToBoardBtn" style="margin-top:16px">Back to the board</button></div>');
+  const qBlock = $('quizBlock'); if(qBlock) qBlock.remove();
+  checkGroupBonus(mod.tab === 'nucleic' ? 'nucleic' : mod.tab);
+}
+function celebrate(){
+  if(reduceMotion) return;
+  const b = document.createElement('div'); b.className = 'burst';
+  const colors = ['#e8a33d','#d94f6a','#c2b12c','#5a7fe0','#f2c14e'];
+  for(let i=0;i<16;i++){
+    const s = document.createElement('i');
+    const ang = Math.random()*Math.PI*2, dist = 80+Math.random()*140;
+    s.style.setProperty('--dx', Math.cos(ang)*dist+'px');
+    s.style.setProperty('--dy', Math.sin(ang)*dist+'px');
+    s.style.setProperty('--rot', (Math.random()*360)+'deg');
+    s.style.background = colors[i%colors.length];
+    s.style.left = '50%'; s.style.top = '30%';
+    b.appendChild(s);
+  }
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 1000);
+}
+
+/* ---------- enzyme challenge ---------- */
+function openChallenge(squareId){
+  const sq = SQUARES.find(s=>s.id===squareId);
+  const pool = ENZYME_POOL[sq.group];
+  const challenge = pool[Math.floor(Math.random()*pool.length)];
+  UI.overlay = {mode:'challenge', squareId, tab:sq.group, challenge, resolved:false};
+  renderApp();
+}
+function mountChallengeDom(){
+  const o = UI.overlay;
+  LAB.tab = o.tab; renderLab(); playSfx('open');
+  o.logLenStart = LAB.tabs[o.tab].log.length;
+  o.startComplement = LAB.tabs.nucleic.complement;
+  LAB.onGoalProgress = checkChallengeWin;
+  clearInterval(challengeInterval);
+  const ms = effectiveEnzymeMs();
+  o.enzymeMs = ms;
+  if(ms === null){ o.deadline = null; return; } // timers Off: no countdown, no auto-fail
+  o.deadline = Date.now() + ms;
+  challengeInterval = setInterval(tickChallenge, 120);
+  tickChallenge();
+}
+function tickChallenge(){
+  const o = UI.overlay; if(!o || o.mode !== 'challenge' || o.resolved || o.deadline === null) return;
+  const left = o.deadline - Date.now();
+  const pct = Math.max(0, Math.min(100, left / o.enzymeMs * 100));
+  const bar = $('chTimerBar'), txt = $('chTimerTxt');
+  if(bar) bar.style.width = pct + '%';
+  if(txt) txt.textContent = Math.max(0, Math.ceil(left/1000)) + 's left';
+  if(left <= 0) resolveChallenge(false);
+}
+function checkChallengeWin(){
+  const o = UI.overlay; if(!o || o.mode !== 'challenge' || o.resolved) return;
+  const T = LAB.tabs[o.tab];
+  const newest = T.log.length > o.logLenStart ? T.log[0] : null;
+  const toggled = T.complement === true && o.startComplement !== true;
+  if(o.challenge.test(newest, T, toggled)) resolveChallenge(true);
+}
+function resolveChallenge(won){
+  const o = UI.overlay; if(!o || o.resolved) return;
+  o.resolved = true;
+  clearInterval(challengeInterval);
+  const gained = won ? CFG.ATP_ENZYME_WIN : CFG.ATP_ENZYME_LOSE;
+  awardATP(gained); persist();
+  playSfx(won ? 'buy' : 'wrong');
+  if(won && !reduceMotion) celebrate();
+  closeOverlay();
+  openPopup({
+    emoji: won ? '⚡' : '⏱️',
+    title: won ? 'Enzyme activated!' : 'Time’s up!',
+    body: won ? 'You beat the clock and doubled your ATP for this square.' : 'No worries — enzymes miss their substrate sometimes too. You still banked a little ATP for trying.',
+    atp: gained,
+    actions:[{label:'Back to board', act:'closePopup'}]
+  });
+}
+
+/* ============================================================
+   PART 7: popups — denaturation question, water break, corner
+   bonus, menu, reset confirm, how-to-play
+============================================================ */
+function openModule(squareId){ UI.overlay = {mode:'module', squareId, tab: MODULES[squareId].tab}; renderApp(); }
+function closeOverlay(){
+  clearInterval(challengeInterval);
+  UI.overlay = null; LAB.onGoalProgress = null;
+  if(pendingGroupPopup){
+    const group = pendingGroupPopup; pendingGroupPopup = null;
+    awardATP(CFG.ATP_SET_BONUS); persist();
+    openPopup({
+      emoji:'🏆', title:GROUPS[group].label + ' set complete!',
+      body:'You own all three ' + GROUPS[group].label.toLowerCase() + ' properties. Bonus ATP unlocked.',
+      atp:CFG.ATP_SET_BONUS, actions:[{label:'Nice!', act:'closePopup'}]
+    });
+    return;
+  }
+  renderApp();
+}
+function openPopup(p){ UI.popup = p; renderApp(); }
+function closePopup(){ UI.popup = null; renderApp(); }
+
+function openDenature(){ openPopup({mode:'denature', qIdx: Math.floor(Math.random()*DENATURE_QUESTIONS.length)}); }
+function openWaterBreak(){
+  const flavor = WATERBREAK_FLAVOR[Math.floor(Math.random()*WATERBREAK_FLAVOR.length)];
+  awardATP(CFG.ATP_WATER_BREAK); persist();
+  openPopup({emoji:'💧', title:'Water Break!', body:flavor, atp:CFG.ATP_WATER_BREAK, actions:[{label:'Back to board', act:'closePopup'}]});
+}
+function openCornerBonus(){
+  const flavor = CORNER_FLAVOR[Math.floor(Math.random()*CORNER_FLAVOR.length)];
+  awardATP(CFG.ATP_CORNER_BONUS); persist();
+  openPopup({emoji:'♻️', title:'ATP Synthase Spin!', body:flavor, atp:CFG.ATP_CORNER_BONUS, actions:[{label:'Back to board', act:'closePopup'}]});
+}
+function openGoInfo(){
+  openPopup({emoji:'⚡', title:'The ATP Hub', body:'This is GO — roll around the board and every time you pass or land here, you bank ATP automatically.', actions:[{label:'Back to board', act:'closePopup'}]});
+}
+function openMenu(){ openPopup({mode:'menu'}); }
+function openHowto(){ openPopup({mode:'howto'}); }
+function openConfirmReset(){ openPopup({mode:'confirmReset'}); }
+function doReset(){
+  const name = PLAYER.name;
+  STORE.players[name] = freshPlayer(name);
+  PLAYER = STORE.players[name];
+  saveStore(STORE);
+  UI.popup = null;
+  renderApp();
+}
+function switchPlayer(){ PLAYER = null; UI.screen = 'onboard'; UI.popup = null; UI.overlay = null; renderApp(); }
+
+function infoBodyHTML(p){
+  return '<div class="popup-emoji">' + p.emoji + '</div><h3 style="text-align:center;margin-top:8px">' + esc(p.title) + '</h3>' +
+    '<p class="popup-txt">' + esc(p.body) + '</p>' +
+    (p.atp ? '<p class="atp-pop" style="text-align:center">+' + p.atp + ' ATP</p>' : '') +
+    '<div class="popup-actions">' + p.actions.map(a => '<button class="btn btn-primary" data-popact="' + a.act + '">' + esc(a.label) + '</button>').join('') + '</div>';
+}
+function denatureBodyHTML(){
+  const p = UI.popup, q = DENATURE_QUESTIONS[p.qIdx];
+  return '<div class="popup-emoji">🌀</div><h3 style="text-align:center;margin-top:6px">Denaturation Station</h3>' +
+    '<p class="popup-txt">Answer correctly to refold your protein and get back in the game. Wrong answers just explain why — try again.</p>' +
+    '<p class="quiz-q" style="margin-top:14px">' + esc(q.q) + '</p>' +
+    '<div class="quiz-opts" id="denOpts">' + q.choices.map((c,i) => '<button class="qopt" data-danswer="' + i + '">' + esc(c) + '</button>').join('') + '</div>' +
+    '<div id="denFb"></div>';
+}
+function denatureAnswer(i){
+  const p = UI.popup, q = DENATURE_QUESTIONS[p.qIdx];
+  const opts = document.querySelectorAll('#denOpts .qopt');
+  const fb = $('denFb');
+  if(i === q.correct){
+    opts.forEach((el,idx) => { el.disabled = true; if(idx===i) el.classList.add('correct'); });
+    awardATP(CFG.ATP_DENATURE); persist(); playSfx('correct');
+    fb.innerHTML = '<div class="quiz-fb good">Refolded! ' + esc(q.explain) + '</div>' +
+      '<div class="popup-actions"><button class="btn btn-primary" data-popact="closePopup">Back to board</button></div>';
+  } else {
+    opts[i].disabled = true; opts[i].classList.add('wrong'); playSfx('wrong');
+    fb.innerHTML = '<div class="quiz-fb warn">Not yet. ' + esc(q.explain) + ' Try another answer.</div>';
+  }
+}
+function menuBodyHTML(){
+  return '<div class="popup-emoji">☰</div><h3 style="text-align:center">Menu</h3>' +
+    '<p class="popup-txt">Playing as <strong>' + esc(PLAYER.name) + '</strong> · ' + PLAYER.atp + ' ATP · ' + ownedCount() + '/12 properties</p>' +
+    '<div class="popup-actions">' +
+      '<button class="btn" data-popact="howto">How to play</button>' +
+      '<button class="btn" data-popact="switchPlayer">Switch player</button>' +
+      '<button class="btn" data-popact="confirmReset">Reset my progress</button>' +
+      '<button class="btn btn-primary" data-popact="closePopup">Close</button>' +
+    '</div>';
+}
+function confirmResetBodyHTML(){
+  return '<div class="popup-emoji">⚠️</div><h3 style="text-align:center">Reset your progress?</h3>' +
+    '<p class="popup-txt">This clears all ATP and owned properties for <strong>' + esc(PLAYER.name) + '</strong> on this device. It can’t be undone.</p>' +
+    '<div class="popup-actions"><button class="btn" data-popact="menu">Cancel</button><button class="btn btn-primary" data-popact="doReset">Yes, reset</button></div>';
+}
+function howtoBodyHTML(){
+  return '<div class="popup-emoji">📖</div><h3 style="text-align:center">How to play</h3>' +
+    '<p class="popup-txt" style="text-align:left">' +
+      '• Roll the die to move around the board, or tap any property directly — you never have to wait on the dice.<br><br>' +
+      '• Landing on (or tapping) a property opens its lesson: a quick hook, a guided build in the lab, then 1–2 checks for understanding. Wrong answers explain why and let you retry.<br><br>' +
+      '• Finishing a lesson “buys” the property and banks ATP, the cell’s energy currency.<br><br>' +
+      '• Passing or landing on GO banks ATP. Denaturation Station asks a quick protein-shape question to “refold.” Water Break and the ATP Synthase Spin corner hand out bonus ATP. Enzyme squares are timed bonus challenges.<br><br>' +
+      '• Own all 3 properties in a color group for a bonus.' +
+    '</p><div class="popup-actions"><button class="btn btn-primary" data-popact="closePopup">Got it</button></div>';
+}
+function popupHTML(){
+  const p = UI.popup;
+  let inner;
+  if(p.mode === 'denature') inner = denatureBodyHTML();
+  else if(p.mode === 'menu') inner = menuBodyHTML();
+  else if(p.mode === 'confirmReset') inner = confirmResetBodyHTML();
+  else if(p.mode === 'howto') inner = howtoBodyHTML();
+  else if(p.mode === 'settings') inner = settingsBodyHTML();
+  else inner = infoBodyHTML(p);
+  const closable = p.mode !== 'denature';
+  return '<div class="overlay-back" id="popupBack"><div class="overlay-card popup-card">' +
+    (closable ? '<button class="overlay-close" id="closePopupBtn" aria-label="Close">✕</button>' : '') +
+    inner + '</div></div>';
+}
+
+/* ============================================================
+   PART 8: shared header/nav, Home screen, and the restored
+   Learn Lab screen (tabs + shelf/bench + original challenge
+   list + cheat sheet + learning targets), plus the Settings
+   panel (question timers).
+============================================================ */
+function headerHTML(active){
+  return '<header class="top">' +
+    '<div class="brand"><h1 data-nav="home" style="cursor:pointer" title="Home">MonoPoly</h1><p>Build the cell, one macromolecule at a time.</p></div>' +
+    '<nav class="scr-nav" aria-label="Screens">' +
+      '<button class="navpill' + (active==='lab'?' active':'') + '" data-nav="lab" aria-current="' + (active==='lab') + '">🧪 Learn Lab</button>' +
+      '<button class="navpill' + (active==='board'?' active':'') + '" data-nav="board" aria-current="' + (active==='board') + '">🎲 Play MonoPoly</button>' +
+    '</nav>' +
+    '<div class="hdr-right">' +
+      '<div class="wallet" id="walletChip"><span class="ic">' + atpIcon(30) + '</span><div><div class="n" id="walletN">' + PLAYER.atp + '</div><div class="l">ATP — the cell’s energy currency</div></div></div>' +
+      '<button class="iconbtn" id="settingsBtn" title="Settings">⚙️</button>' +
+      '<button class="iconbtn" id="soundBtn" aria-pressed="' + SOUND_ON + '" title="Sound effects">' + (SOUND_ON ? '🔊' : '🔇') + '</button>' +
+      '<button class="iconbtn" id="menuBtn" title="Menu">☰</button>' +
+    '</div>' +
+  '</header>';
+}
+
+/* ---------- home ---------- */
+function homeHTML(){
+  return '<div class="wrap">' + headerHTML('home') +
+    '<div class="home-cards">' +
+      '<button class="home-card" data-nav="lab"><div class="hc-ic">🧪</div><h2>Learn Lab</h2>' +
+        '<p>Build monomers into polymers, run every reaction, and work through the challenge list for all four macromolecules.</p></button>' +
+      '<button class="home-card" data-nav="board"><div class="hc-ic">🎲</div><h2>Play MonoPoly</h2>' +
+        '<p>Roll around the board and turn what you learned into properties, ATP, and bonuses.</p></button>' +
+    '</div>' +
+  '</div>';
+}
+
+/* ---------- Learn Lab (restored original teaching layout) ---------- */
+function labTabsHTML(){
+  return '<nav class="tabs" role="tablist" aria-label="Macromolecule type">' + Object.keys(TABS).map(k =>
+    '<button class="tab" role="tab" data-labtab="' + k + '" aria-selected="' + (LAB.tab === k) + '">' + tabIcon(k) + TABS[k].label + '</button>'
+  ).join('') + '</nav>';
+}
+function labScreenHTML(){
+  return '<div class="wrap">' + headerHTML('lab') +
+    labTabsHTML() +
+    '<div class="toast" id="labToast" aria-live="polite"></div>' +
+    ledgerHTML() +
+    shelfBenchHTML() +
+    '<div class="lower">' +
+      '<section class="panel"><h2 class="pt">What just happened</h2><div id="logWrap" aria-live="polite"></div></section>' +
+      '<section class="panel challenges"><h2 class="pt">Challenges</h2><p class="prog" id="prog"></p><ul class="chal" id="chal"></ul></section>' +
+      '<section class="panel facts"><h2 class="pt" id="factsTitle">Cheat sheet</h2><dl id="facts"></dl><p class="factshook" id="factshook"></p></section>' +
+    '</div>' +
+    '<section class="panel targets"><h2 class="pt">Learning targets</h2><ul>' +
+      '<li>I can explain how monomers bond into polymers by dehydration synthesis, which releases a water molecule for every bond.</li>' +
+      '<li>I can explain how polymers break back into monomers by hydrolysis, which uses up a water molecule for every bond.</li>' +
+      '<li>I can identify the monomer, polymer, bond, and main job of carbohydrates, proteins, lipids, and nucleic acids.</li>' +
+    '</ul></section>' +
+  '</div>';
+}
+function switchLabTab(k){ if(TABS[k]){ LAB.tab = k; renderApp(); } }
+
+let labToastTimer = null;
+function renderLabChal(){
+  const t = LAB.tab, list = CHALLENGES[t], done = PLAYER.labChallenges[t] || [];
+  const prog = $('prog'); if(prog) prog.textContent = done.length + ' of ' + list.length + ' complete';
+  const chal = $('chal'); if(!chal) return;
+  chal.innerHTML = list.map((c,i) => {
+    const isDone = done.includes(i);
+    return '<li class="' + (isDone ? 'done' : '') + '"><span class="box" aria-hidden="true">' + (isDone ? '✓' : '') + '</span><span class="tx">' + esc(c.t) + '</span></li>';
   }).join('');
 }
-
-function renderFacts(){
-  const f = FACTS[S.tab];
-  $('factsTitle').textContent = TABS[S.tab].label + ' cheat sheet';
-  $('facts').innerHTML = f.rows.map(r => '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>').join('');
-  $('hook').textContent = f.hook;
-}
-
-function renderLedger(){
-  $('wOut').textContent = S.water.released;
-  $('wIn').textContent = S.water.used;
-}
-
-function render(){
-  const fk = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.fk : null;
-  document.body.dataset.tab = S.tab;
-  renderTabs(); renderShelf(); renderTools(); renderMat(); renderSelected(); renderHint();
-  renderLog(); renderChallenges(); renderFacts(); renderLedger();
-  if(fk){ const el = document.querySelector('[data-fk="' + fk + '"]'); if(el && !el.disabled) el.focus({preventScroll:true}); }
-}
-
-/* ---------- Water animation ---------- */
-const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-function centerOf(el){
-  if(!el) return null;
-  const m = $('mat').getBoundingClientRect(), r = el.getBoundingClientRect();
-  let cy = r.top + r.height / 2;
-  if(el.classList && el.classList.contains('bond')){
-    const by = parseFloat(getComputedStyle(el).getPropertyValue('--bond-y')) || r.height / 2;
-    cy = r.top + by;
-  }
-  return {x:r.left + r.width / 2 - m.left, y:cy - m.top};
-}
-function spawnWater(pos, dir, delay){
-  if(!pos || reduceMotion) return;
-  setTimeout(() => {
-    const w = document.createElement('div');
-    w.className = 'h2o ' + dir;
-    w.style.left = pos.x + 'px'; w.style.top = pos.y + 'px';
-    w.innerHTML = waterSVG(38) + '<span>H\u2082O</span>';
-    $('mat').appendChild(w);
-    setTimeout(() => w.remove(), 1800);
-  }, delay || 0);
-}
-function bump(id){
-  const el = $(id); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
-}
-
-/* ---------- Challenge checking ---------- */
-let toastTimer = null;
-function check(ev){
-  const t = S.tab, T = S.tabs[t];
+function labChallengeCheck(ev){
+  const t = LAB.tab, T = LAB.tabs[t], list = CHALLENGES[t];
+  if(!PLAYER.labChallenges[t]) PLAYER.labChallenges[t] = [];
+  const done = PLAYER.labChallenges[t];
   const newly = [];
-  CHALLENGES[t].forEach((c, i) => { if(!T.done.has(i) && c.test(T, ev)){ T.done.add(i); newly.push(c.t); } });
-  if(newly.length){
-    const el = $('toast');
-    el.textContent = 'Challenge complete: ' + newly.join(' ') + (T.done.size === CHALLENGES[t].length ? ' That\u2019s every ' + TABS[t].label.toLowerCase() + ' challenge!' : '');
-    el.classList.add('show'); clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 5000);
-    renderChallenges();
+  list.forEach((c,i) => {
+    if(!done.includes(i) && c.test(T, ev)){ done.push(i); newly.push(c.t); }
+  });
+  if(!newly.length) return;
+  newly.forEach(() => awardATP(CFG.ATP_LAB_CHALLENGE));
+  persist();
+  renderLabChal();
+  const el = $('labToast');
+  if(el){
+    const allDone = done.length === list.length;
+    el.textContent = 'Challenge complete: ' + newly.join(' ') + ' +' + (CFG.ATP_LAB_CHALLENGE * newly.length) + ' ATP.' +
+      (allDone ? ' That’s every ' + TABS[t].label.toLowerCase() + ' challenge!' : '');
+    el.classList.add('show'); clearTimeout(labToastTimer);
+    labToastTimer = setTimeout(() => el.classList.remove('show'), 5000);
   }
-}
-function pushLog(e){ const T = S.tabs[S.tab]; T.log.unshift(e); if(T.log.length > 12) T.log.pop(); }
-
-/* ---------- Actions: linear polymers ---------- */
-function addLinear(key){
-  const t = S.tab, T = S.tabs[t];
-  const unit = t === 'nucleic' ? {b:key, s:T.mode} : key;
-  let mol = T.mols.find(m => m.id === T.active);
-  if(!mol){
-    if(T.mols.length >= 6){ warn('The bench holds 6 molecules. Remove one or clear the bench to make room.'); return; }
-    mol = {id:uid(), units:[unit]}; T.mols.push(mol); T.active = mol.id;
-    render(); check({type:'place'}); return;
-  }
-  if(t === 'nucleic' && mol.units[0].s !== unit.s){ warn('DNA and RNA nucleotides don\u2019t mix in one strand. Tap \u201cStart a new molecule\u201d first.'); return; }
-  if(mol.units.length >= 12){ warn('That chain hit the bench limit of 12. Real polymers get far longer. Start a new molecule to keep building.'); return; }
-  const before = describe(t, mol.units).eq;
-  mol.units.push(unit);
-  const after = describe(t, mol.units).eq;
-  S.water.released++;
-  pushLog({type:'syn', left:[before, monoName(t, unit)], right:[after], n:1});
-  render(); bump('chipOut');
-  spawnWater(centerOf(document.querySelector('[data-bond="' + mol.id + '-' + (mol.units.length - 2) + '"]')), 'out');
-  check({type:'syn'});
-}
-function breakBond(molId, i){
-  const t = S.tab, T = S.tabs[t];
-  const idx = T.mols.findIndex(m => m.id === molId); if(idx < 0) return;
-  const mol = T.mols[idx];
-  const pos = centerOf(document.querySelector('[data-bond="' + molId + '-' + i + '"]'));
-  const len = mol.units.length, before = describe(t, mol.units).eq;
-  const left = mol.units.slice(0, i + 1), right = mol.units.slice(i + 1);
-  if(T.mols.length >= 10){ warn('The bench is crowded. Remove a molecule before breaking more apart.'); return; }
-  mol.units = left;
-  T.mols.splice(idx + 1, 0, {id:uid(), units:right});
-  S.water.used++;
-  pushLog({type:'hyd', left:[before], right:[describe(t, left).eq, describe(t, right).eq], n:1});
-  render(); bump('chipIn'); spawnWater(pos, 'in');
-  check({type:'hyd', len});
-}
-function breakAllLinear(){
-  const t = S.tab, T = S.tabs[t];
-  const idx = T.mols.findIndex(m => m.id === T.active); if(idx < 0) return;
-  const mol = T.mols[idx], n = mol.units.length - 1; if(n < 1) return;
-  if(T.mols.length + n > 16){ warn('Breaking every bond would overflow the bench. Remove a molecule first.'); return; }
-  const positions = [];
-  for(let i = 0; i < n; i++) positions.push(centerOf(document.querySelector('[data-bond="' + mol.id + '-' + i + '"]')));
-  const before = describe(t, mol.units).eq;
-  const pieces = mol.units.map(u => ({id:uid(), units:[u]}));
-  T.mols.splice(idx, 1, ...pieces);
-  T.active = pieces[0].id;
-  S.water.used += n;
-  const names = mol.units.map(u => monoName(t, u));
-  pushLog({type:'hyd', left:[before], right:names.length > 4 ? [names.length + ' monomers'] : names, n});
-  render(); bump('chipIn');
-  positions.forEach((p, k) => spawnWater(p, 'in', k * 110));
-  check({type:'hyd', len:n + 1});
 }
 
-/* ---------- Actions: lipids ---------- */
-function addLipid(key){
-  const L = S.tabs.lipids;
-  if(key === 'glycerol'){
-    if(L.glycerol){ warn('One glycerol at a time. Clear the bench to start a new lipid.'); return; }
-    L.glycerol = true; render(); return;
-  }
-  if(!L.glycerol){ warn('Start with a glycerol backbone. Fatty acids and phosphates need something to bond to.'); return; }
-  let slot;
-  if(key === 'phos'){
-    if(L.slots[2]){ warn('Carbon 3 is taken, and phosphate only bonds to carbon 3. Break that bond first.'); return; }
-    slot = 2;
-  } else {
-    slot = L.slots.findIndex(s => !s);
-    if(slot < 0){ warn('All three carbons are bonded. Break a bond to swap a piece.'); return; }
-  }
-  const before = nameLipid(L).eq;
-  L.slots[slot] = key;
-  const after = nameLipid(L);
-  if(L.slots.filter(s => s === 'sat' || s === 'unsat').length === 3) L.wasTri = true;
-  S.water.released++;
-  pushLog({type:'syn', left:[before, LIPID_PARTS[key].name], right:[after.eq], n:1});
-  render(); bump('chipOut');
-  spawnWater(centerOf(document.querySelector('[data-lbond="' + slot + '"] circle')), 'out');
-  check({type:'syn'});
+/* ---------- settings (question timers) ---------- */
+function openSettings(){ openPopup({mode:'settings'}); }
+function settingsBodyHTML(){
+  const cur = PLAYER.timerSetting || 'off';
+  const opts = [['off','Off — untimed, full ATP either way'],['relaxed','Relaxed — double time'],['standard','Standard timing']];
+  return '<div class="popup-emoji">⚙️</div><h3 style="text-align:center">Settings</h3>' +
+    '<p class="popup-txt">Question timers — used by Enzyme Card challenges.</p>' +
+    '<div class="popup-actions" style="flex-direction:column;align-items:stretch">' +
+      opts.map(([v,l]) => '<button class="btn' + (cur===v?' btn-primary':'') + '" data-timerset="' + v + '">' + esc(l) + '</button>').join('') +
+    '</div>' +
+    '<div class="popup-actions"><button class="btn btn-primary" data-popact="closePopup">Done</button></div>';
 }
-function breakLipid(i){
-  const L = S.tabs.lipids; if(!L.slots[i]) return;
-  const pos = centerOf(document.querySelector('[data-lbond="' + i + '"] circle'));
-  const before = nameLipid(L).eq, piece = L.slots[i];
-  L.slots[i] = null;
-  S.water.used++;
-  pushLog({type:'hyd', left:[before], right:[nameLipid(L).eq, LIPID_PARTS[piece].name], n:1});
-  render(); bump('chipIn'); spawnWater(pos, 'in');
-  lipidDigestCheck();
-}
-function breakAllLipid(){
-  const L = S.tabs.lipids;
-  const filled = L.slots.map((s, i) => s ? i : -1).filter(i => i >= 0); if(!filled.length) return;
-  const positions = filled.map(i => centerOf(document.querySelector('[data-lbond="' + i + '"] circle')));
-  const before = nameLipid(L).eq, parts = filled.map(i => LIPID_PARTS[L.slots[i]].name);
-  L.slots = [null, null, null];
-  S.water.used += filled.length;
-  pushLog({type:'hyd', left:[before], right:['Glycerol'].concat(parts), n:filled.length});
-  render(); bump('chipIn');
-  positions.forEach((p, k) => spawnWater(p, 'in', k * 110));
-  lipidDigestCheck();
-}
-function lipidDigestCheck(){
-  const L = S.tabs.lipids;
-  if(L.wasTri && !L.slots.some(Boolean)){ L.wasTri = false; check({type:'digestedTri'}); }
-  else check({type:'hyd'});
+function effectiveEnzymeMs(){
+  const setting = (PLAYER && PLAYER.timerSetting) || 'off';
+  if(setting === 'off') return null;
+  if(setting === 'relaxed') return CFG.ENZYME_MS * 2;
+  return CFG.ENZYME_MS;
 }
 
-/* ---------- Events ---------- */
+/* ============================================================
+   PART 9: player session start + event wiring + init
+============================================================ */
+function startGame(name){
+  name = (name || '').trim().slice(0,24);
+  if(!name) return;
+  if(!STORE.players[name]) STORE.players[name] = freshPlayer(name);
+  PLAYER = normalizePlayer(STORE.players[name]);
+  STORE.current = name;
+  saveStore(STORE);
+  UI.screen = 'home';
+  renderApp();
+}
+
 document.addEventListener('click', e => {
-  const tgt = e.target;
-  const tab = tgt.closest('[data-tab]');
-  if(tab && tab.classList.contains('tab')){ S.tab = tab.dataset.tab; $('toast').classList.remove('show'); render(); return; }
-  const add = tgt.closest('[data-add]');
-  if(add){ S.tab === 'lipids' ? addLipid(add.dataset.add) : addLinear(add.dataset.add); return; }
-  const mode = tgt.closest('[data-mode]');
+  const t = e.target;
+
+  const startBtn = t.closest('#startBtn');
+  if(startBtn){ const inp = $('nameInput'); startGame(inp ? inp.value : ''); return; }
+  const cont = t.closest('[data-continue]');
+  if(cont){ startGame(cont.dataset.continue); return; }
+
+  const soundBtn = t.closest('#soundBtn');
+  if(soundBtn){ SOUND_ON = !SOUND_ON; saveSoundPref(SOUND_ON); if(SOUND_ON) ensureAudio(); renderApp(); return; }
+  const menuBtn = t.closest('#menuBtn');
+  if(menuBtn){ openMenu(); return; }
+  const settingsBtn = t.closest('#settingsBtn');
+  if(settingsBtn){ openSettings(); return; }
+  const timerSet = t.closest('[data-timerset]');
+  if(timerSet){ PLAYER.timerSetting = timerSet.dataset.timerset; persist(); openSettings(); return; }
+  const navBtn = t.closest('[data-nav]');
+  if(navBtn){
+    clearInterval(challengeInterval);
+    UI.overlay = null; UI.popup = null; LAB.onGoalProgress = null;
+    UI.screen = navBtn.dataset.nav;
+    renderApp();
+    return;
+  }
+  const labTabBtn = t.closest('[data-labtab]');
+  if(labTabBtn){ switchLabTab(labTabBtn.dataset.labtab); return; }
+
+  const rollBtn = t.closest('#rollBtn');
+  if(rollBtn){ rollDice(); return; }
+  const sqBtn = t.closest('.sq[data-sqid]');
+  if(sqBtn && !UI.overlay && !UI.popup && !UI.rolling){
+    const sq = SQUARES.find(s => s.id === sqBtn.dataset.sqid);
+    if(sq.type === 'prop') openModule(sq.id);
+    else if(sq.type === 'enzyme') openChallenge(sq.id);
+    else if(sq.type === 'jail') openDenature();
+    else if(sq.type === 'park') openWaterBreak();
+    else if(sq.type === 'bonus') openCornerBonus();
+    else if(sq.type === 'go') openGoInfo();
+    return;
+  }
+
+  const closeOv = t.closest('#closeOverlayBtn');
+  if(closeOv){ closeOverlay(); return; }
+  const backBtn = t.closest('#backToBoardBtn');
+  if(backBtn){ closeOverlay(); return; }
+  const giveUp = t.closest('#giveUpBtn');
+  if(giveUp){ resolveChallenge(false); return; }
+
+  const qopt = t.closest('[data-qopt]');
+  if(qopt && !qopt.disabled){ quizAnswer(parseInt(qopt.dataset.qopt,10)); return; }
+  const qnext = t.closest('#quizNextBtn');
+  if(qnext){ quizNext(); return; }
+  const danswer = t.closest('[data-danswer]');
+  if(danswer && !danswer.disabled){ denatureAnswer(parseInt(danswer.dataset.danswer,10)); return; }
+
+  const closePop = t.closest('#closePopupBtn');
+  if(closePop){ closePopup(); return; }
+  const popact = t.closest('[data-popact]');
+  if(popact){
+    const a = popact.dataset.popact;
+    if(a === 'closePopup') closePopup();
+    else if(a === 'menu') openMenu();
+    else if(a === 'howto') openHowto();
+    else if(a === 'switchPlayer') switchPlayer();
+    else if(a === 'confirmReset') openConfirmReset();
+    else if(a === 'doReset') doReset();
+    return;
+  }
+
+  /* lab bench delegated events (shelf / bonds / tools / molecule select) — live on the Learn Lab screen or inside a board overlay */
+  if(!UI.overlay && UI.screen !== 'lab') return;
+  const add = t.closest('[data-add]');
+  if(add){ LAB.tab === 'lipids' ? addLipid(add.dataset.add) : addLinear(add.dataset.add); return; }
+  const mode = t.closest('[data-mode]');
   if(mode){
-    const T = S.tabs.nucleic; if(T.mode === mode.dataset.mode) return;
+    const T = LAB.tabs.nucleic; if(T.mode === mode.dataset.mode) return;
     T.mode = mode.dataset.mode;
     const act = T.mols.find(m => m.id === T.active);
     if(act && act.units[0].s !== T.mode) T.active = null;
-    render(); return;
+    renderLab(); return;
   }
-  const bond = tgt.closest('[data-bond]');
+  const bond = t.closest('[data-bond]');
   if(bond){ const k = bond.dataset.bond, cut = k.lastIndexOf('-'); breakBond(k.slice(0, cut), parseInt(k.slice(cut + 1), 10)); return; }
-  const lb = tgt.closest('[data-lbond]');
+  const lb = t.closest('[data-lbond]');
   if(lb){ breakLipid(parseInt(lb.dataset.lbond, 10)); return; }
-  const act = tgt.closest('[data-act]');
-  if(act){ doAct(act.dataset.act); return; }
-  const sel = tgt.closest('[data-sel]') || tgt.closest('[data-mol]');
+  const act = t.closest('[data-act]');
+  if(act){ doLabAct(act.dataset.act); return; }
+  const sel = t.closest('[data-sel]') || t.closest('[data-mol]');
   if(sel){
-    const T = S.tabs[S.tab]; const id = sel.dataset.sel || sel.dataset.mol;
-    if(T.active !== id){ T.active = id; render(); }
+    const T = LAB.tabs[LAB.tab]; const id = sel.dataset.sel || sel.dataset.mol;
+    if(T.active !== id){ T.active = id; renderLab(); }
   }
 });
 document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && document.activeElement && document.activeElement.id === 'nameInput'){ startGame(document.activeElement.value); return; }
   const lb = e.target.closest && e.target.closest('[data-lbond]');
-  if(lb && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); breakLipid(parseInt(lb.dataset.lbond, 10)); return; }
-  const tab = e.target.closest && e.target.closest('.tab');
-  if(tab && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')){
-    const keys = Object.keys(TABS); let i = keys.indexOf(S.tab);
-    i = (i + (e.key === 'ArrowRight' ? 1 : keys.length - 1)) % keys.length;
-    S.tab = keys[i]; render();
-    const el = document.querySelector('[data-fk="tab-' + S.tab + '"]'); if(el) el.focus();
-  }
+  if(lb && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); breakLipid(parseInt(lb.dataset.lbond, 10)); }
 });
-function doAct(a){
-  const t = S.tab, T = S.tabs[t];
+function doLabAct(a){
+  const t = LAB.tab, T = LAB.tabs[t];
   if(t === 'lipids'){
     if(a === 'breakall') breakAllLipid();
-    if(a === 'clear'){ T.glycerol = false; T.slots = [null, null, null]; T.wasTri = false; render(); }
+    if(a === 'clear'){ T.glycerol = false; T.slots = [null, null, null]; T.wasTri = false; renderLab(); }
     return;
   }
-  if(a === 'new'){ T.active = null; render(); return; }
+  if(a === 'new'){ T.active = null; renderLab(); return; }
   if(a === 'breakall'){ breakAllLinear(); return; }
-  if(a === 'remove'){ T.mols = T.mols.filter(m => m.id !== T.active); T.active = T.mols.length ? T.mols[T.mols.length - 1].id : null; render(); return; }
-  if(a === 'clear'){ T.mols = []; T.active = null; render(); return; }
-  if(a === 'comp'){ T.complement = !T.complement; render(); check({type:'comp'}); }
+  if(a === 'remove'){ T.mols = T.mols.filter(m => m.id !== T.active); T.active = T.mols.length ? T.mols[T.mols.length - 1].id : null; renderLab(); return; }
+  if(a === 'clear'){ T.mols = []; T.active = null; renderLab(); return; }
+  if(a === 'comp'){ T.complement = !T.complement; renderLab(); afterAction({type:'comp'}); }
 }
 
-/* ---------- Init ---------- */
-$('wIconOut').innerHTML = waterSVG(32);
-$('wIconIn').innerHTML = waterSVG(32);
-render();
+/* ---------- init ---------- */
+(function init(){
+  if(STORE.current && STORE.players[STORE.current]){
+    PLAYER = normalizePlayer(STORE.players[STORE.current]);
+    UI.screen = 'home';
+  }
+  renderApp();
+})();
 })();
 </script>
 </body>
 </html>
+
