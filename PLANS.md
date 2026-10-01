@@ -6,8 +6,8 @@ only committed once Mr. Rankin approves it. Update this file as phases finish.
 | Phase | What | Status |
 |---|---|---|
 | A2 | Full-width board, property art, 3D dice, card system, Lab review nudges | ✅ Done |
-| B | Our standard, proficiency levels, "Meet the Big Four" | ⏳ Next |
-| C | Nucleic acids upgrades: double helix, ATP/ADP station | Planned |
+| B | Our standard, proficiency levels, "Meet the Big Four" | ✅ Done |
+| C | Nucleic acids upgrades: double helix, ATP/ADP station | ⏳ Next |
 | D | Gamified questions | Planned |
 
 ---
@@ -24,7 +24,23 @@ ATP coins + confetti. GO payout halved (30 / +12) to balance the two dice.
 
 ---
 
-## Phase B — our standard, proficiency levels, and "Meet the Big Four"
+## Phase B — our standard, proficiency levels, and "Meet the Big Four" ✅
+
+Notes from the build:
+- 76 items tagged (`lv` + inline comment). Totals: 43 at Level 1, 14 at
+  Level 2, 19 at Level 3.
+- New Level 3 questions: Glucose Grove (why runners eat carbs), Starch
+  Boulevard (starch/glycogen storage), Glycerol Gardens (bears and fat),
+  Nucleotide Knoll (RNA's job), Helix Heights (DNA's job).
+- A few challenges were reworded to frame them around function (Phe–Lys–Gly–Met
+  "would it fold and do the same job?", phospholipid "building block of every
+  cell membrane").
+- The proteins Enzyme Card "Protease patrol! Bond two amino acids" is now
+  "Ribosome rush!" (proteases break bonds rather than build them), and
+  "Helicase hustle" is now "Pairing practice".
+- `BIG_FOUR_STATS` % dry weight values are rough (proteins ~43, lipids ~38,
+  minerals/other ~15, carbs ~2, nucleic ~2). Please check them.
+
 
 **Standard** (replace any remaining "I can" targets with this, word for word):
 

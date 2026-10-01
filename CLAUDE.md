@@ -50,12 +50,21 @@ screen/overlay/popup change (cheap enough at this DOM size).
 - **Home** (`homeHTML()`) — two cards, Learn Lab / Play MonoPoly, plus the
   school logo. Reachable anytime via the header nav pills or by clicking the
   brand/logo.
-- **Learn Lab** (`labScreenHTML()`) — the *restored original* teaching layout:
-  tabs, monomer shelf, bench (tap-to-bond/tap-to-break), water counters, the
-  reaction log, the original per-tab `CHALLENGES` list (not the same thing as
-  `MODULES`, see below), the cheat-sheet/hook, and the standard/targets
-  section. This is the primary teaching surface — students are meant to start
-  here, not on the board.
+- **Learn Lab** (`labScreenHTML()`) — tabs in `LAB_TAB_ORDER`: **Meet the Big
+  Four** (`LAB.tab === 'bigfour'`, first tab and the landing tab for new/reset
+  players) then the four bench tabs. A bench tab is the *restored original*
+  teaching layout: monomer shelf, bench (tap-to-bond/tap-to-break), water
+  counters, the reaction log, the per-tab `CHALLENGES` list (not the same thing
+  as `MODULES`), and the cheat-sheet/hook. The Big Four tab has no bench
+  (`bigFourHTML()`/`renderBigFour()`, PART 8b): a side-by-side comparison
+  (`#b4-table`), elements + the oxygen-ratio trick (`#b4-elements`), the
+  Element Detective drill (`#b4-detective`, `DETECTIVE_FORMULAS`), energy per
+  gram + food lab (`#b4-energy`), and the body-composition chart (`#b4-body`).
+  Its activities fire `afterAction({type:'detective'|'energy'|'body', ...})`
+  into the same `labChallengeCheck` as the bench tabs. Every tab ends with our
+  standard (`standardHTML()`, text in `STANDARD`, word for word — it replaced
+  the old "I can" learning targets). This is the primary teaching surface —
+  students are meant to start here, not on the board.
 - **Play MonoPoly** (`boardScreenHTML()`) — no side panel. The board is a 6×6
   perimeter grid stretched into a wide rectangle spanning the full `.wrap`
   width (same as the header/Lab). `.wrap.board-wrap` is a 100svh flex column,
@@ -104,11 +113,35 @@ screen/overlay/popup change (cheap enough at this DOM size).
   bonus, enzyme win, Showdown finish). All of it, plus dice tumble, token
   hops, and card fly/zoom, is skipped under `reduceMotion`.
 - **Report Card** (`reportCardHTML()`, `UI.screen === 'report'`, reached via the
-  ☰ menu) — ATP total, per-group ownership + Lab-challenge counts, and Mogul
-  Showdown best/last stars + badge.
+  ☰ menu) — ATP total, progress by proficiency level (`levelReportHTML()`:
+  "Level N: x of y" plus a level × group table, built from `levelItems()`),
+  per-group ownership + Lab-challenge counts, and Mogul Showdown best/last
+  stars + badge.
+
+## Proficiency levels (standard 1.2)
+
+Every Lab challenge, module quiz question, Enzyme Card, Showdown round, and
+Denaturation question has `lv:1|2|3` with an inline `/* L#: why */` comment —
+the user re-tags by editing those. L1 = identify polymers/monomers, builds,
+naming, Element Detective; L2 = formation/separation (dehydration synthesis,
+hydrolysis, water, digestion) + relative energy (Calories/g, C–H bonds);
+L3 = functions. Every molecule must keep at least 2 Level 3 items. Completion
+is tracked per item: `PLAYER.labChallenges`, `PLAYER.quizDone`,
+`PLAYER.enzymeDone[id]` (Enzyme Cards need a stable `id`),
+`PLAYER.showdownDone[index]`, `PLAYER.denatureDone[index]` — so only ever
+*append* to `SHOWDOWN_ROUNDS`/`DENATURE_QUESTIONS`/a module's `quiz`, never
+reorder. When a module gains a question after a student bought it, the owned
+card shows the new check (bonus ATP, no repurchase), and `normalizePlayer()`
+pads `quizDone`. Levels show as `lvlChip(lv)` on challenges, quiz checks,
+Enzyme Cards, Denaturation, and in the Showdown kicker. Each quiz question also
+needs a matching `QUIZ_REVIEW[id][i]` wrong-answer target (several point into
+Big Four via `focus:'#b4-…'`).
 
 ## How the file is organized (script is one big IIFE, in numbered PARTs)
 
+0. **Top of the script** — `BIG_FOUR_STATS` (every number on the Big Four tab:
+   elements, Calories/g, % dry weight, foods; marked "approximate, verify
+   against Mr. Rankin's notes"), `DETECTIVE_FORMULAS`, `STANDARD`.
 1. **Macromolecule data + SVG tile builders** — reused verbatim from the original
    MonoPoly lab prototype (carbs/proteins/lipids/nucleic acid data, `carbTile()`,
    `aaTile()`, `nucTile()`, `lipidSVG()`, naming functions like `nameCarb()`).
@@ -123,7 +156,7 @@ screen/overlay/popup change (cheap enough at this DOM size).
    The shelf+bench markup itself is `shelfBenchHTML()`; `labBenchHTML()` wraps
    it with the water ledger and a 2-column log/cheat-sheet row for overlays,
    while the Learn Lab screen assembles its own 3-column row (log/challenges/
-   cheat-sheet) plus the learning-targets section, matching the original layout.
+   cheat-sheet) plus the standard section, matching the original layout.
 3. **Game config** — `CFG` (all ATP amounts, tunable in one place), `LOGO_DATA_URI`
    (the embedded school logo, right after `const INK`), `SQUARES` (the 20-square
    board loop) + `SQ_GRID` (their positions on a 6×6 perimeter grid), `MODULES`
@@ -158,7 +191,8 @@ screen/overlay/popup change (cheap enough at this DOM size).
    `denaturePanelHTML()`/`denatureAnswer()` (retries always allowed);
    `menuBodyHTML()`/`settingsBodyHTML()`/`confirmResetBodyHTML()`/
    `howtoBodyHTML()` stay on the true-modal `UI.popup` system.
-8. **Shared header/nav, Home screen, Learn Lab screen, Settings** — `headerHTML()`
+8. **Shared header/nav, Home screen, Learn Lab screen, Big Four (8b), Report
+   Card, Settings** — `headerHTML()`
    is used by all main screens; `labScreenHTML()`/`labTabsHTML()` render
    the restored Lab; `labChallengeCheck()`/`renderLabChal()` drive the Lab's
    challenge list and award ATP; the Settings popup (`settingsBodyHTML()`) holds

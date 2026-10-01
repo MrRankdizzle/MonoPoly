@@ -271,6 +271,83 @@ body.card-open.atp-lift .wallet{position:relative; z-index:60; pointer-events:no
 .facts dt.review-focus, .facts dd.review-focus{outline:0; background:color-mix(in srgb, var(--brand-blue) 28%, transparent); border-radius:6px; animation:none}
 @keyframes focusPulse{50%{outline-color:transparent}}
 
+/* ---------- proficiency levels + standard ---------- */
+body[data-tab="bigfour"]{--accent:var(--brand); --on-accent:#fff}
+.lvl{display:inline-block; font-size:.68rem; font-weight:800; letter-spacing:.03em; line-height:1.5; padding:0 7px; border-radius:999px; vertical-align:middle; white-space:nowrap}
+.lvl1{background:#dff1e6; color:#1d6b42}
+.lvl2{background:#e1eafb; color:#2a55a4}
+.lvl3{background:#f0e3fb; color:#6c35a3}
+.standard{margin-top:16px}
+.std-code{font-weight:800}
+.std-code span{color:var(--muted); font-weight:600; font-size:.85rem}
+.std-text{margin-top:4px; font-size:.95rem}
+.std-levels{list-style:none; margin:12px 0 0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:10px 18px; font-size:.9rem}
+.std-levels li{display:flex; gap:8px; align-items:flex-start; padding-left:12px; border-left:3px solid var(--line)}
+@media (max-width:820px){ .std-levels{grid-template-columns:1fr} }
+.toast.show{position:sticky; top:8px; z-index:25; box-shadow:0 8px 20px -10px rgba(0,0,0,.4)}
+.lv-row{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start; padding:10px 0; border-top:1px solid var(--line)}
+.lv-row:first-of-type{border-top:0}
+.lv-row .lvl{font-size:.85rem; padding:2px 10px; margin-top:2px}
+.lv-bar{display:block; height:10px; border-radius:999px; background:var(--bg); border:1px solid var(--line); overflow:hidden; margin:6px 0}
+.lv-bar i{display:block; height:100%; background:linear-gradient(90deg, var(--brand-blue), var(--brand)); border-radius:999px}
+.lv-txt{font-size:.85rem; color:var(--muted)}
+.lv-table-wrap{overflow-x:auto; margin-top:10px}
+.lv-table{border-collapse:collapse; font-size:.85rem; min-width:100%}
+.lv-table th, .lv-table td{padding:6px 10px; text-align:center; border-bottom:1px solid var(--line); white-space:nowrap}
+.lv-table tbody th{text-align:left}
+
+/* ---------- Meet the Big Four ---------- */
+.b4-hero p{max-width:75ch; color:var(--muted)}
+.b4-cards{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin-top:16px}
+.b4-card{background:var(--panel); border:1.5px solid var(--line); border-top:6px solid var(--gc); border-radius:16px; padding:12px 14px}
+.b4-head{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+.b4-head h3{font-size:1.05rem}
+.b4-tile{display:flex; width:48px; height:48px; align-items:center; justify-content:center; background:var(--mat); border-radius:12px; flex:none}
+.b4-card dl{margin:0; font-size:.85rem}
+.b4-card dt{font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-top:8px}
+.b4-card dd{margin:2px 0 0}
+.b4-row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; align-items:start}
+.b4-row + .challenges, .b4-row ~ .challenges{margin-top:16px}
+@media (max-width:1020px){ .b4-cards{grid-template-columns:1fr 1fr} }
+@media (max-width:820px){ .b4-row{grid-template-columns:1fr} }
+@media (max-width:520px){ .b4-cards{grid-template-columns:1fr} }
+.el{display:inline-flex; align-items:center; justify-content:center; min-width:1.75em; height:1.75em; padding:0 .3em; margin:1px 2px; border-radius:999px; border:1.5px solid #1b2422; font-weight:800; font-size:.8rem; line-height:1}
+.el sub{font-size:.65em; margin-left:1px; vertical-align:-.2em}
+.b4-els{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:.9rem}
+.b4-els li{display:flex; align-items:center; flex-wrap:wrap; gap:4px}
+.b4-els .dot{width:11px; height:11px; border-radius:50%; margin-right:4px}
+.b4-els strong{min-width:9.5em}
+.b4-trick{margin-top:12px; font-size:.9rem; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--brand-blue) 14%, transparent)}
+.b4-note{font-size:.82rem; color:var(--muted); margin-top:6px}
+.ratio{margin-top:12px}
+.ratio-f{display:flex; flex-wrap:wrap; align-items:center; gap:2px; font-size:.85rem}
+.ratio-f span{color:var(--muted); margin-left:6px}
+.ratio-bars{display:flex; flex-direction:column; gap:3px; margin-top:6px}
+.rb{display:grid; grid-template-columns:1fr 4.5em; gap:8px; align-items:center; font-size:.78rem}
+.rb i{display:block; height:10px; border-radius:999px; border:1px solid #1b2422; min-width:4px}
+.det-formula{display:flex; flex-wrap:wrap; justify-content:center; gap:4px; padding:16px 10px; margin:10px 0; background:var(--bg); border-radius:14px; font-size:1.35rem}
+.det-formula .el{font-size:1.1rem}
+.det-opts{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.det-opts .qopt{border-left:5px solid var(--gc, var(--line))}
+.det-score{margin-top:10px; font-size:.88rem}
+.det-rules{margin-top:10px; font-size:.88rem}
+.det-rules summary{cursor:pointer; font-weight:700}
+.det-rules ol{margin:6px 0 0; padding-left:20px}
+.ebars{display:flex; flex-direction:column; gap:6px}
+.ebar{display:grid; grid-template-columns:minmax(7em, 34%) 1fr 4.6em; gap:8px; align-items:center; font-size:.85rem}
+.ebar-t{display:block; height:16px; background:var(--bg); border-radius:999px; overflow:hidden; border:1px solid var(--line)}
+.ebar-t i{display:block; height:100%; border-radius:999px; transition:width .5s ease}
+.ebar-t.na{background:none; border:0; height:auto; font-size:.8rem; color:var(--muted); font-style:italic}
+.ebar b{text-align:right; font-size:.82rem}
+.food-opts{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:8px; margin-top:8px}
+.food{text-align:left; border:1.5px solid var(--line); border-left:5px solid var(--gc); background:var(--panel); border-radius:12px; padding:8px 10px; cursor:pointer; display:flex; flex-direction:column; gap:2px}
+.food small{font-size:.75rem; color:var(--muted)}
+.food.on{border-color:var(--brand); background:color-mix(in srgb, var(--brand-blue) 16%, var(--panel)); box-shadow:inset 0 0 0 1px var(--brand)}
+.food-result{display:flex; flex-direction:column; gap:6px; margin:12px 0 10px}
+.body-chart{display:flex; flex-direction:column; gap:6px; margin:12px 0 10px}
+.body-chart.hidden-vals .ebar-t i{opacity:.25}
+@media (prefers-reduced-motion:reduce){ .ebar-t i{transition:none} }
+
 /* ---------- ATP coins + confetti ---------- */
 .coin-fly{position:fixed; left:0; top:0; z-index:80; width:26px; height:26px; pointer-events:none; will-change:transform}
 .coin-fly svg{display:block}
@@ -476,6 +553,60 @@ const LOGO_DATA_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeAAAAGHCAY
 const $ = id => document.getElementById(id);
 const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============================================================
+   BIG FOUR NUMBERS — approximate, verify against Mr. Rankin's notes.
+   Everything numeric on the "Meet the Big Four" tab comes from here.
+   calPerG: food Calories (kcal) per gram when used as fuel (null = not a fuel).
+   dryWeightPct: share of an average human body's dry weight (everything
+   except water); varies a lot from person to person, especially lipids.
+   Foods: Calories per gram for the energy-lab comparison.
+============================================================ */
+const BIG_FOUR_STATS = {
+  groups:{
+    carbs:   {elements:['C','H','O'], extra:'', calPerG:4, dryWeightPct:2},
+    lipids:  {elements:['C','H','O'], extra:'P (in phospholipids)', calPerG:9, dryWeightPct:38},
+    proteins:{elements:['C','H','O','N'], extra:'S (in some)', calPerG:4, dryWeightPct:43},
+    nucleic: {elements:['C','H','O','N','P'], extra:'', calPerG:null, dryWeightPct:2}
+  },
+  otherDryWeightPct:15, // minerals (mostly bone), salts, and everything else
+  waterPct:60,          // share of total body weight that is water
+  foods:[
+    {name:'Olive oil', group:'lipids', calPerG:9, note:'pure fat'},
+    {name:'Butter', group:'lipids', calPerG:7, note:'mostly fat, plus some water'},
+    {name:'Table sugar', group:'carbs', calPerG:4, note:'pure carbohydrate (sucrose)'},
+    {name:'Dry white rice', group:'carbs', calPerG:3.6, note:'mostly starch'},
+    {name:'Egg white protein powder', group:'proteins', calPerG:4, note:'almost all protein'},
+    {name:'Almonds', group:'lipids', calPerG:5.8, note:'about half fat, plus protein and carbs'}
+  ]
+};
+/* Element Detective drill: real formulas. Rule of thumb taught on the tab:
+   P (with N) → nucleic acid; N but no P → protein; only C/H/O → compare O to C:
+   about one O per C → carbohydrate, far less O than C → lipid. */
+const DETECTIVE_FORMULAS = [
+  {name:'glucose', group:'carbs', f:[['C',6],['H',12],['O',6]]},
+  {name:'sucrose (table sugar)', group:'carbs', f:[['C',12],['H',22],['O',11]]},
+  {name:'ribose', group:'carbs', f:[['C',5],['H',10],['O',5]]},
+  {name:'stearic acid (a saturated fatty acid)', group:'lipids', f:[['C',18],['H',36],['O',2]]},
+  {name:'palmitic acid (a fatty acid in palm oil)', group:'lipids', f:[['C',16],['H',32],['O',2]]},
+  {name:'tristearin (a triglyceride in beef fat)', group:'lipids', f:[['C',57],['H',110],['O',6]]},
+  {name:'alanine (an amino acid)', group:'proteins', f:[['C',3],['H',7],['N',1],['O',2]]},
+  {name:'methionine (an amino acid)', group:'proteins', f:[['C',5],['H',11],['N',1],['O',2],['S',1]]},
+  {name:'glycine (an amino acid)', group:'proteins', f:[['C',2],['H',5],['N',1],['O',2]]},
+  {name:'adenosine monophosphate (a nucleotide)', group:'nucleic', f:[['C',10],['H',14],['N',5],['O',7],['P',1]]},
+  {name:'cytidine monophosphate (a nucleotide)', group:'nucleic', f:[['C',9],['H',14],['N',3],['O',8],['P',1]]}
+];
+/* Our standard, word for word. Shown in the Learn Lab and on the Report Card. */
+const STANDARD = {
+  code:'1.2 | Biological Molecules',
+  text:'I can compare and contrast the four main types of biomolecules that comprise the body: carbohydrates, lipids, nucleic acids and proteins.',
+  ngss:'HS-PS1-1',
+  levels:{
+    1:'I can identify different biological molecules (polymers) and their respective building blocks (monomers).',
+    2:'Additionally, I can describe the chemical formation and separation of biological molecules, and use this to explain the relative amounts of energy stored in different biomolecules.',
+    3:'Additionally, I can describe the functions of the different biological molecules.'
+  }
+};
 
 /* ============================================================
    PART 1: shared macromolecule data + SVG tile builders
@@ -1094,32 +1225,46 @@ const GROUPS = {
    This is the Learn Lab's open-ended challenge list, one array per tab — distinct
    from MODULES' per-property guided goals above. Completing one earns ATP (see
    labChallengeCheck). `anyMol` is defined in Part 1. */
+/* Proficiency levels (standard 1.2, see STANDARD below). Every Lab challenge,
+   module quiz question, Enzyme Card, Showdown round, and Denaturation question
+   carries `lv` (1|2|3) with an inline comment saying why — re-tag freely.
+   L1 = identify polymers/monomers, straightforward builds, naming, Element Detective
+   L2 = formation + separation (dehydration synthesis, hydrolysis, water, digestion)
+        and relative energy (Calories/g, C–H bonds)
+   L3 = functions (energy storage, membranes, enzymes, structure, transport, genetic info) */
 const CHALLENGES = {
+  bigfour:[ // Meet the Big Four (tests read only the event, there's no bench here)
+    {lv:1, /* L1: Element Detective */ t:'Element Detective: classify 5 formulas correctly.', test:(T, ev) => ev && ev.type === 'detective' && ev.correct >= 5},
+    {lv:1, /* L1: Element Detective, carb vs. lipid by oxygen */ t:'Element Detective: spot a lipid by its low oxygen.', test:(T, ev) => ev && ev.type === 'detective' && ev.ok && ev.group === 'lipids'},
+    {lv:2, /* L2: relative energy */ t:'Energy lab: compare a lipid food with a carbohydrate food.', test:(T, ev) => ev && ev.type === 'energy' && ev.groups.includes('lipids') && ev.groups.includes('carbs')},
+    {lv:2, /* L2: relative energy */ t:'Energy lab: correctly predict which food stores more energy per gram.', test:(T, ev) => ev && ev.type === 'energy' && ev.predictedRight},
+    {lv:1, /* L1: identify the big four */ t:'Body chart: find the biomolecule that makes up most of your dry weight.', test:(T, ev) => ev && ev.type === 'body' && ev.ok}
+  ],
   carbs:[
-    {t:'Build table sugar (sucrose).', test:T => anyMol(T, u => nameCarb(u).name === 'Sucrose')},
-    {t:'Build milk sugar (lactose).', test:T => anyMol(T, u => nameCarb(u).name === 'Lactose')},
-    {t:'Build maltose.', test:T => anyMol(T, u => nameCarb(u).name === 'Maltose')},
-    {t:'Build a starch-style chain of 5 or more glucose.', test:T => anyMol(T, u => u.length >= 5 && u.every(x => x === 'glu'))},
-    {t:'Digest it: hydrolyze a disaccharide back into two monosaccharides.', test:(T, ev) => ev && ev.type === 'hyd' && ev.len === 2}
+    {lv:1, /* L1: build + name */ t:'Build table sugar (sucrose).', test:T => anyMol(T, u => nameCarb(u).name === 'Sucrose')},
+    {lv:1, /* L1: build + name */ t:'Build milk sugar (lactose).', test:T => anyMol(T, u => nameCarb(u).name === 'Lactose')},
+    {lv:1, /* L1: build + name */ t:'Build maltose.', test:T => anyMol(T, u => nameCarb(u).name === 'Maltose')},
+    {lv:1, /* L1: polymer from monomers */ t:'Build a starch-style chain of 5 or more glucose.', test:T => anyMol(T, u => u.length >= 5 && u.every(x => x === 'glu'))},
+    {lv:2, /* L2: hydrolysis / digestion */ t:'Digest it: hydrolyze a disaccharide back into two monosaccharides.', test:(T, ev) => ev && ev.type === 'hyd' && ev.len === 2}
   ],
   proteins:[
-    {t:'Build any dipeptide.', test:T => anyMol(T, u => u.length === 2)},
-    {t:'Build a polypeptide with 6 or more amino acids.', test:T => anyMol(T, u => u.length >= 6)},
-    {t:'Build this exact sequence: Met–Gly–Lys–Phe.', test:T => anyMol(T, u => u.join('-') === 'met-gly-lys-phe')},
-    {t:'Same parts, new order: build Phe–Lys–Gly–Met. Is it the same protein?', test:T => anyMol(T, u => u.join('-') === 'phe-lys-gly-met')},
-    {t:'Digest it: break a peptide bond in a chain of 3 or more.', test:(T, ev) => ev && ev.type === 'hyd' && ev.len >= 3}
+    {lv:1, /* L1: build */ t:'Build any dipeptide.', test:T => anyMol(T, u => u.length === 2)},
+    {lv:1, /* L1: polymer from monomers */ t:'Build a polypeptide with 6 or more amino acids.', test:T => anyMol(T, u => u.length >= 6)},
+    {lv:1, /* L1: build a sequence */ t:'Build this exact sequence: Met–Gly–Lys–Phe.', test:T => anyMol(T, u => u.join('-') === 'met-gly-lys-phe')},
+    {lv:3, /* L3: order -> shape -> job */ t:'Same parts, new order: build Phe–Lys–Gly–Met. Would it fold and do the same job?', test:T => anyMol(T, u => u.join('-') === 'phe-lys-gly-met')},
+    {lv:2, /* L2: hydrolysis / digestion */ t:'Digest it: break a peptide bond in a chain of 3 or more.', test:(T, ev) => ev && ev.type === 'hyd' && ev.len >= 3}
   ],
   lipids:[
-    {t:'Build a butter-style fat with 3 saturated tails.', test:T => { const d = nameLipid(T); return d && d.name === 'Saturated fat'; }},
-    {t:'Build an olive-oil-style fat with 3 unsaturated tails.', test:T => { const d = nameLipid(T); return d && d.name === 'Unsaturated fat (oil)'; }},
-    {t:'Build a phospholipid for a cell membrane.', test:T => { const d = nameLipid(T); return d && d.name === 'Phospholipid'; }},
-    {t:'Digest a triglyceride all the way back to glycerol + 3 fatty acids.', test:(T, ev) => ev && ev.type === 'digestedTri'}
+    {lv:1, /* L1: build + name */ t:'Build a butter-style fat with 3 saturated tails.', test:T => { const d = nameLipid(T); return d && d.name === 'Saturated fat'; }},
+    {lv:1, /* L1: build + name */ t:'Build an olive-oil-style fat with 3 unsaturated tails.', test:T => { const d = nameLipid(T); return d && d.name === 'Unsaturated fat (oil)'; }},
+    {lv:3, /* L3: membranes */ t:'Build a phospholipid, the building block of every cell membrane.', test:T => { const d = nameLipid(T); return d && d.name === 'Phospholipid'; }},
+    {lv:2, /* L2: hydrolysis / digestion */ t:'Digest a triglyceride all the way back to glycerol + 3 fatty acids.', test:(T, ev) => ev && ev.type === 'digestedTri'}
   ],
   nucleic:[
-    {t:'Build a DNA strand with 6 or more nucleotides.', test:T => anyMol(T, u => u[0].s === 'DNA' && u.length >= 6)},
-    {t:'Build an RNA strand (2 or more) that includes uracil.', test:T => anyMol(T, u => u[0].s === 'RNA' && u.length >= 2 && u.some(x => x.b === 'U'))},
-    {t:'Build DNA containing ATGC, then show its matching strand.', test:T => T.complement && anyMol(T, u => u[0].s === 'DNA' && u.map(x => x.b).join('').includes('ATGC'))},
-    {t:'Break a phosphodiester bond in the backbone.', test:(T, ev) => ev && ev.type === 'hyd'}
+    {lv:1, /* L1: polymer from monomers */ t:'Build a DNA strand with 6 or more nucleotides.', test:T => anyMol(T, u => u[0].s === 'DNA' && u.length >= 6)},
+    {lv:1, /* L1: DNA vs RNA monomers */ t:'Build an RNA strand (2 or more) that includes uracil.', test:T => anyMol(T, u => u[0].s === 'RNA' && u.length >= 2 && u.some(x => x.b === 'U'))},
+    {lv:1, /* L1: base pairing */ t:'Build DNA containing ATGC, then show its matching strand.', test:T => T.complement && anyMol(T, u => u[0].s === 'DNA' && u.map(x => x.b).join('').includes('ATGC'))},
+    {lv:2, /* L2: hydrolysis */ t:'Break a phosphodiester bond in the backbone.', test:(T, ev) => ev && ev.type === 'hyd'}
   ]
 };
 
@@ -1128,18 +1273,20 @@ const MODULES = {
     hook:'Every candy bar, banana, and mid-race energy gel owes its buzz to one tiny ring: glucose. It’s the single sugar your cells burn for fuel, and it’s the starting block for basically every carb on this board.',
     goals:[{text:'Place any single monosaccharide (glucose, fructose, or galactose) on the bench.', test:T=>T.mols.some(m=>m.units.length===1)}],
     quiz:[
-      {q:'What is a monosaccharide?', choices:['A single simple sugar unit','A chain of many sugars','A type of fat','A protein building block'], correct:0,
+      {lv:1, /* L1: monomer definition */ q:'What is a monosaccharide?', choices:['A single simple sugar unit','A chain of many sugars','A type of fat','A protein building block'], correct:0,
         explain:'Mono- means one, and -saccharide means sugar. A monosaccharide is just one simple sugar ring, like glucose.'},
-      {q:'Which of these is NOT a monosaccharide?', choices:['Glucose','Fructose','Sucrose','Galactose'], correct:2,
-        explain:'Sucrose is table sugar — glucose and fructose already bonded together, so it’s a disaccharide, not a monosaccharide.'}
+      {lv:1, /* L1: identify monomers */ q:'Which of these is NOT a monosaccharide?', choices:['Glucose','Fructose','Sucrose','Galactose'], correct:2,
+        explain:'Sucrose is table sugar — glucose and fructose already bonded together, so it’s a disaccharide, not a monosaccharide.'},
+      {lv:3, /* L3: quick energy */ q:'Why do runners eat pasta or bananas the day before a big race?', choices:['Carbohydrates are the body’s go-to source of quick, short-term energy','Carbohydrates store genetic information','Carbohydrates build the cell membrane','Carbohydrates speed up reactions like enzymes'], correct:0,
+        explain:'Carbs break down into glucose fast, so they’re the body’s quick, short-term energy source. Lipids are the long-term energy store.'}
     ]},
   sucrosest:{tab:'carbs', title:'Sucrose Street', sub:'Disaccharides + dehydration synthesis',
     hook:'Table sugar isn’t a monomer at all — it’s glucose and fructose holding hands. Every time two sugars link together, a water molecule gets kicked out. That’s dehydration synthesis: molecular chemistry’s version of packing light.',
     goals:[{text:'Build sucrose: bond a fructose to a glucose (either order).', test:T=>anyMol(T,u=>nameCarb(u).name==='Sucrose')}],
     quiz:[
-      {q:'Building sucrose from glucose and fructose releases a...', choices:['Water molecule','Oxygen molecule','Glucose molecule','Nothing'], correct:0,
+      {lv:2, /* L2: dehydration synthesis releases water */ q:'Building sucrose from glucose and fructose releases a...', choices:['Water molecule','Oxygen molecule','Glucose molecule','Nothing'], correct:0,
         explain:'Joining two monomers with a glycosidic bond is dehydration synthesis — “dehydration” because a water molecule is removed.'},
-      {q:'Lactose (milk sugar) is made from which two monosaccharides?', choices:['Glucose + Fructose','Galactose + Glucose','Fructose + Fructose','Galactose + Fructose'], correct:1,
+      {lv:1, /* L1: monomers of a disaccharide */ q:'Lactose (milk sugar) is made from which two monosaccharides?', choices:['Glucose + Fructose','Galactose + Glucose','Fructose + Fructose','Galactose + Fructose'], correct:1,
         explain:'Lactose = galactose + glucose. Sucrose = glucose + fructose. Maltose = glucose + glucose.'}
     ]},
   starchblvd:{tab:'carbs', title:'Starch Boulevard', sub:'Polysaccharides + hydrolysis',
@@ -1149,18 +1296,20 @@ const MODULES = {
       {text:'Digest it — break a bond in the chain (hydrolysis).', test:T=>T.log.some(e=>e.type==='hyd')}
     ],
     quiz:[
-      {q:'Starch, glycogen, and cellulose are all polysaccharides built from repeating...', choices:['Glucose','Fructose','Amino acids','Nucleotides'], correct:0,
+      {lv:1, /* L1: polymer from monomers */ q:'Starch, glycogen, and cellulose are all polysaccharides built from repeating...', choices:['Glucose','Fructose','Amino acids','Nucleotides'], correct:0,
         explain:'All three are long chains of glucose monomers — they just branch and bond a little differently from each other.'},
-      {q:'Digesting starch back into sugars is an example of...', choices:['Hydrolysis','Dehydration synthesis','Denaturation','Saturation'], correct:0,
-        explain:'Hydrolysis uses a water molecule to break a bond apart — the reverse of the dehydration synthesis that built the chain.'}
+      {lv:2, /* L2: hydrolysis / digestion */ q:'Digesting starch back into sugars is an example of...', choices:['Hydrolysis','Dehydration synthesis','Denaturation','Saturation'], correct:0,
+        explain:'Hydrolysis uses a water molecule to break a bond apart — the reverse of the dehydration synthesis that built the chain.'},
+      {lv:3, /* L3: short-term energy storage */ q:'Plants store extra glucose as starch, and your liver stores it as glycogen. What job do these polysaccharides do?', choices:['Short-term energy storage','Carry genetic instructions','Form the cell membrane','Fight infections as antibodies'], correct:0,
+        explain:'Starch and glycogen are glucose “savings accounts” your cells can break down quickly. (Cellulose, another glucose polymer, does a different job: structure in plant cell walls.)'}
     ]},
   aminoave:{tab:'proteins', title:'Amino Avenue', sub:'Amino acids + R groups',
     hook:'Twenty different amino acids are the entire alphabet your body uses to spell out every protein you own — collagen, hemoglobin, the keratin in your hair. Swap the R group side chain and you get a totally different letter.',
     goals:[{text:'Place any amino acid on the bench.', test:T=>T.mols.some(m=>m.units.length===1)}],
     quiz:[
-      {q:'What part of an amino acid changes from one amino acid to the next?', choices:['The R group (side chain)','The central carbon','The amino group','The carboxyl group'], correct:0,
+      {lv:1, /* L1: monomer structure */ q:'What part of an amino acid changes from one amino acid to the next?', choices:['The R group (side chain)','The central carbon','The amino group','The carboxyl group'], correct:0,
         explain:'Every amino acid shares the same core. The R group is the only part that differs, and it decides whether the amino acid is polar, nonpolar, or charged.'},
-      {q:'A nonpolar R group tends to...', choices:['Avoid water and hide inside a folded protein','Dissolve easily in water','Carry a permanent positive charge','Be identical to every other R group'], correct:0,
+      {lv:1, /* L1: monomer properties */ q:'A nonpolar R group tends to...', choices:['Avoid water and hide inside a folded protein','Dissolve easily in water','Carry a permanent positive charge','Be identical to every other R group'], correct:0,
         explain:'Nonpolar R groups are hydrophobic (water-fearing), so they usually end up tucked inside a protein’s folded core.'}
     ]},
   peptideplace:{tab:'proteins', title:'Peptide Place', sub:'Peptide bonds — order matters',
@@ -1170,28 +1319,30 @@ const MODULES = {
       {text:'Build a second, different dipeptide to compare sequences.', test:T=>{const d=T.mols.filter(m=>m.units.length===2).map(m=>m.units.join('-')); return new Set(d).size>=2;}}
     ],
     quiz:[
-      {q:'Two amino acids joined by a peptide bond form a...', choices:['Dipeptide','Disaccharide','Monoglyceride','Nucleotide'], correct:0,
+      {lv:1, /* L1: naming */ q:'Two amino acids joined by a peptide bond form a...', choices:['Dipeptide','Disaccharide','Monoglyceride','Nucleotide'], correct:0,
         explain:'Two amino acids = a dipeptide, just like two sugars = a disaccharide.'},
-      {q:'Met–Gly–Lys and Lys–Gly–Met use the same three amino acids. Are they the same protein?', choices:['No — the sequence changes the protein entirely','Yes, order never matters','Yes, they have the same mass','No, they’re made of different elements'], correct:0,
+      {lv:3, /* L3: order -> shape -> job */ q:'Met–Gly–Lys and Lys–Gly–Met use the same three amino acids. Are they the same protein?', choices:['No — the sequence changes the protein entirely','Yes, order never matters','Yes, they have the same mass','No, they’re made of different elements'], correct:0,
         explain:'Sequence is everything — change the order and you change how the chain folds, which changes (or destroys) its function.'}
     ]},
   foldingfalls:{tab:'proteins', title:'Folding Falls', sub:'Shape = function, denaturation',
     hook:'Fry an egg and the clear, runny white turns opaque and firm — forever. That’s not cooking magic, it’s denaturation: heat ripping apart the folds that gave the protein its shape (and its job). Lose the fold, lose the function.',
     goals:[{text:'Build a polypeptide with 6 or more amino acids.', test:T=>anyMol(T,u=>u.length>=6)}],
     quiz:[
-      {q:'A protein’s function depends most directly on its...', choices:['3D shape','Color','Weight','Number of carbons'], correct:0,
+      {lv:3, /* L3: shape = function */ q:'A protein’s function depends most directly on its...', choices:['3D shape','Color','Weight','Number of carbons'], correct:0,
         explain:'Structure determines function — a protein folds into a specific shape, and that shape is what lets it do its job.'},
-      {q:'What is denaturation?', choices:['A protein losing its shape, usually from heat or pH','A protein gaining new amino acids','Two proteins bonding together','A protein turning into a carbohydrate'], correct:0,
+      {lv:3, /* L3: denaturation destroys function */ q:'What is denaturation?', choices:['A protein losing its shape, usually from heat or pH','A protein gaining new amino acids','Two proteins bonding together','A protein turning into a carbohydrate'], correct:0,
         explain:'Denaturation unfolds a protein’s shape without changing its amino acid sequence — and once unfolded, most proteins can’t do their job anymore.'}
     ]},
   glycerolgardens:{tab:'lipids', title:'Glycerol Gardens', sub:'Building a triglyceride',
     hook:'Every stick of butter and bottle of olive oil starts the exact same way: a 3-carbon glycerol backbone waiting for fatty acids to bond on. Attach one tail and you’ve got a monoglyceride.',
     goals:[{text:'Add glycerol, then attach one fatty acid (build a monoglyceride).', test:T=>{const d=nameLipid(T); return d && d.name==='Monoglyceride';}}],
     quiz:[
-      {q:'What is the 3-carbon backbone every triglyceride is built on?', choices:['Glycerol','Glucose','A fatty acid','A phosphate group'], correct:0,
+      {lv:1, /* L1: building blocks */ q:'What is the 3-carbon backbone every triglyceride is built on?', choices:['Glycerol','Glucose','A fatty acid','A phosphate group'], correct:0,
         explain:'Glycerol is the 3-carbon backbone. Each carbon has a spot where a fatty acid (or a phosphate) can bond on.'},
-      {q:'What kind of bond attaches a fatty acid to glycerol?', choices:['An ester bond, formed by dehydration synthesis','A peptide bond','A glycosidic bond','A phosphodiester bond'], correct:0,
-        explain:'Lipids use ester bonds. Like every macromolecule on this board, forming that bond releases a water molecule.'}
+      {lv:2, /* L2: ester bond by dehydration synthesis */ q:'What kind of bond attaches a fatty acid to glycerol?', choices:['An ester bond, formed by dehydration synthesis','A peptide bond','A glycosidic bond','A phosphodiester bond'], correct:0,
+        explain:'Lipids use ester bonds. Like every macromolecule on this board, forming that bond releases a water molecule.'},
+      {lv:3, /* L3: long-term energy storage (uses L2 energy/gram) */ q:'Why do bears store fat instead of glycogen to survive the winter?', choices:['Fat stores about twice the energy per gram (about 9 vs. 4 Calories), so it packs more energy into less weight','Fat is easier to digest than glycogen','Animals can’t store glycogen','Fat is made of amino acids'], correct:0,
+        explain:'Lipids are the long-term energy store. With far more C–H bonds per gram, fat holds about 9 Calories/g vs. about 4 for carbohydrates: a much lighter way to carry months of fuel.'}
     ]},
   saturationsquare:{tab:'lipids', title:'Saturation Square', sub:'Saturated vs. unsaturated',
     hook:'Butter sits solid in the fridge door. Olive oil pools in a bottle at room temperature. Same basic ingredients — glycerol plus fatty acids — but one has straight, saturated tails that stack like firewood, and the other doesn’t.',
@@ -1200,28 +1351,30 @@ const MODULES = {
       {text:'Build a fat with 3 unsaturated tails (oil-style).', test:T=>{const d=nameLipid(T); return d && d.name==='Unsaturated fat (oil)';}}
     ],
     quiz:[
-      {q:'Why is butter solid at room temperature while olive oil is liquid?', choices:['Butter’s straight, saturated tails pack tightly; oil’s kinked tails can’t','Butter has no fatty acids','Oil has more glycerol than butter','Butter is a protein and oil is a carbohydrate'], correct:0,
+      {lv:1, /* L1: saturated vs. unsaturated structure */ q:'Why is butter solid at room temperature while olive oil is liquid?', choices:['Butter’s straight, saturated tails pack tightly; oil’s kinked tails can’t','Butter has no fatty acids','Oil has more glycerol than butter','Butter is a protein and oil is a carbohydrate'], correct:0,
         explain:'Saturated tails are straight and pack tightly together. Unsaturated tails have a kink from a double bond, so they can’t stack as neatly.'},
-      {q:'A “saturated” fatty acid is saturated with...', choices:['Hydrogen','Water','Oxygen','Nitrogen'], correct:0,
+      {lv:1, /* L1: naming / structure */ q:'A “saturated” fatty acid is saturated with...', choices:['Hydrogen','Water','Oxygen','Nitrogen'], correct:0,
         explain:'Saturated means saturated with hydrogen: no carbon-carbon double bonds, so every carbon holds as many hydrogens as possible.'}
     ]},
   membranemarina:{tab:'lipids', title:'Membrane Marina', sub:'Phospholipids + the bilayer',
     hook:'Every one of your trillions of cells is wrapped in a wall built from phospholipids: water-loving heads facing out, water-fearing tails hiding in the middle. Basically a self-assembling membrane made of molecular popsicles.',
     goals:[{text:'Build a phospholipid (glycerol + 2 fatty acid tails + a phosphate).', test:T=>{const d=nameLipid(T); return d && d.name==='Phospholipid';}}],
     quiz:[
-      {q:'A phospholipid has a water-loving head and water-fearing tails. What are those called?', choices:['Hydrophilic head, hydrophobic tails','Hydrophobic head, hydrophilic tails','Both hydrophilic','Both hydrophobic'], correct:0,
+      {lv:1, /* L1: naming the parts */ q:'A phospholipid has a water-loving head and water-fearing tails. What are those called?', choices:['Hydrophilic head, hydrophobic tails','Hydrophobic head, hydrophilic tails','Both hydrophilic','Both hydrophobic'], correct:0,
         explain:'The phosphate head is hydrophilic (water-loving) and the fatty acid tails are hydrophobic (water-fearing).'},
-      {q:'Why do phospholipids in water form a bilayer, tails inward?', choices:['So hydrophobic tails hide from water while hydrophilic heads face it','So the tails can face outward toward water','Glycerol pushes them apart','Phosphate groups repel each other'], correct:0,
+      {lv:3, /* L3: membranes */ q:'Why do phospholipids in water form a bilayer, tails inward?', choices:['So hydrophobic tails hide from water while hydrophilic heads face it','So the tails can face outward toward water','Glycerol pushes them apart','Phosphate groups repel each other'], correct:0,
         explain:'Tails point inward, away from water, while heads face outward into the watery environment on both sides — that’s every cell membrane.'}
     ]},
   nucleotideknoll:{tab:'nucleic', title:'Nucleotide Knoll', sub:'The 3 parts of a nucleotide',
     hook:'Your entire genetic blueprint is spelled out using just a handful of copies of one small molecule: the nucleotide. Phosphate, sugar, base — three parts, repeated billions of times, is the whole secret behind DNA.',
     goals:[{text:'Place a single nucleotide on the bench.', test:T=>T.mols.some(m=>m.units.length===1)}],
     quiz:[
-      {q:'What three parts make up every nucleotide?', choices:['A phosphate group, a 5-carbon sugar, and a nitrogen base','A glycerol, a fatty acid, and a phosphate','An amino group, a carboxyl group, and an R group','Two sugars and a bond'], correct:0,
+      {lv:1, /* L1: monomer parts */ q:'What three parts make up every nucleotide?', choices:['A phosphate group, a 5-carbon sugar, and a nitrogen base','A glycerol, a fatty acid, and a phosphate','An amino group, a carboxyl group, and an R group','Two sugars and a bond'], correct:0,
         explain:'Phosphate + sugar + nitrogen base = one nucleotide, every time, whether it’s DNA or RNA.'},
-      {q:'What’s the key sugar difference between a DNA and an RNA nucleotide?', choices:['DNA uses deoxyribose; RNA uses ribose','DNA uses glucose; RNA uses fructose','They use the exact same sugar','DNA has no sugar'], correct:0,
-        explain:'Deoxyribose (DNA) is missing one oxygen compared to ribose (RNA) — that’s where the “deoxy” in DNA’s name comes from.'}
+      {lv:1, /* L1: DNA vs. RNA monomers */ q:'What’s the key sugar difference between a DNA and an RNA nucleotide?', choices:['DNA uses deoxyribose; RNA uses ribose','DNA uses glucose; RNA uses fructose','They use the exact same sugar','DNA has no sugar'], correct:0,
+        explain:'Deoxyribose (DNA) is missing one oxygen compared to ribose (RNA) — that’s where the “deoxy” in DNA’s name comes from.'},
+      {lv:3, /* L3: genetic information / building proteins */ q:'What is one job of RNA in your cells?', choices:['Carrying a working copy of a gene’s instructions to help build proteins','Storing long-term energy as fat','Forming the cell membrane','Making up most of your muscle'], correct:0,
+        explain:'RNA copies the instructions in a gene and helps the cell build the protein those instructions describe.'}
     ]},
   backbonebay:{tab:'nucleic', title:'Backbone Bay', sub:'Phosphodiester bonds',
     hook:'Snip the sugar-phosphate backbone anywhere along a DNA strand and the whole structure falls apart. Phosphodiester bonds are the zipper teeth holding every strand of DNA and RNA together, one water molecule at a time.',
@@ -1230,49 +1383,51 @@ const MODULES = {
       {text:'Break a bond in the backbone (hydrolysis).', test:T=>T.log.some(e=>e.type==='hyd')}
     ],
     quiz:[
-      {q:'What bond links one nucleotide to the next in a strand?', choices:['A phosphodiester bond','A peptide bond','A glycosidic bond','An ester bond'], correct:0,
+      {lv:1, /* L1: naming the bond */ q:'What bond links one nucleotide to the next in a strand?', choices:['A phosphodiester bond','A peptide bond','A glycosidic bond','An ester bond'], correct:0,
         explain:'Phosphodiester bonds link the phosphate of one nucleotide to the sugar of the next, building the sugar-phosphate backbone.'},
-      {q:'Breaking a phosphodiester bond in a strand is an example of...', choices:['Hydrolysis — it uses a water molecule','Dehydration synthesis — it releases a water molecule','Denaturation','Saturation'], correct:0,
+      {lv:2, /* L2: hydrolysis */ q:'Breaking a phosphodiester bond in a strand is an example of...', choices:['Hydrolysis — it uses a water molecule','Dehydration synthesis — it releases a water molecule','Denaturation','Saturation'], correct:0,
         explain:'Breaking any bond built by dehydration synthesis takes hydrolysis, which uses a water molecule to split it back apart.'}
     ]},
   helixheights:{tab:'nucleic', title:'Helix Heights', sub:'Base pairing, DNA vs. RNA',
     hook:'A always finds T, and G always finds C — a pairing rule so reliable your cells use it to copy your entire genome every time a cell divides. Miss the pattern and you’ve basically got a genetic dropped call.',
     goals:[{text:'Build a DNA strand (2+ nucleotides) and reveal its matching strand.', test:T=>T.complement && anyMol(T,u=>u[0] && u[0].s==='DNA' && u.length>=2)}],
     quiz:[
-      {q:'In DNA, adenine always pairs with...', choices:['Thymine','Guanine','Cytosine','Another adenine'], correct:0,
+      {lv:1, /* L1: base pairing */ q:'In DNA, adenine always pairs with...', choices:['Thymine','Guanine','Cytosine','Another adenine'], correct:0,
         explain:'A pairs with T (2 hydrogen bonds), and G pairs with C (3 hydrogen bonds) — that predictable pairing is why DNA can be copied accurately.'},
-      {q:'What’s a key difference between DNA and RNA?', choices:['DNA is usually double-stranded and uses thymine; RNA is usually single-stranded and uses uracil','DNA is single-stranded and RNA is double-stranded','DNA has no nitrogen bases','RNA can’t pair bases at all'], correct:0,
-        explain:'DNA pairs into a double helix and uses thymine. RNA usually works as a single strand and swaps in uracil wherever DNA uses thymine.'}
+      {lv:1, /* L1: DNA vs. RNA */ q:'What’s a key difference between DNA and RNA?', choices:['DNA is usually double-stranded and uses thymine; RNA is usually single-stranded and uses uracil','DNA is single-stranded and RNA is double-stranded','DNA has no nitrogen bases','RNA can’t pair bases at all'], correct:0,
+        explain:'DNA pairs into a double helix and uses thymine. RNA usually works as a single strand and swaps in uracil wherever DNA uses thymine.'},
+      {lv:3, /* L3: genetic information */ q:'What is DNA’s main job?', choices:['Storing the genetic instructions for building every protein in an organism','Providing quick energy','Insulating the body','Speeding up reactions as an enzyme'], correct:0,
+        explain:'DNA is long-term storage for genetic information. The order of its bases spells out the instructions for building proteins.'}
     ]}
 };
 
 const ENZYME_POOL = {
   carbs:[
-    {prompt:'Lactase appeared! Build lactose (galactose + glucose).', test:e=>e && e.type==='syn' && e.right[0]==='Lactose'},
-    {prompt:'Amylase alert! Break any glycosidic bond.', test:e=>e && e.type==='hyd'}
+    {id:'carbs-lactase', lv:1, /* L1: build + name */ prompt:'Lactase appeared! Build lactose (galactose + glucose).', test:e=>e && e.type==='syn' && e.right[0]==='Lactose'},
+    {id:'carbs-amylase', lv:2, /* L2: hydrolysis */ prompt:'Amylase alert! Break any glycosidic bond.', test:e=>e && e.type==='hyd'}
   ],
   proteins:[
-    {prompt:'Protease patrol! Bond two amino acids into a dipeptide.', test:e=>e && e.type==='syn' && /Dipeptide/.test(e.right[0])},
-    {prompt:'Peptidase pop quiz! Break a peptide bond.', test:e=>e && e.type==='hyd'}
+    {id:'proteins-ribosome', lv:1, /* L1: build */ prompt:'Ribosome rush! Bond two amino acids into a dipeptide.', test:e=>e && e.type==='syn' && /Dipeptide/.test(e.right[0])},
+    {id:'proteins-peptidase', lv:2, /* L2: hydrolysis */ prompt:'Peptidase pop quiz! Break a peptide bond.', test:e=>e && e.type==='hyd'}
   ],
   lipids:[
-    {prompt:'Lipase rush! Break a bond on your lipid.', test:e=>e && e.type==='hyd'},
-    {prompt:'Synthase surge! Bond a new part onto your lipid.', test:e=>e && e.type==='syn'}
+    {id:'lipids-lipase', lv:2, /* L2: hydrolysis / digestion */ prompt:'Lipase rush! Break a bond on your lipid.', test:e=>e && e.type==='hyd'},
+    {id:'lipids-synthase', lv:1, /* L1: build */ prompt:'Synthase surge! Bond a new part onto your lipid.', test:e=>e && e.type==='syn'}
   ],
   nucleic:[
-    {prompt:'Polymerase power! Bond two nucleotides together.', test:e=>e && e.type==='syn'},
-    {prompt:'Helicase hustle! Reveal a DNA strand’s matching strand.', test:(e,T,toggled)=>toggled===true}
+    {id:'nucleic-polymerase', lv:1, /* L1: build */ prompt:'Polymerase power! Bond two nucleotides together.', test:e=>e && e.type==='syn'},
+    {id:'nucleic-pairing', lv:1, /* L1: base pairing */ prompt:'Pairing practice! Reveal a DNA strand’s matching strand.', test:(e,T,toggled)=>toggled===true}
   ]
 };
 
 const DENATURE_QUESTIONS = [
-  {q:'You fry an egg. The clear, runny white turns solid and white. What happened to its proteins?', choices:['They denatured — heat unfolded their shape','They turned into a carbohydrate','They were digested by hydrolysis','Nothing changed, only the color did'], correct:0,
+  {lv:3, /* L3: denaturation destroys function */ q:'You fry an egg. The clear, runny white turns solid and white. What happened to its proteins?', choices:['They denatured — heat unfolded their shape','They turned into a carbohydrate','They were digested by hydrolysis','Nothing changed, only the color did'], correct:0,
     explain:'Heat broke the bonds holding the protein’s folded shape, so it unfolded (denatured) and lost its original function — that’s why it can’t go back to raw.'},
-  {q:'Why can extreme heat or pH make an enzyme stop working?', choices:['It denatures, changing its shape so it no longer fits its target','It turns into a lipid','It gains more amino acids','It converts to a monosaccharide'], correct:0,
+  {lv:3, /* L3: enzyme shape = function */ q:'Why can extreme heat or pH make an enzyme stop working?', choices:['It denatures, changing its shape so it no longer fits its target','It turns into a lipid','It gains more amino acids','It converts to a monosaccharide'], correct:0,
     explain:'An enzyme’s job depends entirely on its 3D shape. Denature that shape and the active site no longer fits — shape decides function.'},
-  {q:'Which best describes denaturation?', choices:['A protein loses its shape (and function) without its amino acid sequence changing','A protein’s amino acid sequence is rearranged','A protein is broken into individual amino acids','A protein gains a brand-new function'], correct:0,
+  {lv:3, /* L3: denaturation destroys function */ q:'Which best describes denaturation?', choices:['A protein loses its shape (and function) without its amino acid sequence changing','A protein’s amino acid sequence is rearranged','A protein is broken into individual amino acids','A protein gains a brand-new function'], correct:0,
     explain:'Denaturation unfolds a protein’s shape. The sequence of amino acids stays the same, but without the right shape, it can’t do its job.'},
-  {q:'Sickle cell disease comes from swapping one amino acid in hemoglobin. Why does that matter?', choices:['Even one wrong amino acid can change the protein’s shape and function','Amino acid order never affects shape','It only changes the protein’s color','It turns hemoglobin into a carbohydrate'], correct:0,
+  {lv:3, /* L3: order -> shape -> job */ q:'Sickle cell disease comes from swapping one amino acid in hemoglobin. Why does that matter?', choices:['Even one wrong amino acid can change the protein’s shape and function','Amino acid order never affects shape','It only changes the protein’s color','It turns hemoglobin into a carbohydrate'], correct:0,
     explain:'Order matters — one swapped amino acid can misfold hemoglobin into a rigid shape that distorts red blood cells into a sickle shape.'}
 ];
 const WATERBREAK_FLAVOR = [
@@ -1291,40 +1446,40 @@ const CORNER_FLAVOR = [
    Riddles/MC are graded the same way (choices + correct index) so they share
    one answer path — only the framing (clue list vs. plain question) differs. */
 const SHOWDOWN_ROUNDS = [
-  {group:'carbs', kind:'build', tab:'carbs', prompt:'Build lactose: bond galactose to glucose.',
+  {lv:1, /* L1: build + name */ group:'carbs', kind:'build', tab:'carbs', prompt:'Build lactose: bond galactose to glucose.',
     test:T => anyMol(T, u => nameCarb(u).name === 'Lactose'),
     explain:'Lactose is galactose + glucose joined by a glycosidic bond — the same kind of bond every disaccharide uses.'},
-  {group:'carbs', kind:'mc', q:'What do we call a long chain of glucose monomers, like starch or glycogen?',
+  {lv:1, /* L1: naming the polymer */ group:'carbs', kind:'mc', q:'What do we call a long chain of glucose monomers, like starch or glycogen?',
     choices:['Polysaccharide','Polypeptide','Phospholipid','Nucleotide strand'], correct:0,
     explain:'Poly- (many) + saccharide (sugar) — a long sugar chain.'},
-  {group:'carbs', kind:'riddle', clues:['I’m made of glucose and galactose,', 'and some people lack the enzyme to break me apart.'], q:'What am I?',
+  {lv:2, /* L2: digestion / hydrolysis */ group:'carbs', kind:'riddle', clues:['I’m made of glucose and galactose,', 'and some people lack the enzyme to break me apart.'], q:'What am I?',
     choices:['Lactose','Sucrose','Maltose','Fructose'], correct:0,
     explain:'Lactose — milk sugar. Without enough lactase to hydrolyze it, that’s lactose intolerance.'},
-  {group:'proteins', kind:'build', tab:'proteins', prompt:'Build any dipeptide — bond two amino acids together.',
+  {lv:1, /* L1: build */ group:'proteins', kind:'build', tab:'proteins', prompt:'Build any dipeptide — bond two amino acids together.',
     test:T => anyMol(T, u => u.length === 2),
     explain:'Any two amino acids joined by a peptide bond make a dipeptide.'},
-  {group:'proteins', kind:'mc', q:'What bond links amino acids together in a chain?',
+  {lv:1, /* L1: naming the bond */ group:'proteins', kind:'mc', q:'What bond links amino acids together in a chain?',
     choices:['A peptide bond','A glycosidic bond','An ester bond','A phosphodiester bond'], correct:0,
     explain:'Peptide bonds link amino acids into polypeptides, which fold into proteins.'},
-  {group:'proteins', kind:'riddle', clues:['I’m a chain of amino acids,', 'and if you change my order, you change my shape — and my job.'], q:'What am I?',
+  {lv:3, /* L3: order -> shape -> job */ group:'proteins', kind:'riddle', clues:['I’m a chain of amino acids,', 'and if you change my order, you change my shape — and my job.'], q:'What am I?',
     choices:['A polypeptide','A polysaccharide','A triglyceride','A DNA strand'], correct:0,
     explain:'A polypeptide — sequence decides how it folds, and shape decides function.'},
-  {group:'lipids', kind:'build', tab:'lipids', prompt:'Build a phospholipid: glycerol + 2 fatty acid tails + a phosphate.',
+  {lv:3, /* L3: membrane building block */ group:'lipids', kind:'build', tab:'lipids', prompt:'Build a phospholipid: glycerol + 2 fatty acid tails + a phosphate.',
     test:T => { const d = nameLipid(T); return d && d.name === 'Phospholipid'; },
     explain:'Two fatty acid tails plus a phosphate on the third carbon makes a phospholipid — every cell membrane’s building block.'},
-  {group:'lipids', kind:'mc', q:'What causes the "kink" in an unsaturated fatty acid tail?',
+  {lv:1, /* L1: structure of unsaturated tails */ group:'lipids', kind:'mc', q:'What causes the "kink" in an unsaturated fatty acid tail?',
     choices:['A carbon-carbon double bond','An extra phosphate group','A missing glycerol','An amino acid side chain'], correct:0,
     explain:'A double bond bends the tail, which is why unsaturated fats stay liquid at room temperature.'},
-  {group:'lipids', kind:'riddle', clues:['I have a water-loving head and two water-fearing tails,', 'and two layers of me make up your cell’s outer wall.'], q:'What am I?',
+  {lv:3, /* L3: membranes */ group:'lipids', kind:'riddle', clues:['I have a water-loving head and two water-fearing tails,', 'and two layers of me make up your cell’s outer wall.'], q:'What am I?',
     choices:['A phospholipid','A triglyceride','A nucleotide','An amino acid'], correct:0,
     explain:'A phospholipid — hydrophilic head out, hydrophobic tails in, forming the membrane bilayer.'},
-  {group:'nucleic', kind:'build', tab:'nucleic', prompt:'Build a DNA strand of 4 or more nucleotides.',
+  {lv:1, /* L1: build */ group:'nucleic', kind:'build', tab:'nucleic', prompt:'Build a DNA strand of 4 or more nucleotides.',
     test:T => anyMol(T, u => u[0] && u[0].s === 'DNA' && u.length >= 4),
     explain:'Each nucleotide links to the next with a phosphodiester bond, building the sugar-phosphate backbone.'},
-  {group:'nucleic', kind:'mc', q:'What are the three parts of every nucleotide?',
+  {lv:1, /* L1: monomer parts */ group:'nucleic', kind:'mc', q:'What are the three parts of every nucleotide?',
     choices:['Phosphate, sugar, nitrogen base','Glycerol, fatty acid, phosphate','Amino group, carboxyl group, R group','Two sugars and a bond'], correct:0,
     explain:'Phosphate + sugar + base, every time — whether it’s DNA or RNA.'},
-  {group:'nucleic', kind:'riddle', clues:['Billions of copies of me link up in a specific order,', 'and that order spells out your entire genetic code.'], q:'What am I?',
+  {lv:3, /* L3: genetic information */ group:'nucleic', kind:'riddle', clues:['Billions of copies of me link up in a specific order,', 'and that order spells out your entire genetic code.'], q:'What am I?',
     choices:['A nucleotide','An amino acid','A monosaccharide','A fatty acid'], correct:0,
     explain:'A nucleotide — the monomer of DNA and RNA.'}
 ];
@@ -1546,11 +1701,13 @@ const PLAYER_COLORS = [
    | 'targets' | 'facts:<cheat-sheet row label>'. Indexed like MODULES[id].quiz. */
 const QUIZ_REVIEW = {
   glugrove:[{tab:'carbs', focus:'facts:Monomer', text:'Review what a monosaccharide is in the Lab'},
-    {tab:'carbs', focus:'shelf', text:'See the three monosaccharides on the Lab shelf'}],
+    {tab:'carbs', focus:'shelf', text:'See the three monosaccharides on the Lab shelf'},
+    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'}],
   sucrosest:[{tab:'carbs', focus:'bench', text:'Review how sucrose forms in the Lab'},
     {tab:'carbs', focus:'challenges', text:'Practice building lactose in the Lab'}],
   starchblvd:[{tab:'carbs', focus:'facts:Polymer', text:'Review polysaccharides in the Lab'},
-    {tab:'carbs', focus:'hook', text:'Review how hydrolysis digests starch in the Lab'}],
+    {tab:'carbs', focus:'hook', text:'Review how hydrolysis digests starch in the Lab'},
+    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'}],
   aminoave:[{tab:'proteins', focus:'shelf', text:'Review R groups (side chains) on the Lab shelf'},
     {tab:'proteins', focus:'shelf', text:'Review nonpolar side chains in the Lab'}],
   peptideplace:[{tab:'proteins', focus:'facts:Bond', text:'Review peptide bonds in the Lab'},
@@ -1558,19 +1715,23 @@ const QUIZ_REVIEW = {
   foldingfalls:[{tab:'proteins', focus:'hook', text:'Review how shape decides a protein’s job in the Lab'},
     {tab:'proteins', focus:'facts:Job', text:'Review protein shape and function in the Lab'}],
   glycerolgardens:[{tab:'lipids', focus:'facts:Building blocks', text:'Review the glycerol backbone in the Lab'},
-    {tab:'lipids', focus:'facts:Bond', text:'Review ester bonds in the Lab'}],
+    {tab:'lipids', focus:'facts:Bond', text:'Review ester bonds in the Lab'},
+    {tab:'bigfour', focus:'#b4-energy', text:'Compare energy per gram in Meet the Big Four'}],
   saturationsquare:[{tab:'lipids', focus:'hook', text:'Review why butter is solid and oil pours in the Lab'},
-    {tab:'lipids', focus:'shelf', text:'Compare saturated and unsaturated tails on the Lab shelf'}],
+    {tab:'bigfour', focus:'#b4-elements', text:'See why lipids are packed with C–H bonds in Meet the Big Four'}],
   membranemarina:[{tab:'lipids', focus:'shelf', text:'Review the phospholipid head and tails in the Lab'},
     {tab:'lipids', focus:'facts:Job', text:'Review cell membranes in the Lab'}],
   nucleotideknoll:[{tab:'nucleic', focus:'facts:Monomer', text:'Review the 3 parts of a nucleotide in the Lab'},
-    {tab:'nucleic', focus:'hook', text:'Review DNA vs. RNA sugars in the Lab'}],
+    {tab:'nucleic', focus:'hook', text:'Review DNA vs. RNA sugars in the Lab'},
+    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'}],
   backbonebay:[{tab:'nucleic', focus:'facts:Bond', text:'Review phosphodiester bonds in the Lab'},
     {tab:'nucleic', focus:'bench', text:'Review how hydrolysis breaks the backbone in the Lab'}],
   helixheights:[{tab:'nucleic', focus:'challenges', text:'Practice base pairing (“Show matching strand”) in the Lab'},
-    {tab:'nucleic', focus:'hook', text:'Review DNA vs. RNA in the Lab'}]
+    {tab:'nucleic', focus:'hook', text:'Review DNA vs. RNA in the Lab'},
+    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'}]
 };
 const DENATURE_REVIEW = {tab:'proteins', focus:'hook', text:'Review how a protein’s shape decides its job in the Lab'};
+/* Every quiz question must have a review target: QUIZ_REVIEW[id][i] lines up with MODULES[id].quiz[i]. */
 /* Showdown MC/riddle rounds, keyed by group + kind. */
 const SHOWDOWN_REVIEW = {
   'carbs:mc':{tab:'carbs', focus:'facts:Polymer', text:'Review polysaccharides in the Lab'},
@@ -1580,7 +1741,7 @@ const SHOWDOWN_REVIEW = {
   'lipids:mc':{tab:'lipids', focus:'shelf', text:'Compare saturated and unsaturated tails on the Lab shelf'},
   'lipids:riddle':{tab:'lipids', focus:'facts:Job', text:'Review phospholipids and membranes in the Lab'},
   'nucleic:mc':{tab:'nucleic', focus:'facts:Monomer', text:'Review the 3 parts of a nucleotide in the Lab'},
-  'nucleic:riddle':{tab:'nucleic', focus:'facts:Monomer', text:'Review nucleotides in the Lab'}
+  'nucleic:riddle':{tab:'bigfour', focus:'#b4-table', text:'Review what nucleic acids do in Meet the Big Four'}
 };
 
 /* ============================================================
@@ -1627,7 +1788,7 @@ function freshPlayer(name){
   return {
     name, atp:0, pos:0, laps:0, color:PLAYER_COLORS[0].hex,
     owned:{}, goalsDone:{}, quizDone:{}, setBonus:{},
-    labChallenges:{},
+    labChallenges:{}, enzymeDone:{}, showdownDone:{}, denatureDone:{},
     showdown:{bestStars:0, lastStars:0, badge:false, attempts:0},
     createdAt: Date.now(), lastPlayed: Date.now()
   };
@@ -1641,6 +1802,11 @@ function normalizePlayer(p){
   p.owned = p.owned || {};
   p.setBonus = p.setBonus || {};
   p.labChallenges = p.labChallenges || {};
+  p.enzymeDone = p.enzymeDone || {};     // Enzyme Card id -> solved (for Report Card levels)
+  p.showdownDone = p.showdownDone || {}; // SHOWDOWN_ROUNDS index -> solved at least once
+  p.denatureDone = p.denatureDone || {}; // DENATURE_QUESTIONS index -> answered correctly
+  // Quiz/goal arrays grow when a module gains questions; pad, never overwrite.
+  Object.keys(p.quizDone).forEach(id => { const m = MODULES[id]; if(m) while(p.quizDone[id].length < m.quiz.length) p.quizDone[id].push(false); });
   if(!p.showdown || typeof p.showdown.bestStars !== 'number') p.showdown = {bestStars:0, lastStars:0, badge:false, attempts:0};
   if(typeof p.pos !== 'number') p.pos = 0;
   if(!p.color) p.color = PLAYER_COLORS[0].hex;
@@ -1815,8 +1981,10 @@ function celebrate(){
 }
 
 /* ---------- root render ---------- */
+let lastScreen = null;
 function renderApp(){
   const app = $('app');
+  if(UI.screen !== lastScreen){ lastScreen = UI.screen; if(!UI.reviewFocus) window.scrollTo(0, 0); }
   document.body.classList.toggle('fx-blur', BLUR_ON);
   document.body.classList.toggle('card-open', UI.screen === 'board' && !!UI.overlay);
   if(UI.screen === 'onboard'){ document.body.dataset.tab = 'board'; app.innerHTML = onboardHTML(); return; }
@@ -1829,7 +1997,7 @@ function renderApp(){
     document.body.dataset.tab = LAB.tab;
     app.innerHTML = labScreenHTML() + (UI.popup ? popupHTML() : '');
     LAB.onGoalProgress = labChallengeCheck;
-    renderLab();
+    if(LAB.tab === 'bigfour') renderBigFour(); else renderLab();
     renderLabChal();
     applyReviewFocus();
     return;
@@ -2204,6 +2372,8 @@ function labBenchHTML(){
 
 function moduleOverlayHTML(){
   const o = UI.overlay, mod = MODULES[o.squareId], owned = !!PLAYER.owned[o.squareId];
+  const qd = PLAYER.quizDone[o.squareId];
+  const newChecks = owned && mod.quiz.some((q, i) => !(qd && qd[i])); // questions added after the student bought it
   const goalsArr = PLAYER.goalsDone[o.squareId] || mod.goals.map(()=>false);
   const goalsHtml = '<ul class="lo-goals" id="loGoals">' + mod.goals.map((g,i) =>
     '<li class="' + (goalsArr[i] ? 'done' : '') + '"><span class="box">' + (goalsArr[i] ? '✓' : '') + '</span><span class="tx">' + esc(g.text) + '</span></li>'
@@ -2213,10 +2383,10 @@ function moduleOverlayHTML(){
       '<div class="deed-intro">' + deedArt(mod.tab, o.squareId) + '<div>' +
         '<p class="deed-sub">' + esc(mod.sub) + '</p>' +
         '<p class="lo-hook">' + esc(mod.hook) + '</p>' +
-        (owned ? '<p class="quiz-fb good" style="margin-top:12px">You already own this property. Keep experimenting in the lab below, or head back to the board.</p>' : goalsHtml) +
+        (owned ? '<p class="quiz-fb good" style="margin-top:12px">' + (newChecks ? 'You own this property, and it has a new check waiting below. Answer it for bonus ATP.' : 'You already own this property. Keep experimenting in the lab below, or head back to the board.') + '</p>' : goalsHtml) +
       '</div></div>' +
       labBenchHTML() +
-      (owned ? '' : '<div class="quiz hidden" id="quizBlock"><div id="quizBody"></div></div>') +
+      (owned && !newChecks ? '' : '<div class="quiz hidden" id="quizBlock"><div id="quizBody"></div></div>') +
     '</div>';
 }
 function challengeOverlayHTML(){
@@ -2224,7 +2394,7 @@ function challengeOverlayHTML(){
   return deedHead(o.tab, 'Enzyme card · ' + GROUPS[o.tab].label, 'Enzyme Alert!') +
     '<div class="deed-body">' +
       '<div class="deed-intro">' + deedArt(o.tab, 'enzyme') + '<div>' +
-        '<p class="deed-sub">Quick build · no timer</p>' +
+        '<p class="deed-sub">' + lvlChip(o.challenge.lv) + ' Quick build · no timer</p>' +
         '<p class="lo-hook">' + esc(o.challenge.prompt) + ' Pull it off for ' + CFG.ATP_ENZYME_WIN + ' ATP.</p>' +
       '</div></div>' +
       labBenchHTML() +
@@ -2238,7 +2408,16 @@ function mountModuleDom(){
   renderLab(); playSfx('open');
   if(!PLAYER.goalsDone[o.squareId]) PLAYER.goalsDone[o.squareId] = mod.goals.map(()=>false);
   if(!PLAYER.quizDone[o.squareId]) PLAYER.quizDone[o.squareId] = mod.quiz.map(()=>false);
-  if(PLAYER.owned[o.squareId]){ LAB.onGoalProgress = null; return; }
+  while(PLAYER.quizDone[o.squareId].length < mod.quiz.length) PLAYER.quizDone[o.squareId].push(false);
+  if(PLAYER.owned[o.squareId]){
+    LAB.onGoalProgress = null;
+    const undone = PLAYER.quizDone[o.squareId].indexOf(false), qb = $('quizBlock');
+    if(undone === -1 || !qb) return;
+    qb.classList.remove('hidden');
+    if(!o.quiz || o.quiz.idx !== undone) o.quiz = {idx:undone, attempts:0, wrong:[]};
+    renderQuizQuestion();
+    return;
+  }
   LAB.onGoalProgress = refreshModuleGoals;
   refreshModuleGoals();
 }
@@ -2276,7 +2455,7 @@ function renderQuizQuestion(){
   const o = UI.overlay, mod = MODULES[o.squareId], q = mod.quiz[o.quiz.idx];
   const body = $('quizBody'); if(!body) return;
   const wrong = o.quiz.wrong || (o.quiz.wrong = []);
-  body.innerHTML = '<p class="quiz-prog">Check ' + (o.quiz.idx+1) + ' of ' + mod.quiz.length + '</p>' +
+  body.innerHTML = '<p class="quiz-prog">Check ' + (o.quiz.idx+1) + ' of ' + mod.quiz.length + ' ' + lvlChip(q.lv) + '</p>' +
     '<p class="quiz-q">' + esc(q.q) + '</p>' +
     '<div class="quiz-opts" id="quizOpts">' + q.choices.map((c,i) => '<button class="qopt' + (wrong.includes(i) ? ' wrong' : '') + '" data-qopt="' + i + '"' + (wrong.includes(i) ? ' disabled' : '') + '>' + esc(c) + '</button>').join('') + '</div>' +
     '<div id="quizFb">' + (wrong.length ? '<div class="quiz-fb good">Welcome back. Give it another try.</div>' : '') + '</div>';
@@ -2299,7 +2478,7 @@ function quizAnswer(i){
     persist(); playSfx('correct');
     const isLast = PLAYER.quizDone[o.squareId].every(Boolean);
     fb.innerHTML = '<div class="quiz-fb good">Correct! ' + esc(q.explain) + '</div>' +
-      '<button class="btn btn-primary quiz-next" id="quizNextBtn">' + (isLast ? 'Finish this property' : 'Next question') + '</button>';
+      '<button class="btn btn-primary quiz-next" id="quizNextBtn">' + (isLast ? (PLAYER.owned[o.squareId] ? 'Done' : 'Finish this property') : 'Next question') + '</button>';
   } else {
     opts[i].disabled = true; opts[i].classList.add('wrong');
     o.quiz.attempts++; o.quiz.wrong.push(i);
@@ -2312,7 +2491,14 @@ function quizNext(){
   const o = UI.overlay, mod = MODULES[o.squareId];
   const doneArr = PLAYER.quizDone[o.squareId];
   const nextIdx = doneArr.indexOf(false);
-  if(nextIdx === -1){ completeModule(); return; }
+  if(nextIdx === -1){
+    if(PLAYER.owned[o.squareId]){
+      const body = $('quizBody');
+      if(body) body.innerHTML = '<div class="quiz-fb good">Every check on this property is done.</div><button class="btn btn-primary quiz-next" id="backToBoardBtn">Back to the board</button>';
+      return;
+    }
+    completeModule(); return;
+  }
   o.quiz = {idx:nextIdx, attempts:0, wrong:[]}; renderQuizQuestion();
 }
 function completeModule(){
@@ -2356,6 +2542,7 @@ function checkChallengeWin(){
 function resolveChallenge(won){
   const o = UI.overlay; if(!o || o.resolved) return;
   o.resolved = true;
+  if(won) PLAYER.enzymeDone[o.challenge.id] = true;
   const gained = won ? CFG.ATP_ENZYME_WIN : CFG.ATP_ENZYME_LOSE;
   awardATP(gained); persist();
   playSfx(won ? 'buy' : 'wrong');
@@ -2403,7 +2590,7 @@ function showdownOverlayHTML(){
       }).join('') + '</div>' +
       '<div id="sdFb">' + (fb || (wrong.length ? '<div class="quiz-fb good">Welcome back. Give it another try.</div>' : '')) + '</div>';
   }
-  return deedHead('showdown', 'Mogul Showdown · Round ' + (o.idx + 1) + ' of ' + SHOWDOWN_ROUNDS.length + ' · ' + GROUPS[round.group].label, kindLabel) +
+  return deedHead('showdown', 'Mogul Showdown · Round ' + (o.idx + 1) + ' of ' + SHOWDOWN_ROUNDS.length + ' · ' + GROUPS[round.group].label + ' · Level ' + round.lv, kindLabel) +
     '<div class="deed-body">' + body + '</div>';
 }
 function showdownCorrectHTML(round){
@@ -2459,6 +2646,7 @@ function showdownRoundResolve(){
   o.resolved = true;
   const round = currentShowdownRound();
   o.results.push({correct:true, firstTry: !!o.firstTry});
+  PLAYER.showdownDone[o.order[o.idx]] = true; persist();
   LAB.onGoalProgress = null;
   playSfx('correct');
   document.querySelectorAll('#sdOpts .qopt').forEach((el, k) => { el.disabled = true; if(k === round.correct) el.classList.add('correct'); });
@@ -2536,7 +2724,7 @@ function doReset(){
   PLAYER = STORE.players[name];
   PLAYER.color = color; // a token color is a preference, not progress
   saveStore(STORE);
-  ACTIVITY = []; UI.returnTo = null; UI.diceNote = '';
+  ACTIVITY = []; UI.returnTo = null; UI.diceNote = ''; LAB.tab = 'bigfour';
   UI.popup = null;
   renderApp();
 }
@@ -2563,7 +2751,7 @@ function goReview(){
 function applyReviewFocus(){
   const f = UI.reviewFocus; if(!f) return;
   UI.reviewFocus = null; // scroll once; the cheat-sheet row stays highlighted via LAB.focusRow
-  const sel = {shelf:'.panel.shelf', bench:'.panel.bench', challenges:'.panel.challenges', hook:'#factshook', targets:'.targets'}[f];
+  const sel = f.charAt(0) === '#' ? f : {shelf:'.panel.shelf', bench:'.panel.bench', challenges:'.panel.challenges', hook:'#factshook', targets:'.standard'}[f];
   let el = sel ? document.querySelector(sel) : document.querySelector('.panel.facts');
   if(!el) return;
   if(sel) el.classList.add('review-focus');
@@ -2597,7 +2785,7 @@ function denaturePanelHTML(){
   return deedHead('denature', 'Denaturation Station', 'Protein trouble!') +
     '<div class="deed-body">' +
       '<div class="deed-intro">' + deedArt('denature', 'denature') + '<div>' +
-        '<p class="deed-sub">Refold your protein</p>' +
+        '<p class="deed-sub">' + lvlChip(q.lv) + ' Refold your protein</p>' +
         '<p class="lo-hook">Answer correctly to refold. Wrong answers explain why, and you can try again as many times as you need.</p>' +
       '</div></div>' +
       '<p class="quiz-q" style="margin-top:16px">' + esc(q.q) + '</p>' +
@@ -2611,6 +2799,7 @@ function denatureAnswer(i){
   const fb = $('denFb');
   if(i === q.correct){
     opts.forEach((el,idx) => { el.disabled = true; if(idx===i) el.classList.add('correct'); });
+    PLAYER.denatureDone[o.qIdx] = true;
     awardATP(CFG.ATP_DENATURE, opts[i]); persist(); playSfx('correct');
     logActivity('Refolded at Denaturation Station (+' + CFG.ATP_DENATURE + ' ATP)');
     fb.innerHTML = '<div class="quiz-fb good">Refolded! ' + esc(q.explain) + '</div>' +
@@ -2692,33 +2881,251 @@ function homeHTML(){
 }
 
 /* ---------- Learn Lab (restored original teaching layout) ---------- */
+const LAB_TAB_ORDER = ['bigfour'].concat(Object.keys(TABS));
+function tabLabel(k){ return k === 'bigfour' ? 'Meet the Big Four' : TABS[k].label; }
+function bigFourIcon(){
+  const o = '<svg viewBox="0 0 22 22" width="20" height="20" aria-hidden="true">';
+  return o + [['#e8a33d',6,6],['#c2b12c',16,6],['#d94f6a',6,16],['#7c5cd6',16,16]].map(c => '<circle cx="' + c[1] + '" cy="' + c[2] + '" r="4.3" fill="' + c[0] + '" stroke="' + INK + '" stroke-width="1.4"/>').join('') + '</svg>';
+}
 function labTabsHTML(){
-  return '<nav class="tabs" role="tablist" aria-label="Macromolecule type">' + Object.keys(TABS).map(k =>
-    '<button class="tab" role="tab" data-labtab="' + k + '" aria-selected="' + (LAB.tab === k) + '">' + tabIcon(k) + TABS[k].label + '</button>'
+  return '<nav class="tabs" role="tablist" aria-label="Macromolecule type">' + LAB_TAB_ORDER.map(k =>
+    '<button class="tab" role="tab" data-labtab="' + k + '" aria-selected="' + (LAB.tab === k) + '">' + (k === 'bigfour' ? bigFourIcon() : tabIcon(k)) + tabLabel(k) + '</button>'
   ).join('') + '</nav>';
+}
+function lvlChip(lv){ return '<span class="lvl lvl' + lv + '" title="Proficiency Level ' + lv + '">L' + lv + '</span>'; }
+function standardHTML(){
+  return '<section class="panel standard"><h2 class="pt">Our standard</h2>' +
+    '<p class="std-code">' + esc(STANDARD.code) + ' <span>[' + esc(STANDARD.ngss) + ']</span></p>' +
+    '<p class="std-text">“' + esc(STANDARD.text) + '”</p>' +
+    '<ol class="std-levels">' + [1,2,3].map(n => '<li>' + lvlChip(n) + '<span><strong>Level ' + n + ':</strong> ' + esc(STANDARD.levels[n]) + '</span></li>').join('') + '</ol>' +
+  '</section>';
 }
 function labScreenHTML(){
   const back = UI.returnTo
     ? '<div class="return-bar" role="status"><span>Your <strong>' + esc(UI.returnTo.label) + '</strong> card is saved right where you left it.</span><button id="returnCardBtn">&larr; Back to my card</button></div>'
     : '';
+  const challenges = '<section class="panel challenges"><h2 class="pt">Challenges</h2><p class="prog" id="prog"></p><ul class="chal" id="chal"></ul></section>';
+  const body = LAB.tab === 'bigfour'
+    ? bigFourHTML() + challenges
+    : ledgerHTML() + shelfBenchHTML() +
+      '<div class="lower">' +
+        '<section class="panel"><h2 class="pt">What just happened</h2><div id="logWrap" aria-live="polite"></div></section>' +
+        challenges +
+        '<section class="panel facts"><h2 class="pt" id="factsTitle">Cheat sheet</h2><dl id="facts"></dl><p class="factshook" id="factshook"></p></section>' +
+      '</div>';
   return '<div class="wrap">' + headerHTML('lab') + back +
     labTabsHTML() +
     '<div class="toast" id="labToast" aria-live="polite"></div>' +
-    ledgerHTML() +
-    shelfBenchHTML() +
-    '<div class="lower">' +
-      '<section class="panel"><h2 class="pt">What just happened</h2><div id="logWrap" aria-live="polite"></div></section>' +
-      '<section class="panel challenges"><h2 class="pt">Challenges</h2><p class="prog" id="prog"></p><ul class="chal" id="chal"></ul></section>' +
-      '<section class="panel facts"><h2 class="pt" id="factsTitle">Cheat sheet</h2><dl id="facts"></dl><p class="factshook" id="factshook"></p></section>' +
-    '</div>' +
-    '<section class="panel targets"><h2 class="pt">Learning targets</h2><ul>' +
-      '<li>I can explain how monomers bond into polymers by dehydration synthesis, which releases a water molecule for every bond.</li>' +
-      '<li>I can explain how polymers break back into monomers by hydrolysis, which uses up a water molecule for every bond.</li>' +
-      '<li>I can identify the monomer, polymer, bond, and main job of carbohydrates, proteins, lipids, and nucleic acids.</li>' +
-    '</ul></section>' +
+    body + standardHTML() +
   '</div>';
 }
-function switchLabTab(k){ if(TABS[k]){ LAB.tab = k; LAB.focusRow = null; renderApp(); } }
+function switchLabTab(k){ if(k === 'bigfour' || TABS[k]){ LAB.tab = k; LAB.focusRow = null; renderApp(); } }
+
+/* ============================================================
+   PART 8b: Meet the Big Four — side-by-side comparison, elements,
+   Element Detective drill, energy-per-gram food lab, body chart.
+   All numbers come from BIG_FOUR_STATS (top of the script).
+============================================================ */
+const B4_ORDER = ['carbs','lipids','proteins','nucleic'];
+const B4_INFO = {
+  carbs:{monomer:'Monosaccharide (simple sugar)', polymer:'Polysaccharide: starch, glycogen, cellulose', jobs:'Quick energy, short-term energy storage, plant structure (cellulose)', found:'Bread, pasta, fruit, plant cell walls', tile:() => carbTile('glu', 46)},
+  lipids:{monomer:'Glycerol + fatty acids (not a true polymer)', polymer:'Triglycerides (fats and oils), phospholipids, steroids', jobs:'Long-term energy storage, insulation, cell membranes, some hormones', found:'Butter, oils, nuts, every cell membrane', tile:() => lipidMini('unsat')},
+  proteins:{monomer:'Amino acid (20 kinds)', polymer:'Polypeptide, which folds into a protein', jobs:'Enzymes, structure (muscle, hair), transport (hemoglobin), defense (antibodies)', found:'Meat, eggs, beans, your muscles', tile:() => aaTile('ala', 46)},
+  nucleic:{monomer:'Nucleotide (phosphate + sugar + base)', polymer:'DNA and RNA', jobs:'Store and pass on genetic information; help build proteins', found:'The nucleus of every cell', tile:() => nucTile({b:'A', s:'DNA'}, false, 34)}
+};
+const EL_COLORS = {C:['#3c4644','#fff'], H:['#ffffff','#1b2422'], O:['#e0463c','#fff'], N:['#4a7fe0','#fff'], P:['#f29a3c','#1b2422'], S:['#f2d23c','#1b2422']};
+function elChip(el, n){
+  const c = EL_COLORS[el] || ['#ccc', '#1b2422'];
+  return '<span class="el" style="background:' + c[0] + ';color:' + c[1] + '">' + el + (n > 1 ? '<sub>' + n + '</sub>' : '') + '</span>';
+}
+const B4 = { det:null, energy:{sel:[], predicted:null}, body:{guess:null} };
+function shuffled(n){ const a = [...Array(n).keys()]; for(let i = n - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function detState(){
+  if(!B4.det) B4.det = {order:shuffled(DETECTIVE_FORMULAS.length), pos:0, wrong:[], solved:false, correct:0};
+  return B4.det;
+}
+
+function bigFourHTML(){
+  const S = BIG_FOUR_STATS.groups;
+  const cards = B4_ORDER.map(g => {
+    const i = B4_INFO[g], st = S[g];
+    return '<article class="b4-card" style="--gc:var(--' + g + ')">' +
+      '<div class="b4-head"><span class="b4-tile">' + i.tile() + '</span><h3>' + esc(GROUPS[g].label) + '</h3></div>' +
+      '<dl>' +
+        '<dt>Monomer</dt><dd>' + esc(i.monomer) + '</dd>' +
+        '<dt>Polymer</dt><dd>' + esc(i.polymer) + '</dd>' +
+        '<dt>Elements</dt><dd>' + st.elements.map(e => elChip(e)).join('') + (st.extra ? ' <small>+ ' + esc(st.extra) + '</small>' : '') + '</dd>' +
+        '<dt>Energy</dt><dd>' + (st.calPerG ? '<strong>~' + st.calPerG + ' Calories/g</strong>' : 'Not used as fuel') + '</dd>' +
+        '<dt>Main jobs</dt><dd>' + esc(i.jobs) + '</dd>' +
+        '<dt>Found in</dt><dd>' + esc(i.found) + '</dd>' +
+      '</dl></article>';
+  }).join('');
+  const ratio = (label, f) => {
+    const C = f.find(x => x[0] === 'C')[1], H = f.find(x => x[0] === 'H')[1], O = f.find(x => x[0] === 'O')[1];
+    const r = v => (Math.round(v / C * 100) / 100).toString();
+    return '<div class="ratio"><p class="ratio-f">' + f.map(x => elChip(x[0], x[1])).join('') + ' <span>' + esc(label) + '</span></p>' +
+      '<div class="ratio-bars">' + [['C', C], ['H', H], ['O', O]].map(([e, v]) => '<span class="rb"><i style="width:' + Math.min(100, v / C / 2 * 100) + '%;background:' + EL_COLORS[e][0] + '"></i><b>' + e + ' ' + r(v) + '</b></span>').join('') + '</div></div>';
+  };
+  return '<section class="panel b4-hero"><h2 class="pt">Meet the Big Four</h2>' +
+      '<p>Every living thing is built from four families of biomolecules. Each family has its own building blocks (monomers), its own mix of elements, and its own jobs. Start here, then build each one on its own tab.</p></section>' +
+    '<div class="b4-cards" id="b4-table">' + cards + '</div>' +
+    '<div class="b4-row">' +
+      '<section class="panel" id="b4-elements"><h2 class="pt">What are they made of?</h2>' +
+        '<ul class="b4-els">' + B4_ORDER.map(g => '<li><span class="dot" style="background:var(--' + g + ')"></span><strong>' + esc(GROUPS[g].label) + '</strong> ' + S[g].elements.map(e => elChip(e)).join('') + (S[g].extra ? ' <small>+ ' + esc(S[g].extra) + '</small>' : '') + '</li>').join('') + '</ul>' +
+        '<p class="b4-trick"><strong>The oxygen trick:</strong> carbohydrates and lipids are both made of just C, H, and O. Carbs have about <strong>1 C : 2 H : 1 O</strong>. Lipids have <strong>far less oxygen</strong> and many more C–H bonds.</p>' +
+        ratio('glucose, a carbohydrate', DETECTIVE_FORMULAS[0].f) +
+        ratio('stearic acid, part of a fat', DETECTIVE_FORMULAS[3].f) +
+        '<p class="b4-note">Bars show atoms per carbon atom.</p>' +
+      '</section>' +
+      '<section class="panel" id="b4-detective"><h2 class="pt">Element Detective</h2><div id="b4DetBody"></div></section>' +
+    '</div>' +
+    '<div class="b4-row">' +
+      '<section class="panel" id="b4-energy"><h2 class="pt">Energy per gram</h2><div id="b4EnergyBody"></div></section>' +
+      '<section class="panel" id="b4-body"><h2 class="pt">What is your body made of?</h2><div id="b4BodyBody"></div></section>' +
+    '</div>';
+}
+function renderBigFour(){ renderDetective(); renderEnergy(); renderBodyChart(); }
+
+/* ---------- Element Detective ---------- */
+function detReason(item){
+  const has = e => item.f.some(x => x[0] === e), n = e => (item.f.find(x => x[0] === e) || [0, 0])[1];
+  if(has('P')) return 'It has phosphorus (P) and nitrogen (N). Nucleotides carry a phosphate group and a nitrogen base, so this is a nucleic acid building block.';
+  if(has('N')) return 'It has nitrogen (N) but no phosphorus. Every amino acid has an amino group (with N), so this is a protein building block.' + (has('S') ? ' The sulfur (S) is a bonus clue: a few amino acids carry S.' : '');
+  const C = n('C'), O = n('O');
+  if(O / C >= .7) return 'Only C, H, and O, with about one O for every C (' + C + ' C : ' + O + ' O). That 1 : 2 : 1 pattern means carbohydrate.';
+  return 'Only C, H, and O, but just ' + O + ' O for ' + C + ' C. Far less oxygen and lots of C–H bonds means lipid.';
+}
+function renderDetective(){
+  const box = $('b4DetBody'); if(!box) return;
+  const d = detState(), item = DETECTIVE_FORMULAS[d.order[d.pos]];
+  const fb = d.solved
+    ? '<div class="quiz-fb good">Case closed: it’s <strong>' + esc(item.name) + '</strong>. ' + esc(detReason(item)) + '</div><button class="btn btn-primary quiz-next" data-b4next="1">Next formula</button>'
+    : d.wrong.length ? '<div class="quiz-fb warn">Not quite. Check the clues: is there P? N? How much O compared with C?</div>' : '';
+  box.innerHTML = '<p class="b4-note">Classify the formula. Correct on the first try counts toward your score.</p>' +
+    '<div class="det-formula" aria-label="Formula">' + item.f.map(x => elChip(x[0], x[1])).join('') + '</div>' +
+    '<div class="det-opts">' + B4_ORDER.map(g => {
+      const cls = d.solved && g === item.group ? ' correct' : d.wrong.includes(g) ? ' wrong' : '';
+      return '<button class="qopt' + cls + '" data-b4det="' + g + '" style="--gc:var(--' + g + ')"' + (d.solved || d.wrong.includes(g) ? ' disabled' : '') + '>' + esc(GROUPS[g].label) + '</button>';
+    }).join('') + '</div>' +
+    '<div id="detFb">' + fb + '</div>' +
+    '<p class="det-score">First-try score: <strong>' + d.correct + '</strong></p>' +
+    '<details class="det-rules"><summary>Detective’s rules</summary><ol>' +
+      '<li>Has <strong>P</strong> (and N)? → nucleic acid.</li>' +
+      '<li>Has <strong>N</strong> but no P? → protein (S is a bonus clue).</li>' +
+      '<li>Only C, H, O? Compare O with C. About one O per C → carbohydrate. Far fewer O → lipid.</li>' +
+    '</ol></details>';
+}
+function detAnswer(g){
+  const d = detState(), item = DETECTIVE_FORMULAS[d.order[d.pos]];
+  if(d.solved) return;
+  if(g === item.group){
+    const first = !d.wrong.length;
+    d.solved = true; if(first) d.correct++;
+    playSfx('correct'); renderDetective();
+    afterAction({type:'detective', ok:first, group:item.group, correct:d.correct});
+  } else {
+    d.wrong.push(g); playSfx('wrong'); renderDetective();
+  }
+}
+function detNext(){
+  const d = detState();
+  d.pos++; d.wrong = []; d.solved = false;
+  if(d.pos >= d.order.length){ d.order = shuffled(DETECTIVE_FORMULAS.length); d.pos = 0; }
+  renderDetective();
+}
+
+/* ---------- energy per gram + food lab ---------- */
+function renderEnergy(){
+  const box = $('b4EnergyBody'); if(!box) return;
+  const S = BIG_FOUR_STATS.groups, max = 9;
+  const bars = B4_ORDER.map(g => '<div class="ebar"><span class="ebar-l">' + esc(GROUPS[g].label) + '</span>' +
+    (S[g].calPerG ? '<span class="ebar-t"><i style="width:' + (S[g].calPerG / max * 100) + '%;background:var(--' + g + ')"></i></span><b>~' + S[g].calPerG + ' Cal/g</b>' : '<span class="ebar-t na">not used as fuel</span><b></b>') + '</div>').join('');
+  const E = B4.energy, foods = BIG_FOUR_STATS.foods;
+  let lab = '<p class="b4-note">Pick two foods to compare 10 grams of each.</p><div class="food-opts">' + foods.map((f, i) =>
+    '<button class="food' + (E.sel.includes(i) ? ' on' : '') + '" data-b4food="' + i + '" style="--gc:var(--' + f.group + ')"><strong>' + esc(f.name) + '</strong><small>' + esc(f.note) + '</small></button>').join('') + '</div>';
+  if(E.sel.length === 2){
+    const [a, b] = E.sel.map(i => foods[i]);
+    if(E.predicted === null){
+      lab += '<p class="quiz-q" style="margin-top:12px">Predict: which has more Calories in 10 g?</p><div class="det-opts">' +
+        '<button class="qopt" data-b4pred="0">' + esc(a.name) + '</button><button class="qopt" data-b4pred="1">' + esc(b.name) + '</button><button class="qopt" data-b4pred="2">About the same</button></div>';
+    } else {
+      const ca = a.calPerG * 10, cb = b.calPerG * 10, answer = Math.abs(ca - cb) < 5 ? 2 : ca > cb ? 0 : 1;
+      const right = E.predicted === answer, top = Math.max(ca, cb);
+      lab += '<div class="food-result">' + [a, b].map(f => '<div class="ebar"><span class="ebar-l">' + esc(f.name) + '</span><span class="ebar-t"><i style="width:' + (f.calPerG * 10 / top * 100) + '%;background:var(--' + f.group + ')"></i></span><b>' + Math.round(f.calPerG * 10) + ' Cal</b></div>').join('') + '</div>' +
+        '<div class="quiz-fb ' + (right ? 'good' : 'warn') + '">' + (right ? 'Good prediction! ' : 'Surprise! ') +
+          (answer === 2 ? 'They store about the same energy per gram.' : (answer === 0 ? a.name : b.name) + ' stores more energy per gram.') +
+          ' Fats pack about 9 Calories/g because their long tails are loaded with C–H bonds. Carbohydrates and proteins already hold lots of oxygen, so they store about 4.</div>' +
+        '<button class="btn quiz-next" data-b4reset="1">Try another pair</button>';
+    }
+  }
+  box.innerHTML = '<div class="ebars">' + bars + '</div>' +
+    '<p class="b4-trick"><strong>Why?</strong> Energy is stored in chemical bonds, especially C–H bonds. Lipids have the most C–H bonds and the least oxygen, so they store the most energy per gram. That’s why your body uses fat for long-term storage.</p>' + lab;
+}
+function energyPick(i){
+  const E = B4.energy;
+  if(E.sel.includes(i)) E.sel = E.sel.filter(x => x !== i);
+  else { E.sel.push(i); if(E.sel.length > 2) E.sel.shift(); }
+  E.predicted = null; renderEnergy();
+}
+function energyPredict(k){
+  const E = B4.energy, foods = BIG_FOUR_STATS.foods, [a, b] = E.sel.map(i => foods[i]);
+  E.predicted = k;
+  const ca = a.calPerG * 10, cb = b.calPerG * 10, answer = Math.abs(ca - cb) < 5 ? 2 : ca > cb ? 0 : 1;
+  playSfx(k === answer ? 'correct' : 'wrong');
+  renderEnergy();
+  afterAction({type:'energy', groups:[a.group, b.group], predictedRight:k === answer});
+}
+
+/* ---------- body composition chart ---------- */
+function renderBodyChart(){
+  const box = $('b4BodyBody'); if(!box) return;
+  const S = BIG_FOUR_STATS, guess = B4.body.guess;
+  const rows = B4_ORDER.map(g => ({g, label:GROUPS[g].label, pct:S.groups[g].dryWeightPct, color:'var(--' + g + ')'}))
+    .concat([{g:'other', label:'Minerals and other', pct:S.otherDryWeightPct, color:'#9aa6a3'}])
+    .sort((a, b) => b.pct - a.pct);
+  const biggest = B4_ORDER.reduce((m, g) => S.groups[g].dryWeightPct > S.groups[m].dryWeightPct ? g : m, B4_ORDER[0]);
+  const shown = guess !== null;
+  box.innerHTML = '<p class="b4-note">About ' + S.waterPct + '% of you is water. Take the water away and what’s left is your <strong>dry weight</strong>.</p>' +
+    '<p class="quiz-q" style="margin-top:8px">Which biomolecule makes up the biggest share of your dry weight?</p>' +
+    '<div class="det-opts">' + B4_ORDER.map(g => '<button class="qopt' + (shown && g === biggest ? ' correct' : guess === g ? ' wrong' : '') + '" data-b4body="' + g + '">' + esc(GROUPS[g].label) + '</button>').join('') + '</div>' +
+    '<div class="body-chart' + (shown ? '' : ' hidden-vals') + '">' + rows.map(r =>
+      '<div class="ebar"><span class="ebar-l">' + esc(r.label) + '</span><span class="ebar-t"><i style="width:' + (shown ? r.pct / rows[0].pct * 100 : 30) + '%;background:' + r.color + '"></i></span><b>' + (shown ? '~' + r.pct + '%' : '?') + '</b></div>').join('') + '</div>' +
+    (shown ? '<div class="quiz-fb ' + (guess === biggest ? 'good' : 'warn') + '">' + (guess === biggest ? 'Right! ' : 'Not quite, tap the biggest bar’s group. ') +
+      'Proteins and lipids make up most of you: proteins build muscle, enzymes, and more, and lipids store energy and form every membrane. Carbohydrates are mostly burned for fuel, so very little is stored at any time.</div>' : '');
+}
+function bodyGuess(g){
+  B4.body.guess = g;
+  const S = BIG_FOUR_STATS.groups, biggest = B4_ORDER.reduce((m, k) => S[k].dryWeightPct > S[m].dryWeightPct ? k : m, B4_ORDER[0]);
+  playSfx(g === biggest ? 'correct' : 'wrong');
+  renderBodyChart();
+  afterAction({type:'body', ok:g === biggest});
+}
+
+/* ---------- Report Card: progress by proficiency level ---------- */
+function levelItems(){
+  const P = PLAYER, items = [];
+  Object.keys(CHALLENGES).forEach(t => CHALLENGES[t].forEach((c, i) => items.push({lv:c.lv, g:t, done:(P.labChallenges[t] || []).includes(i)})));
+  Object.keys(MODULES).forEach(id => MODULES[id].quiz.forEach((q, i) => items.push({lv:q.lv, g:MODULES[id].tab, done:!!(P.quizDone[id] && P.quizDone[id][i])})));
+  Object.keys(ENZYME_POOL).forEach(g => ENZYME_POOL[g].forEach(e => items.push({lv:e.lv, g, done:!!P.enzymeDone[e.id]})));
+  SHOWDOWN_ROUNDS.forEach((r, i) => items.push({lv:r.lv, g:r.group, done:!!P.showdownDone[i]}));
+  DENATURE_QUESTIONS.forEach((q, i) => items.push({lv:q.lv, g:'proteins', done:!!P.denatureDone[i]}));
+  return items;
+}
+function levelReportHTML(){
+  const items = levelItems(), cols = ['bigfour'].concat(B4_ORDER);
+  const cell = (lv, g) => { const xs = items.filter(x => x.lv === lv && (!g || x.g === g)); return xs.length ? xs.filter(x => x.done).length + ' / ' + xs.length : '–'; };
+  const rows = [1,2,3].map(lv => {
+    const xs = items.filter(x => x.lv === lv), d = xs.filter(x => x.done).length;
+    return '<div class="lv-row">' + lvlChip(lv) + '<div class="lv-main"><p><strong>Level ' + lv + ': ' + d + ' of ' + xs.length + '</strong></p>' +
+      '<span class="lv-bar"><i style="width:' + (xs.length ? d / xs.length * 100 : 0) + '%"></i></span>' +
+      '<p class="lv-txt">' + esc(STANDARD.levels[lv]) + '</p></div></div>';
+  }).join('');
+  const table = '<div class="lv-table-wrap"><table class="lv-table"><thead><tr><th></th>' + cols.map(g => '<th>' + esc(g === 'bigfour' ? 'Big Four' : GROUPS[g].label) + '</th>').join('') + '</tr></thead><tbody>' +
+    [1,2,3].map(lv => '<tr><th>Level ' + lv + '</th>' + cols.map(g => '<td>' + cell(lv, g) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+  return '<section class="panel" style="margin-bottom:16px"><h2 class="pt">Standard ' + esc(STANDARD.code) + '</h2>' +
+    '<p class="lv-txt" style="margin-bottom:12px">“' + esc(STANDARD.text) + '” [' + esc(STANDARD.ngss) + ']</p>' + rows +
+    '<p class="lv-txt" style="margin-top:10px">Counts every Lab challenge, property check, Enzyme Card, Showdown round, and Denaturation question at that level.</p>' + table + '</section>';
+}
 
 /* ---------- Report Card ---------- */
 function openReportCard(){ UI.popup = null; UI.screen = 'report'; renderApp(); }
@@ -2739,6 +3146,7 @@ function reportCardHTML(){
   return '<div class="wrap">' + headerHTML('report') +
     '<h1 style="font-size:1.6rem;margin:8px 0 4px">Report Card — ' + esc(PLAYER.name) + '</h1>' +
     '<p class="popup-txt" style="text-align:left;margin-bottom:16px">' + PLAYER.atp + ' ATP total · ' + ownedCount() + ' of 12 properties owned</p>' +
+    levelReportHTML() +
     '<div class="lower" style="grid-template-columns:1fr 1fr">' + groupRows + '</div>' +
     '<section class="panel" style="margin-top:16px"><h2 class="pt">⚔️ Mogul Showdown</h2>' + showdownBlock + '</section>' +
     '<p style="margin-top:18px"><button class="btn btn-primary" data-nav="home">Back to Home</button></p>' +
@@ -2752,7 +3160,7 @@ function renderLabChal(){
   const chal = $('chal'); if(!chal) return;
   chal.innerHTML = list.map((c,i) => {
     const isDone = done.includes(i);
-    return '<li class="' + (isDone ? 'done' : '') + '"><span class="box" aria-hidden="true">' + (isDone ? '✓' : '') + '</span><span class="tx">' + esc(c.t) + '</span></li>';
+    return '<li class="' + (isDone ? 'done' : '') + '"><span class="box" aria-hidden="true">' + (isDone ? '✓' : '') + '</span><span class="tx">' + esc(c.t) + ' ' + lvlChip(c.lv) + '</span></li>';
   }).join('');
 }
 function labChallengeCheck(ev){
@@ -2771,7 +3179,7 @@ function labChallengeCheck(ev){
   if(el){
     const allDone = done.length === list.length;
     el.textContent = 'Challenge complete: ' + newly.join(' ') + ' +' + (CFG.ATP_LAB_CHALLENGE * newly.length) + ' ATP.' +
-      (allDone ? ' That’s every ' + TABS[t].label.toLowerCase() + ' challenge!' : '');
+      (allDone ? ' That’s every ' + tabLabel(t) + ' challenge!' : '');
     el.classList.add('show'); clearTimeout(labToastTimer);
     labToastTimer = setTimeout(() => el.classList.remove('show'), 5000);
   }
@@ -2799,7 +3207,7 @@ function settingsBodyHTML(){
 function startGame(name){
   name = (name || '').trim().slice(0,24);
   if(!name) return;
-  if(!STORE.players[name]) STORE.players[name] = freshPlayer(name);
+  if(!STORE.players[name]){ STORE.players[name] = freshPlayer(name); LAB.tab = 'bigfour'; } // new players land on Meet the Big Four
   PLAYER = normalizePlayer(STORE.players[name]);
   STORE.current = name;
   saveStore(STORE);
@@ -2880,6 +3288,18 @@ document.addEventListener('click', e => {
     else if(a.indexOf('color:') === 0){ PLAYER.color = a.slice(6); persist(); openSettings(); }
     return;
   }
+
+  /* Meet the Big Four activities */
+  const b4det = t.closest('[data-b4det]');
+  if(b4det && !b4det.disabled){ detAnswer(b4det.dataset.b4det); return; }
+  if(t.closest('[data-b4next]')){ detNext(); return; }
+  const b4food = t.closest('[data-b4food]');
+  if(b4food){ energyPick(parseInt(b4food.dataset.b4food, 10)); return; }
+  const b4pred = t.closest('[data-b4pred]');
+  if(b4pred){ energyPredict(parseInt(b4pred.dataset.b4pred, 10)); return; }
+  if(t.closest('[data-b4reset]')){ B4.energy = {sel:[], predicted:null}; renderEnergy(); return; }
+  const b4body = t.closest('[data-b4body]');
+  if(b4body){ bodyGuess(b4body.dataset.b4body); return; }
 
   /* lab bench delegated events (shelf / bonds / tools / molecule select) — live on the Learn Lab screen or inside a board overlay */
   if(!UI.overlay && UI.screen !== 'lab') return;
