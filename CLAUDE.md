@@ -43,13 +43,33 @@ only, skinned in the school's colors and logo.
 
 ## The screens
 
-`UI.screen` is one of `'onboard' | 'home' | 'lab' | 'board' | 'report'`.
-`renderApp()` is the single dispatcher — it fully rebuilds `#app` on every
-screen/overlay/popup change (cheap enough at this DOM size).
+`UI.screen` is one of `'lab' | 'board' | 'report'`. There is no home or
+onboarding screen: the app always opens in the Learn Lab. `renderApp()` is the
+single dispatcher — it fully rebuilds `#app` on every screen/overlay/popup
+change (cheap enough at this DOM size).
 
-- **Home** (`homeHTML()`) — two cards, Learn Lab / Play MonoPoly, plus the
-  school logo. Reachable anytime via the header nav pills or by clicking the
-  brand/logo.
+**Who's playing (PART 9).** A device with no named player gets an unnamed
+guest, `STORE.players['__guest__']` (`GUEST`, `name:''`), so Lab progress
+(challenges, ATP, level evidence) saves immediately with no name. New players
+land on Meet the Big Four; returning ones on `PLAYER.lastTab` (saved by
+`switchLabTab()`, restored by "Back to the Lab"). Every Play button
+(`data-play`) and the Report Card go through `goPlay(next)`:
+- guest → the `name` popup (name + game piece; quick-pick chips for other
+  names on the device). `claimName()` renames the guest to that name (or, if
+  the name already exists, merges the guest's ATP + Lab challenges into it via
+  `mergeGuestInto()`) and deletes the guest key — nothing is lost.
+- named player, first Play this session (`UI.confirmed` false) → the
+  `continue` popup: "Continue as [name]?" / "Not me". "Not me" opens the name
+  popup in `fresh` mode, which creates a brand-new player (or switches to an
+  existing one by name) without touching the previous player's save.
+- otherwise → straight to the board (or back to a saved card via `returnTo`).
+The header shows the big gold **Play Mustang MonoPoly** button (`playBtnHTML()`,
+dice art + words, shine/bounce animations off under reduced motion) on the Lab
+and Report Card, and **← Back to the Lab** on the board. `renderNudge()` shows a
+dismissible "you've got the [molecule] basics down" banner (with a Play button)
+on a bench tab once 3+ of its challenges are done and none of that group's
+properties is owned (`PLAYER.nudgeOff[tab]` remembers a dismissal). The Report
+Card needs a name, so an unnamed player is sent through the name popup first.
 - **Learn Lab** (`labScreenHTML()`) — tabs in `LAB_TAB_ORDER`: **Meet the Big
   Four** (`LAB.tab === 'bigfour'`, first tab and the landing tab for new/reset
   players) then the four bench tabs. A bench tab is the *restored original*
@@ -226,7 +246,7 @@ Big Four via `focus:'#b4-…'`).
    written back immediately, not just held in memory until the next action.
    `PLAYER.color` (token + deed-banner color) is migrated in there too.
    `BLUR_ON` (`monopoly_bioquest_blur`) is a per-device preference like sound.
-5. **App shell** — onboarding, board + center rendering, dice, token hops,
+5. **App shell** — board + center rendering, dice, token hops,
    landing dispatch, the card stage (`showCard`/`animateCardOpen`/
    `animateCardClose`), flying ATP coins, confetti.
 6. **Module + enzyme-challenge card content** — both share `labBenchHTML()`.
@@ -239,8 +259,8 @@ Big Four via `focus:'#b4-…'`).
    `denaturePanelHTML()`/`denatureAnswer()` (retries always allowed);
    `menuBodyHTML()`/`settingsBodyHTML()`/`confirmResetBodyHTML()`/
    `howtoBodyHTML()` stay on the true-modal `UI.popup` system.
-8. **Shared header/nav, Home screen, Learn Lab screen, Big Four (8b), Report
-   Card, Settings** — `headerHTML()`
+8. **Shared header/nav, Learn Lab screen, Big Four (8b), Report Card,
+   Settings** — `headerHTML()`
    is used by all main screens; `labScreenHTML()`/`labTabsHTML()` render
    the restored Lab; `labChallengeCheck()`/`renderLabChal()` drive the Lab's
    challenge list and award ATP; the Settings popup (`settingsBodyHTML()`) holds
@@ -278,7 +298,8 @@ Big Four via `focus:'#b4-…'`).
    backbone-breaking goals or Enzyme Cards. Both ATP wallets (`#walletChip`,
    `#bcWalletBtn`) open the `atpInfo` popup; it and the ATP Synthase Spin card
    link to the station (`goAtpLab()`).
-10. **Event wiring + init** — one delegated `click` listener; everything else is
+10. **Who's playing (PART 9) + event wiring + init** — guest player, name and
+    Continue popups, Play button, basics nudge (see "Who's playing" above); — one delegated `click` listener; everything else is
     a plain function call, no framework.
 
 ## Branding
@@ -288,8 +309,8 @@ Big Four via `focus:'#b4-…'`).
   visible bounds and downsized (long edge 480px) from the original `LC Logo.png`
   before encoding — if the logo ever changes, re-crop/resize before re-embedding,
   don't just base64 a full-resolution export (bloats the file for no visual gain).
-  Used via `<img class="brand-logo">` (header) and `<img class="home-logo">`
-  (home screen + onboarding).
+  Used via `<img class="brand-logo">` (header) and the faint watermark in the
+  board center (`.bc-watermark`).
 - `--brand` / `--brand-blue` in `:root` were sampled directly from that logo
   file's actual pixels (navy `#233766`, sky accent `#65a5e3`), not a generic
   "Carolina blue" swatch — if the logo is ever swapped, re-sample rather than

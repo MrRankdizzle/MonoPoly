@@ -10,6 +10,7 @@ only committed once Mr. Rankin approves it. Update this file as phases finish.
 | C | Nucleic acids upgrades: double helix, ATP/ADP station | ✅ Done |
 | D1 | Property tiers, rent, new question types + questions, save migration, Report Card | ✅ Done |
 | D2 | Streak meter, lifelines, confidence wagers | ✅ Done |
+| E | Land in the Learn Lab, name at first Play, header Play button | ✅ Done |
 
 ---
 
@@ -333,4 +334,30 @@ refreshed at GO; the Showdown has streak only.
 - **Optional confidence wager** before answering (Low, Medium, or High, with a
   small cap) to reward students who know they know it. Losses stay small; this
   should feel encouraging.
+
+---
+
+## Phase E — land in the Learn Lab, name at first Play ✅
+
+- The two-card home screen and the name-first onboarding are gone. The app
+  opens straight into the Learn Lab: Meet the Big Four for new players, the
+  last tab used for returning ones.
+- No name is needed for the Lab. Progress saves right away to an unnamed guest
+  player on the device.
+- The first Play asks for a name and game piece in one quick card. All guest
+  Lab progress carries over to that name; if the name already exists on the
+  device, the guest's ATP and Lab challenges merge into it.
+- On a device with a named player, the first Play of each session asks
+  "Continue as [name]?" with "Not me", which starts a fresh player and leaves
+  the other save untouched.
+- Opening the Report Card before naming asks for a name first.
+- A big gold "Play Mustang MonoPoly" button with dice art sits in the header
+  everywhere in the Lab, with a shine and bounce now and then (off with reduced
+  motion). The board header has "← Back to the Lab".
+- A dismissible nudge appears when a molecule tab's basics (3+ challenges) are
+  done and none of that group's properties is owned yet.
+- Known trade-off: on a shared Chromebook, Lab work done before tapping Play
+  saves to whoever was last named on that device. "Continue as / Not me"
+  protects the game itself, and "Switch player" in the menu changes the
+  player any time.
 
