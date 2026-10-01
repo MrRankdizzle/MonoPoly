@@ -11,6 +11,7 @@ only committed once Mr. Rankin approves it. Update this file as phases finish.
 | D1 | Property tiers, rent, new question types + questions, save migration, Report Card | ✅ Done |
 | D2 | Streak meter, lifelines, confidence wagers | ✅ Done |
 | E | Land in the Learn Lab, name at first Play, header Play button | ✅ Done |
+| F | Theme + Animations settings, game pieces, focused game cards | ✅ Done |
 
 ---
 
@@ -360,4 +361,31 @@ refreshed at GO; the Showdown has streak only.
   saves to whoever was last named on that device. "Continue as / Not me"
   protects the game itself, and "Switch player" in the menu changes the
   player any time.
+
+---
+
+## Phase F — theme, animations, game pieces, focused game cards ✅
+
+- One theme system, Dark by default, with a Theme setting (Dark / Light).
+  The device's color scheme is ignored. Every color is a theme token. Both
+  themes pass a WCAG contrast check (text 4.5:1, UI 3:1); light theme deepens
+  carbs/lipids slightly, and proteins, GO and Water Break bands were deepened
+  so white text passes.
+- Animations setting: Match my device (default) / Full / Reduced. Full plays
+  the dice, hops, card flights and coins even when the device reports reduced
+  motion (e.g., Windows "Animation effects" off).
+- Dice check whether 3D transforms really render; if they come out flat, the
+  dice switch to a convincing 2D roll.
+- Six game pieces (Mustang horse traced from Mustang.png, glucose hexagon, amino acid bead, double
+  helix, water molecule, ATP battery) in 8 bright colors, with a halo + dark
+  outline. Picked on the name card and changeable in Settings. Deed banners use
+  the same color. Existing saves keep their color and get the horse.
+- Game cards focus on one task: step tracker, one big task line, a compact
+  build with a goal preview and only the needed pieces, or the question; one
+  primary button; Lab extras hidden; a one-line "what happened" after each bond;
+  wager/lifelines small and secondary; Review in the Lab only after a wrong
+  answer. Cards build on their own bench, so the Learn Lab bench is never
+  disturbed. Bonus cards end with "Collect ATP".
+- The Mustang horse piece is traced from `Mustang.png` (the PNG stays out of
+  the repo).
 

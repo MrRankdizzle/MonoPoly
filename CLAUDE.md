@@ -17,9 +17,23 @@ only, skinned in the school's colors and logo.
   (A short-lived headless-Chrome check purely to catch JS errors before handing
   work back is fine — that's not a server and nothing gets deployed by it.)
 - **Chromebook/phone-friendly.** No layout that requires a mouse, hover-only
-  affordances, or a large viewport. Respect `prefers-reduced-motion` (the dice
-  spin, token movement, water-drop animation, and confetti burst all already
-  check `reduceMotion` — extend that pattern for any new animation).
+  affordances, or a large viewport. Motion follows the **Animations setting**
+  (`MOTION`: `'auto'` = match the device's `prefers-reduced-motion`, default;
+  `'full'` = always animate, for e.g. Windows with "Animation effects" off;
+  `'reduced'`). `applyMotion()` sets the `reduceMotion` flag every JS
+  animation checks and the `:root.rm` class every CSS animation keys off —
+  never write a raw `@media (prefers-reduced-motion)` block; prefix new
+  reduced-motion CSS with `:root.rm` instead.
+- **One theme system, dark by default.** `<html data-theme="dark|light">` comes
+  from the Theme setting (`THEME`, `monopoly_bioquest_theme`, default `'dark'`);
+  the device's color scheme is ignored. Every color is a token in
+  `:root[data-theme="dark"]` / `:root[data-theme="light"]` (`--bg`, `--panel`,
+  `--ink`, `--muted`, `--line`, `--good*`, `--warn*`, `--atp-ink`,
+  `--brand-text`, `--brand-accent`, `--lvlN-*`, `--hot*`, `--el-border`, …;
+  `--accent-text` on `body` for accent-colored text). Never hard-code a
+  light-only color or use `prefers-color-scheme`. Both themes were checked for
+  WCAG contrast (4.5:1 text, 3:1 UI); in light, `--carbs`/`--lipids` are
+  deepened slightly so they hold 3:1 on white.
 - **Sound is off by default.** `SOUND_ON` loads from `localStorage`
   (`monopoly_bioquest_sound`) and defaults to `false`. All sound effects are
   synthesized with the WebAudio API (`tone()` / `playSfx()`) — no audio files.
@@ -111,8 +125,24 @@ Card needs a name, so an unnamed player is sent through the name popup first.
   flies off the deck, flips, zooms up), `'sq-<idx>'` (zooms from the square),
   a CSS selector, or `'center'`; `closeOverlay()` shrinks it back to the same
   origin. Card markup = `deedHead(band, kicker, title)` (color band from
-  `BAND`, incl. the `← Board` button `#closeOverlayBtn`) + `.deed-body`, with
-  `deedArt(band, artKey)`. The board behind is dimmed, and blurred only when
+  `BAND`, incl. the `← Board` button `#closeOverlayBtn`) + `.deed-body`.
+  **Game cards are focused on one task**: `taskHeadHTML()` (art, "Step k of
+  N" tracker, one big task line) + `#stepBody` (a compact build OR the
+  question) + `#cardActions` (ONE primary button: Next / Buy / Collect ATP /
+  Back to the board). Builds use `cardBuildHTML(tab, spec)`: a Goal preview,
+  only the pieces that task needs (+1–2 distractors), only the tools it needs,
+  a small bench, and one "what happened" line (`cardWhat()`). Build specs live
+  in `GOAL_BUILDS[moduleId][goalIdx]`, `ENZYME_BUILDS[enzymeId]`,
+  `SHOWDOWN_BUILDS[group]` (`task`, `shelf`, `goal`, optional `mode`, `tools`,
+  `preload`, `preloadIfEmpty`, `fresh`, `breakStep`). No Lab extras on cards
+  (no log, cheat sheet, challenge list, water counters). **Each card builds on
+  its own bench**: `cardBench(holder, tab, spec)` swaps the holder's bench and
+  water counters into `LAB.tabs[tab]`/`LAB.water`, and `renderApp()` always
+  calls `restoreLabBench()` first, so the Learn Lab bench is never touched.
+  Property cards step through `moduleSteps(o)` (buy = guided builds then the
+  Level 1 checks; house/plant/bonus = that stage's checks), held in `o.step`
+  and advanced by `cardNext()`. Bonus/result cards (`mode:'info'`) pay ATP on
+  "Collect" (`collectInfo()`); closing the card any other way also collects. The board behind is dimmed, and blurred only when
   `BLUR_ON` (Settings toggle; defaults on only for >4 cores and >4GB, since
   blur can lag on low-end Chromebooks).
   **Wrong answers** (module quiz, Denaturation, Showdown MC/riddle) show the
@@ -264,9 +294,9 @@ Big Four via `focus:'#b4-…'`).
    is used by all main screens; `labScreenHTML()`/`labTabsHTML()` render
    the restored Lab; `labChallengeCheck()`/`renderLabChal()` drive the Lab's
    challenge list and award ATP; the Settings popup (`settingsBodyHTML()`) holds
-   the sound toggle, the blur toggle, "Reset my progress", and the game-piece
-   color swatches (`data-popact="toggleSound"`/`"toggleBlur"`/`"confirmReset"`/
-   `"color:<hex>"`).
+   sound, blur, Theme, Animations, "Reset my progress", and the game-piece
+   picker (`data-popact="toggleSound"`/`"toggleBlur"`/`"theme:<v>"`/
+   `"motion:<v>"`/`"confirmReset"`/`"piece:<id>"`/`"color:<hex>"`).
 9. **Mogul Showdown** (`SHOWDOWN_ROUNDS`, `openShowdown()` → `UI.overlay.mode ===
    'showdown'`) — 14 rounds (3 per macromolecule: one `kind:'build'` reusing the
    lab engine, one `kind:'mc'`, one `kind:'riddle'`, plus 2 extra nucleic-acid
@@ -301,6 +331,23 @@ Big Four via `focus:'#b4-…'`).
 10. **Who's playing (PART 9) + event wiring + init** — guest player, name and
     Continue popups, Play button, basics nudge (see "Who's playing" above); — one delegated `click` listener; everything else is
     a plain function call, no framework.
+
+## Game pieces + dice
+
+- `PIECES` (horse, hex, bead, helix, water, atp) on a 40×48 viewBox, drawn by
+  `pieceSVG(design, color)` in three passes (white halo, dark outline, color)
+  so they read on every square in both themes. `PLAYER.piece` + `PLAYER.color`
+  (8 bright `PLAYER_COLORS`; older saves keep any color they had and default to
+  the horse). Deed banners use the player's color with `inkOn()` text.
+  `HORSE_PATH` is the Mustang silhouette traced from `Mustang.png` (a galloping
+  silhouette with transparency) into one path, fitted slightly wider than the
+  40px box (x −5..45) so the wide horse doesn't look squat. The PNG itself is
+  never committed; if it changes, re-trace it (largest shape → outline →
+  Douglas–Peucker → smoothed quadratic path) rather than embedding the image.
+- Dice: CSS 3D cubes. `detect3D()` measures a hidden probe made from the dice's
+  own CSS once per session; if 3D transforms render flat (no GPU, preserve-3d
+  flattened), `DICE3D = false` and the dice render as 2D faces that spin,
+  bounce, and flicker through numbers before landing (`roll2D()`).
 
 ## Branding
 
