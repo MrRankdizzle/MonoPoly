@@ -7,8 +7,8 @@ only committed once Mr. Rankin approves it. Update this file as phases finish.
 |---|---|---|
 | A2 | Full-width board, property art, 3D dice, card system, Lab review nudges | ✅ Done |
 | B | Our standard, proficiency levels, "Meet the Big Four" | ✅ Done |
-| C | Nucleic acids upgrades: double helix, ATP/ADP station | ⏳ Next |
-| D | Gamified questions | Planned |
+| C | Nucleic acids upgrades: double helix, ATP/ADP station | ✅ Done |
+| D | Gamified questions | ⏳ Next |
 
 ---
 
@@ -96,7 +96,23 @@ tab for new players:
 
 ---
 
-## Phase C — nucleic acids upgrades (Learn Lab nucleic acids tab)
+## Phase C — nucleic acids upgrades (Learn Lab nucleic acids tab) ✅
+
+Notes from the build:
+- Zipping pairs strands position by position, with the bottom strand read
+  3′→5′, which matches the existing "Show matching strand" convention. A true
+  reverse complement (built 5′→3′) is also accepted and flipped into place.
+- Students pick strands with a "Pick for helix" button on each strand, then
+  tap "Zip into a double helix". Mismatches show a live preview marking the
+  base each position needs.
+- Added: 3 Lab challenges (zip L3, spend L2, recharge L2); 3 module questions
+  (Nucleotide Knoll "which molecule do cells spend" L3, Backbone Bay "ATP
+  hydrolysis" L2, Helix Heights "why zipping releases no water" L2); 2
+  Showdown rounds (L2, L3). The Showdown is now 14 rounds; star thresholds
+  are 7 and 12 first-try correct.
+- The nucleic cheat sheet gained "Energy transfer" (ATP) and "Base pairs" rows.
+- Level totals are now 43 at Level 1, 19 at Level 2, 22 at Level 3.
+
 
 **A. Double helix**
 

@@ -348,6 +348,41 @@ body[data-tab="bigfour"]{--accent:var(--brand); --on-accent:#fff}
 .body-chart.hidden-vals .ebar-t i{opacity:.25}
 @media (prefers-reduced-motion:reduce){ .ebar-t i{transition:none} }
 
+/* ---------- Phase C: double helix + ATP station ---------- */
+.sel.pick[aria-pressed="true"]{background:var(--atp); color:#1b2422; border-color:transparent; font-weight:700}
+.duplex{display:grid; grid-template-rows:auto 28px auto; align-items:center; justify-items:center; width:max-content; max-width:100%; overflow-x:auto; padding:2px 0}
+.duplex .end{font-weight:800; font-size:.8rem; color:var(--mat-muted)}
+.duplex .dx{display:flex; line-height:0}
+.hb{display:flex; gap:5px; height:100%; align-items:stretch; justify-content:center}
+.hb i{width:0; border-left:2.5px dashed #e8f3ef}
+.hb.bad{flex-direction:column; align-items:center; justify-content:center; gap:0; color:#ff8a80; line-height:1}
+.hb.bad b{font-size:.9rem}
+.hb.bad small{font-size:.62rem; font-weight:700; white-space:nowrap}
+.duplex.zipping .hb{transform-origin:50% 50%; animation:zipIn .35s ease backwards; animation-delay:calc(var(--i) * 90ms)}
+@keyframes zipIn{from{transform:scaleY(0); opacity:0}}
+.helix-view{margin-top:8px; overflow-x:auto}
+.helix-view.late{animation:fadeUp .5s ease backwards; animation-delay:calc(var(--n) * 90ms + 250ms)}
+@keyframes fadeUp{from{opacity:0; transform:translateY(8px) scaleY(.6)}}
+.helix-svg{display:block; max-width:none}
+.mol.zipped{cursor:default}
+.mismatch-box{border:2px dashed #ff8a80; border-radius:14px; padding:10px 12px; margin-bottom:14px}
+.mismatch-box p{font-size:.88rem; margin-bottom:6px}
+.atp-station{margin-top:16px}
+.atp-stage{position:relative; min-height:0; display:flex; flex-direction:column; align-items:center; padding:12px}
+.atp-name{font-weight:800; font-size:1.1rem; color:#ffd79a}
+.atp-svg{width:100%; max-width:520px; height:auto}
+.atp-eq{margin-top:10px; font-size:.92rem; max-width:80ch}
+.free-p{animation:freeP .5s ease}
+@keyframes freeP{from{transform:translateX(-30px); opacity:.3}}
+.energy-burst{position:absolute; left:72%; top:50%; pointer-events:none}
+.energy-burst i{position:absolute; width:10px; height:10px; border-radius:50%; background:radial-gradient(circle, #fff6c2, #ffb52e 60%, transparent 70%); animation:burstE .8s ease-out forwards}
+@keyframes burstE{from{transform:translate(0,0) scale(1.4); opacity:1} to{transform:translate(var(--dx), var(--dy)) scale(.3); opacity:0}}
+button.wallet{font:inherit; color:inherit; cursor:pointer; text-align:left}
+button.wallet:hover{box-shadow:0 0 0 3px color-mix(in srgb, var(--atp) 40%, transparent)}
+.bcw-row{background:none; border:0; color:inherit; cursor:pointer; padding:2px 6px; border-radius:12px}
+.bcw-row:hover{background:rgba(255,255,255,.08)}
+@media (prefers-reduced-motion:reduce){ .duplex.zipping .hb, .helix-view.late, .free-p{animation:none} }
+
 /* ---------- ATP coins + confetti ---------- */
 .coin-fly{position:fixed; left:0; top:0; z-index:80; width:26px; height:26px; pointer-events:none; will-change:transform}
 .coin-fly svg{display:block}
@@ -658,7 +693,7 @@ const TABS = {
   lipids:{label:'Lipids', shelf:'Parts shelf', bond:'ester bond',
     howto:'Put down glycerol first, then attach fatty acids or a phosphate. Tap any bond to break it with water.'},
   nucleic:{label:'Nucleic acids', shelf:'Monomer shelf', bond:'phosphodiester bond', bondY:30, tileH:86,
-    howto:'Pick DNA or RNA, then tap bases to add nucleotides to the strand. Tap any bond in the backbone to break it with water.'}
+    howto:'Pick DNA or RNA, then tap bases to add nucleotides to the strand. Tap any bond in the backbone to break it with water. Pick two DNA strands to zip them into a double helix.'}
 };
 
 const FACTS = {
@@ -668,7 +703,7 @@ const FACTS = {
     hook:'Twenty amino acids can make endless proteins, the way 26 letters make endless words. Change the order and you change the shape, and the shape decides the job.'},
   lipids:{rows:[['Building blocks','Glycerol + fatty acids'],['A polymer?','Not really. Lipids are not long chains of one repeating monomer.'],['Bond','Ester bond'],['Job','Long-term energy storage, insulation, cell membranes, some hormones'],['Elements','C, H, O (plus P in phospholipids)']],
     hook:'Butter sits in a stick and olive oil pours. Same basic build, but straight tails pack tightly and kinked tails can’t.'},
-  nucleic:{rows:[['Monomer','Nucleotide: phosphate + 5-carbon sugar + nitrogen base'],['Polymer','DNA and RNA'],['Bond','Phosphodiester bond (the sugar-phosphate backbone)'],['Job','Store and pass on genetic instructions, and help build proteins'],['Elements','C, H, O, N, P']],
+  nucleic:{rows:[['Monomer','Nucleotide: phosphate + 5-carbon sugar + nitrogen base'],['Polymer','DNA and RNA'],['Bond','Phosphodiester bond (the sugar-phosphate backbone)'],['Job','Store and pass on genetic instructions, and help build proteins'],['Energy transfer','ATP, a nucleotide with 3 phosphates, is the cell’s energy currency. Spending it is hydrolysis: ATP + H₂O → ADP + phosphate + energy'],['Base pairs','A–T (2 hydrogen bonds), G–C (3). Hydrogen bonds, so pairing releases no water'],['Elements','C, H, O, N, P']],
     hook:'DNA uses deoxyribose sugar and thymine. RNA uses ribose sugar and swaps thymine for uracil.'}
 };
 
@@ -886,7 +921,7 @@ function freshTabs(){
     carbs:{mols:[], active:null, log:[]},
     proteins:{mols:[], active:null, log:[]},
     lipids:{glycerol:false, slots:[null,null,null], wasTri:false, log:[]},
-    nucleic:{mols:[], active:null, log:[], mode:'DNA', complement:false}
+    nucleic:{mols:[], active:null, log:[], mode:'DNA', complement:false, pick:[], mismatch:null, justZipped:null, atpForm:'ATP'}
   };
 }
 const LAB = { tab:'carbs', tabs: freshTabs(), water:{released:0, used:0}, active:false, onGoalProgress:null, focusRow:null };
@@ -928,6 +963,7 @@ function addLinear(key){
     mol = {id:uid(), units:[unit]}; T.mols.push(mol); T.active = mol.id;
     renderLab(); afterAction({type:'place'}); return;
   }
+  if(mol.zip){ warnLab('This strand is zipped into a double helix. Unzip it first, or tap “Start a new molecule”.'); return; }
   if(t === 'nucleic' && mol.units[0].s !== unit.s){ warnLab('DNA and RNA nucleotides don’t mix in one strand. Tap “Start a new molecule” first.'); return; }
   if(mol.units.length >= 12){ warnLab('That chain hit the bench limit of 12. Start a new molecule to keep building.'); return; }
   const before = describe(t, mol.units).eq;
@@ -959,6 +995,7 @@ function breakAllLinear(){
   const t = LAB.tab, T = LAB.tabs[t];
   const idx = T.mols.findIndex(m => m.id === T.active); if(idx < 0) return;
   const mol = T.mols[idx], n = mol.units.length - 1; if(n < 1) return;
+  if(mol.zip){ warnLab('Unzip the double helix before breaking its backbone.'); return; }
   if(T.mols.length + n > 16){ warnLab('Breaking every bond would overflow the bench. Remove a molecule first.'); return; }
   const positions = [];
   for(let i = 0; i < n; i++) positions.push(centerOf(document.querySelector('[data-bond="' + mol.id + '-' + i + '"]')));
@@ -1085,7 +1122,10 @@ function renderTools(){
         '<button class="btn" data-act="breakall"' + (act && act.units.length > 1 ? '' : ' disabled') + '>Break every bond</button>' +
         '<button class="btn" data-act="remove"' + (act ? '' : ' disabled') + '>Remove selected</button>' +
         '<button class="btn" data-act="clear"' + (T.mols.length ? '' : ' disabled') + '>Clear the bench</button>';
-    if(t === 'nucleic') h += '<button class="btn" data-act="comp" aria-pressed="' + T.complement + '">Show matching strand</button>';
+    if(t === 'nucleic'){
+      h += '<button class="btn" data-act="comp" aria-pressed="' + T.complement + '">Show matching strand</button>';
+      h += '<button class="btn' + (T.pick.length === 2 ? ' btn-primary' : '') + '" data-act="zip"' + (T.pick.length === 2 ? '' : ' disabled title="Pick two DNA strands first"') + '>Zip into a double helix</button>';
+    }
   }
   const tools = $('tools'); if(tools) tools.innerHTML = h;
   const howto = $('howto'); if(howto) howto.textContent = TABS[t].howto;
@@ -1103,9 +1143,26 @@ function renderMat(){
     return;
   }
   const tileH = t === 'nucleic' && T.complement ? 134 : TABS[t].tileH;
-  let h = '<div class="mols">';
+  let h = '';
+  if(t === 'nucleic' && T.mismatch){
+    const a = T.mols.find(m => m.id === T.mismatch.top), b = T.mols.find(m => m.id === T.mismatch.bot);
+    // The preview redraws live as the student fixes bases; drop it if a strand is gone or the lengths no longer match.
+    if(!a || !b || a.units.length !== b.units.length || a.zip || b.zip) T.mismatch = null;
+    else h += '<div class="mismatch-box"><p><strong>These strands don’t pair everywhere.</strong> Fix the marked bases, or pick a different strand.</p>' + duplexHTML(a.units, b.units, {bad:T.mismatch.bad}) + '</div>';
+  }
+  h += '<div class="mols">';
   T.mols.forEach(m => {
-    const d = describe(t, m.units), active = m.id === T.active;
+    const active = m.id === T.active;
+    if(m.zip){
+      const fresh = T.justZipped === m.id && !reduceMotion;
+      h += '<div class="mol zipped' + (active ? ' active' : '') + '" data-mol="' + m.id + '">' +
+        duplexHTML(m.units, m.zip.partner, {anim:fresh}) +
+        '<div class="helix-view' + (fresh ? ' late' : '') + '" style="--n:' + m.units.length + '">' + helixSVG(m.units, m.zip.partner) + '</div>' +
+        '<div class="cap"><span class="nm">DNA double helix</span><span class="kd">' + m.units.length + ' base pairs · strands run in opposite directions</span>' +
+        '<button class="sel" data-unzip="' + m.id + '">Unzip</button></div></div>';
+      return;
+    }
+    const d = describe(t, m.units);
     h += '<div class="mol' + (active ? ' active' : '') + '" data-mol="' + m.id + '" style="--tile-h:' + tileH + 'px;--bond-y:' + TABS[t].bondY + 'px"><div class="chain">';
     m.units.forEach((u, i) => {
       h += '<div class="unit">';
@@ -1117,9 +1174,12 @@ function renderMat(){
       h += '</div>';
     });
     h += '</div><div class="cap"><span class="nm">' + esc(d.name) + '</span><span class="kd">' + esc(d.kind) + '</span>' +
-      '<button class="sel" data-sel="' + m.id + '" aria-pressed="' + active + '">' + (active ? 'Building here' : 'Build on this') + '</button></div></div>';
+      '<button class="sel" data-sel="' + m.id + '" aria-pressed="' + active + '">' + (active ? 'Building here' : 'Build on this') + '</button>' +
+      (t === 'nucleic' ? '<button class="sel pick" data-pick="' + m.id + '" aria-pressed="' + T.pick.includes(m.id) + '">' + (T.pick.includes(m.id) ? 'Picked ✓' : 'Pick for helix') + '</button>' : '') +
+      '</div></div>';
   });
   mat.innerHTML = h + '</div>';
+  if(t === 'nucleic') T.justZipped = null;
 }
 function renderSelected(){
   const t = LAB.tab, T = LAB.tabs[t], box = $('selected'); if(!box) return;
@@ -1127,7 +1187,9 @@ function renderSelected(){
   if(t === 'lipids') d = nameLipid(T);
   else {
     const m = T.mols.find(x => x.id === T.active);
-    if(m){
+    if(m && m.zip){
+      d = {name:'DNA double helix', kind:m.units.length + ' base pairs', note:'Two strands held together by hydrogen bonds between paired bases: A–T (2 hydrogen bonds) and G–C (3). The strands run in opposite directions (antiparallel): one reads 5′→3′, its partner 3′→5′. No water was released when they zipped.'};
+    } else if(m){
       d = describe(t, m.units);
       if(t === 'nucleic' && T.complement && m.units[0].s === 'DNA' && m.units.length > 1) d = Object.assign({}, d, {note:'One strand of DNA, shown with its matching strand. Together they twist into the double helix.'});
       if(t === 'nucleic' && T.complement && m.units[0].s === 'RNA') extra = '<p>RNA is usually single-stranded, so there is no matching strand to show.</p>';
@@ -1144,6 +1206,12 @@ function renderLog(){
   if(!T.log.length){ wrap.innerHTML = '<p class="log-empty">Every reaction you run shows up here as an equation. Build something to see your first one.</p>'; return; }
   wrap.innerHTML = '<ol class="log">' + T.log.slice(0, 5).map(e => {
     const L = e.left.map(esc).join(' + '), R = e.right.map(esc).join(' + ');
+    if(e.type === 'pair' || e.type === 'unpair'){
+      return '<li><span class="rx">' + (e.type === 'pair' ? 'Base pairing (hydrogen bonds form)' : 'Unzipping (hydrogen bonds break)') + '</span><span class="eq">' + L + ' <span class="arrow">→</span> ' + R + '</span>' +
+        '<span class="why">' + e.hb + ' hydrogen bonds ' + (e.type === 'pair' ? 'formed' : 'broke') + '. <strong>No water was ' + (e.type === 'pair' ? 'released' : 'used') + ':</strong> this is not ' + (e.type === 'pair' ? 'dehydration synthesis' : 'hydrolysis') + '. Base pairs are held by hydrogen bonds, so the water counters don’t change.</span></li>';
+    }
+    if(e.type === 'atpHyd') return '<li><span class="rx">Hydrolysis (spending ATP)</span><span class="eq">' + L.replace('ATP', 'ATP + ' + wi(1)) + ' <span class="arrow">→</span> ' + R + '</span><span class="why">' + esc(e.why) + '</span></li>';
+    if(e.type === 'atpSyn') return '<li><span class="rx">Dehydration synthesis (recharging ATP)</span><span class="eq">' + L + ' <span class="arrow">→</span> ' + R + ' + ' + wi(1) + '</span><span class="why">' + esc(e.why) + '</span></li>';
     if(e.type === 'syn'){
       return '<li><span class="rx">Dehydration synthesis</span><span class="eq">' + L + ' <span class="arrow">→</span> ' + R + ' + ' + wi(e.n) + '</span>' +
         '<span class="why">' + (e.n > 1 ? e.n + ' water molecules were' : 'A water molecule was') + ' removed to form ' + (e.n > 1 ? e.n + ' ' + bond + 's' : (/^[aeiou]/.test(bond) ? 'an ' : 'a ') + bond) + '.</span></li>';
@@ -1166,7 +1234,164 @@ function renderLab(){
   document.body.dataset.tab = LAB.tab;
   renderShelf(); renderTools(); renderMat(); renderSelected(); renderHint();
   renderLog(); renderFacts(); renderLedger();
+  if(LAB.tab === 'nucleic') renderAtpStation();
 }
+/* ---------- double helix: pick two DNA strands, zip, unzip ----------
+   Pairing is by hydrogen bonds, NOT dehydration synthesis/hydrolysis, so
+   zipping and unzipping never touch LAB.water. Strands pair position by
+   position with the bottom strand read 3'→5' (the same convention as "Show
+   matching strand"); a true reverse complement is also accepted and drawn
+   flipped. A zipped molecule is {id, units:top, zip:{partner, orient, orig}}. */
+function hbCount(units){ return units.reduce((n, u) => n + HB[u.b], 0); }
+function togglePick(id){
+  const T = LAB.tabs.nucleic;
+  T.mismatch = null;
+  T.pick = T.pick.includes(id) ? T.pick.filter(x => x !== id) : T.pick.concat(id).slice(-2);
+  renderLab();
+}
+function zipStrands(){
+  const T = LAB.tabs.nucleic;
+  if(T.pick.length !== 2){ warnLab('Pick two DNA strands first (tap “Pick for helix” on each).'); return; }
+  const a = T.mols.find(m => m.id === T.pick[0]), b = T.mols.find(m => m.id === T.pick[1]);
+  if(!a || !b){ T.pick = []; renderLab(); return; }
+  if(a.units[0].s === 'RNA' || b.units[0].s === 'RNA'){ warnLab('RNA can’t zip into a double helix here. RNA is usually single-stranded: it works as a single working copy of a gene’s instructions.'); return; }
+  if(a.units.length !== b.units.length){ warnLab('Pick two strands of the same length (these have ' + a.units.length + ' and ' + b.units.length + ' nucleotides).'); return; }
+  const fits = list => a.units.every((u, i) => list[i].b === PAIR[u.b]);
+  const rev = b.units.slice().reverse();
+  const orient = fits(b.units) ? 'pos' : fits(rev) ? 'rev' : null;
+  if(!orient){
+    T.mismatch = {top:a.id, bot:b.id, bad:a.units.map((u, i) => b.units[i].b === PAIR[u.b] ? -1 : i).filter(i => i >= 0)};
+    renderLab(); playSfx('wrong');
+    warnLab('Not every base pairs. A pairs with T and G pairs with C. Mismatches are marked with the partner each base needs.');
+    return;
+  }
+  const n = a.units.length, hb = hbCount(a.units);
+  a.zip = {partner: orient === 'pos' ? b.units : rev, orient, orig: b.units};
+  T.mols = T.mols.filter(m => m.id !== b.id);
+  T.active = a.id; T.pick = []; T.mismatch = null; T.justZipped = a.id;
+  pushLog({type:'pair', left:['DNA strand (' + n + ')', 'DNA strand (' + n + ')'], right:['DNA double helix (' + n + ' base pairs)'], hb});
+  renderLab(); playSfx('buy');
+  afterAction({type:'zip', len:n});
+}
+function unzipStrands(id){
+  const T = LAB.tabs.nucleic, idx = T.mols.findIndex(m => m.id === id); if(idx < 0) return;
+  const m = T.mols[idx]; if(!m.zip) return;
+  const n = m.units.length, hb = hbCount(m.units), other = {id:uid(), units:m.zip.orig};
+  delete m.zip;
+  T.mols.splice(idx + 1, 0, other);
+  pushLog({type:'unpair', left:['DNA double helix (' + n + ' base pairs)'], right:['DNA strand (' + n + ')', 'DNA strand (' + n + ')'], hb});
+  renderLab(); playSfx('break');
+  afterAction({type:'unzip', len:n});
+}
+/* Bottom-strand tile: same parts as nucTile, flipped so the base points up
+   toward its partner, with the lettering kept upright. */
+function nucTileDown(unit, w, bad){
+  w = w || 44;
+  const B = BASES[unit.b], sugarFill = unit.s === 'DNA' ? '#c9d4f5' : '#efc9e9', P = polyPts(39, 55, 15, 5, 90);
+  return '<svg class="tile" viewBox="0 0 60 86" width="' + w + '" height="' + Math.round(86 * w / 60) + '" aria-hidden="true">' +
+    '<line x1="20" y1="56" x2="27" y2="56" stroke="' + INK + '" stroke-width="2.4"/>' +
+    '<line x1="39" y1="41" x2="39" y2="31" stroke="' + INK + '" stroke-width="2.4"/>' +
+    '<circle cx="12" cy="56" r="10" fill="#f2c14e" stroke="' + INK + '" stroke-width="2.2"/>' +
+    '<text x="12" y="60.5" text-anchor="middle" font-size="11" font-weight="700" fill="' + INK + '">P</text>' +
+    '<polygon points="' + ptsStr(P) + '" fill="' + sugarFill + '" stroke="' + INK + '" stroke-width="2.2" stroke-linejoin="round"/>' +
+    '<text x="39" y="57" text-anchor="middle" font-size="10" font-weight="600" fill="' + INK + '">dR</text>' +
+    '<rect x="25" y="3" width="28" height="28" rx="6" fill="' + B.color + '" stroke="' + (bad ? '#ff5a4e' : INK) + '" stroke-width="' + (bad ? 4 : 2.2) + '"/>' +
+    '<text x="39" y="22.5" text-anchor="middle" font-size="15" font-weight="700" fill="' + INK + '">' + unit.b + '</text></svg>';
+}
+function duplexHTML(top, bottom, opts){
+  opts = opts || {};
+  const n = top.length, bad = opts.bad || [];
+  const cols = 'grid-template-columns:26px repeat(' + n + ',48px) 26px';
+  const bonds = top.map((u, i) => {
+    if(bad.includes(i)) return '<span class="hb bad" style="--i:' + i + '"><b>✕</b><small>needs ' + PAIR[u.b] + '</small></span>';
+    return '<span class="hb" style="--i:' + i + '">' + Array.from({length:HB[u.b]}, () => '<i></i>').join('') + '</span>';
+  }).join('');
+  return '<div class="duplex' + (opts.anim ? ' zipping' : '') + '" style="' + cols + '">' +
+    '<span class="end">5′</span>' + top.map(u => '<span class="dx">' + nucTile(u, false, 44) + '</span>').join('') + '<span class="end">3′</span>' +
+    '<span></span>' + bonds + '<span></span>' +
+    '<span class="end">3′</span>' + bottom.map((u, i) => '<span class="dx">' + nucTileDown(u, 44, bad.includes(i)) + '</span>').join('') + '<span class="end">5′</span>' +
+  '</div>';
+}
+function helixSVG(top, bottom){
+  const n = top.length, W = 52 + n * 48, H = 128, mid = 64, amp = 40, k = Math.PI / 4;
+  const xAt = i => 50 + i * 48, phase = x => (x - 50) / 48 * k;
+  let s1 = [], s2 = [];
+  for(let x = 26; x <= W - 26; x += 4){ s1.push([x, mid - amp * Math.sin(phase(x))]); s2.push([x, mid + amp * Math.sin(phase(x))]); }
+  let rungs = '';
+  top.forEach((u, i) => {
+    const x = xAt(i), y1 = mid - amp * Math.sin(phase(x)), y2 = mid + amp * Math.sin(phase(x)), ym = (y1 + y2) / 2;
+    rungs += '<line x1="' + x + '" y1="' + y1.toFixed(1) + '" x2="' + x + '" y2="' + ym.toFixed(1) + '" stroke="' + BASES[u.b].color + '" stroke-width="5" stroke-linecap="round"/>' +
+      '<line x1="' + x + '" y1="' + ym.toFixed(1) + '" x2="' + x + '" y2="' + y2.toFixed(1) + '" stroke="' + BASES[bottom[i].b].color + '" stroke-width="5" stroke-linecap="round"/>';
+  });
+  return '<svg class="helix-svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Twisted double helix with ' + n + ' base pairs">' + rungs +
+    '<polyline points="' + ptsStr(s1) + '" fill="none" stroke="#c9d4f5" stroke-width="5" stroke-linecap="round"/>' +
+    '<polyline points="' + ptsStr(s2) + '" fill="none" stroke="#a88af0" stroke-width="5" stroke-linecap="round"/>' +
+    '<text x="8" y="' + (mid + 4) + '" font-size="11" font-weight="700" fill="#e8f3ef">5′</text><text x="' + (W - 16) + '" y="' + (mid + 4) + '" font-size="11" font-weight="700" fill="#e8f3ef">3′</text>' +
+  '</svg>';
+}
+
+/* ---------- ATP ⇄ ADP station (nucleic acids tab of the Learn Lab) ---------- */
+function atpMolSVG(form){
+  const P = (x, lbl) => '<circle cx="' + x + '" cy="52" r="15" fill="#f2c14e" stroke="' + INK + '" stroke-width="2.4"/><text x="' + x + '" y="57" text-anchor="middle" font-size="14" font-weight="800" fill="' + INK + '">P</text>' + (lbl ? '' : '');
+  const sugar = polyPts(118, 52, 20, 5, -90);
+  let s = '<svg class="atp-svg" viewBox="0 0 340 110" role="img" aria-label="' + (form === 'ATP' ? 'ATP: adenine, ribose, and three phosphates' : 'ADP with two phosphates, plus a free phosphate') + '">' +
+    '<line x1="62" y1="52" x2="100" y2="52" stroke="' + INK + '" stroke-width="3"/>' +
+    '<line x1="138" y1="52" x2="168" y2="52" stroke="' + INK + '" stroke-width="3"/>' +
+    '<line x1="198" y1="52" x2="208" y2="52" stroke="' + INK + '" stroke-width="3"/>' +
+    '<rect x="14" y="30" width="48" height="44" rx="9" fill="#ec6f62" stroke="' + INK + '" stroke-width="2.4"/><text x="38" y="58" text-anchor="middle" font-size="15" font-weight="800" fill="' + INK + '">A</text>' +
+    '<polygon points="' + ptsStr(sugar) + '" fill="#efc9e9" stroke="' + INK + '" stroke-width="2.4" stroke-linejoin="round"/><text x="118" y="57" text-anchor="middle" font-size="13" font-weight="700" fill="' + INK + '">R</text>' +
+    P(183) + P(223);
+  if(form === 'ATP'){
+    s += '<path d="M238 52 l5 -6 l5 12 l5 -12 l5 6" fill="none" stroke="#ff7a3d" stroke-width="3" stroke-linejoin="round"/>' + P(273) +
+      '<text x="248" y="96" text-anchor="middle" font-size="11" fill="#ffd79a">energy-rich bond</text>';
+  } else {
+    s += '<g class="free-p">' + P(300) + '</g><text x="300" y="96" text-anchor="middle" font-size="11" fill="#acd0c7">free phosphate</text>';
+  }
+  s += '<text x="38" y="96" text-anchor="middle" font-size="11" fill="#acd0c7">adenine</text><text x="118" y="96" text-anchor="middle" font-size="11" fill="#acd0c7">ribose</text>';
+  return s + '</svg>';
+}
+function renderAtpStation(){
+  const box = $('atpBody'); if(!box) return;
+  const T = LAB.tabs.nucleic, atp = T.atpForm === 'ATP';
+  box.innerHTML = '<p class="howto">ATP (adenosine triphosphate) is a nucleotide: adenine + ribose + <strong>3 phosphates</strong>. ADP (adenosine <strong>di</strong>phosphate) has 2. ATP is your cell’s energy currency.</p>' +
+    '<div class="atp-stage mat" id="atpStage"><div class="atp-name">' + (atp ? 'ATP' : 'ADP + phosphate') + '</div>' + atpMolSVG(T.atpForm) + '</div>' +
+    '<div class="tools" style="margin-top:12px">' +
+      '<button class="btn' + (atp ? ' btn-primary' : '') + '" data-atp="spend"' + (atp ? '' : ' disabled') + '>Spend energy (hydrolysis)</button>' +
+      '<button class="btn' + (atp ? '' : ' btn-primary') + '" data-atp="recharge"' + (atp ? ' disabled' : '') + '>Recharge (dehydration synthesis)</button>' +
+    '</div>' +
+    '<p class="atp-eq">' + (atp
+      ? 'Spending: <strong>ATP + H₂O → ADP + phosphate + energy</strong>. Water breaks off the last phosphate, releasing energy your cell uses to do work.'
+      : 'Recharging: <strong>ADP + phosphate + energy → ATP + H₂O</strong>. It takes energy, which comes from breaking down food in cellular respiration. In your mitochondria, the enzyme ATP synthase spins like a turbine to do this, just like the ATP Synthase Spin square.') + '</p>';
+}
+function atpStationAct(kind){
+  const T = LAB.tabs.nucleic;
+  if(kind === 'spend' && T.atpForm === 'ATP'){
+    T.atpForm = 'ADP'; LAB.water.used++;
+    pushLog({type:'atpHyd', left:['ATP'], right:['ADP', 'phosphate', 'energy'], n:1,
+      why:'A water molecule was used to break off ATP’s last phosphate, releasing the energy stored in that bond.'});
+    renderLab(); bump('chipIn'); playSfx('break'); atpBurst();
+    afterAction({type:'atpSpend'});
+  } else if(kind === 'recharge' && T.atpForm === 'ADP'){
+    T.atpForm = 'ATP'; LAB.water.released++;
+    pushLog({type:'atpSyn', left:['ADP', 'phosphate', 'energy'], right:['ATP'], n:1,
+      why:'A water molecule was removed to bond the phosphate back on. The energy came from breaking down food in cellular respiration.'});
+    renderLab(); bump('chipOut'); playSfx('build');
+    afterAction({type:'atpRecharge'});
+  }
+}
+function atpBurst(){
+  if(reduceMotion) return;
+  const st = $('atpStage'); if(!st) return;
+  const b = document.createElement('div'); b.className = 'energy-burst';
+  for(let i = 0; i < 14; i++){
+    const s = document.createElement('i'), a = i / 14 * Math.PI * 2, d = 50 + Math.random() * 40;
+    s.style.setProperty('--dx', Math.cos(a) * d + 'px'); s.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    b.appendChild(s);
+  }
+  st.appendChild(b);
+  setTimeout(() => b.remove(), 900);
+}
+
 
 /* ============================================================
    PART 3: game config — ATP economy, board layout, modules,
@@ -1180,8 +1405,8 @@ const CFG = {
   ATP_ENZYME_WIN: 30, ATP_ENZYME_LOSE: 5,
   ATP_LAB_CHALLENGE: 20,
   ATP_SHOWDOWN_BASE: 200, ATP_SHOWDOWN_PER_STAR: 50, // total bonus = base + per_star * stars(1-3)
-  SHOWDOWN_STARS_3: 10, // first-try-correct rounds (out of 12) needed for each star rating
-  SHOWDOWN_STARS_2: 6
+  SHOWDOWN_STARS_3: 12, // first-try-correct rounds (out of 14) needed for each star rating
+  SHOWDOWN_STARS_2: 7
 };
 
 /* 20-square board loop, clockwise from GO. Grid coords are 1-based
@@ -1264,7 +1489,10 @@ const CHALLENGES = {
     {lv:1, /* L1: polymer from monomers */ t:'Build a DNA strand with 6 or more nucleotides.', test:T => anyMol(T, u => u[0].s === 'DNA' && u.length >= 6)},
     {lv:1, /* L1: DNA vs RNA monomers */ t:'Build an RNA strand (2 or more) that includes uracil.', test:T => anyMol(T, u => u[0].s === 'RNA' && u.length >= 2 && u.some(x => x.b === 'U'))},
     {lv:1, /* L1: base pairing */ t:'Build DNA containing ATGC, then show its matching strand.', test:T => T.complement && anyMol(T, u => u[0].s === 'DNA' && u.map(x => x.b).join('').includes('ATGC'))},
-    {lv:2, /* L2: hydrolysis */ t:'Break a phosphodiester bond in the backbone.', test:(T, ev) => ev && ev.type === 'hyd'}
+    {lv:2, /* L2: hydrolysis */ t:'Break a phosphodiester bond in the backbone.', test:(T, ev) => ev && ev.type === 'hyd'},
+    {lv:3, /* L3: DNA structure that stores genetic info */ t:'Zip two DNA strands into a double helix.', test:(T, ev) => ev && ev.type === 'zip'},
+    {lv:2, /* L2: hydrolysis releases energy */ t:'Spend an ATP: hydrolyze it into ADP + phosphate.', test:(T, ev) => ev && ev.type === 'atpSpend'},
+    {lv:2, /* L2: dehydration synthesis stores energy */ t:'Recharge ADP back into ATP.', test:(T, ev) => ev && ev.type === 'atpRecharge'}
   ]
 };
 
@@ -1374,7 +1602,9 @@ const MODULES = {
       {lv:1, /* L1: DNA vs. RNA monomers */ q:'What’s the key sugar difference between a DNA and an RNA nucleotide?', choices:['DNA uses deoxyribose; RNA uses ribose','DNA uses glucose; RNA uses fructose','They use the exact same sugar','DNA has no sugar'], correct:0,
         explain:'Deoxyribose (DNA) is missing one oxygen compared to ribose (RNA) — that’s where the “deoxy” in DNA’s name comes from.'},
       {lv:3, /* L3: genetic information / building proteins */ q:'What is one job of RNA in your cells?', choices:['Carrying a working copy of a gene’s instructions to help build proteins','Storing long-term energy as fat','Forming the cell membrane','Making up most of your muscle'], correct:0,
-        explain:'RNA copies the instructions in a gene and helps the cell build the protein those instructions describe.'}
+        explain:'RNA copies the instructions in a gene and helps the cell build the protein those instructions describe.'},
+      {lv:3, /* L3: energy transfer (ATP) */ q:'Which molecule does your cell spend for quick energy, like a rechargeable battery?', choices:['ATP (adenosine triphosphate), a nucleotide','DNA','Cellulose','A phospholipid'], correct:0,
+        explain:'ATP is a nucleotide with three phosphates. Cells spend it by breaking off one phosphate (hydrolysis), then recharge ADP back into ATP using energy from food.'}
     ]},
   backbonebay:{tab:'nucleic', title:'Backbone Bay', sub:'Phosphodiester bonds',
     hook:'Snip the sugar-phosphate backbone anywhere along a DNA strand and the whole structure falls apart. Phosphodiester bonds are the zipper teeth holding every strand of DNA and RNA together, one water molecule at a time.',
@@ -1386,7 +1616,9 @@ const MODULES = {
       {lv:1, /* L1: naming the bond */ q:'What bond links one nucleotide to the next in a strand?', choices:['A phosphodiester bond','A peptide bond','A glycosidic bond','An ester bond'], correct:0,
         explain:'Phosphodiester bonds link the phosphate of one nucleotide to the sugar of the next, building the sugar-phosphate backbone.'},
       {lv:2, /* L2: hydrolysis */ q:'Breaking a phosphodiester bond in a strand is an example of...', choices:['Hydrolysis — it uses a water molecule','Dehydration synthesis — it releases a water molecule','Denaturation','Saturation'], correct:0,
-        explain:'Breaking any bond built by dehydration synthesis takes hydrolysis, which uses a water molecule to split it back apart.'}
+        explain:'Breaking any bond built by dehydration synthesis takes hydrolysis, which uses a water molecule to split it back apart.'},
+      {lv:2, /* L2: hydrolysis of ATP */ q:'When your cell spends ATP, ATP + water → ADP + phosphate. What kind of reaction is that?', choices:['Hydrolysis','Dehydration synthesis','Base pairing','Denaturation'], correct:0,
+        explain:'Water is used to break a bond, so it’s hydrolysis. Recharging ADP back into ATP is the reverse: dehydration synthesis, which releases water.'}
     ]},
   helixheights:{tab:'nucleic', title:'Helix Heights', sub:'Base pairing, DNA vs. RNA',
     hook:'A always finds T, and G always finds C — a pairing rule so reliable your cells use it to copy your entire genome every time a cell divides. Miss the pattern and you’ve basically got a genetic dropped call.',
@@ -1397,7 +1629,9 @@ const MODULES = {
       {lv:1, /* L1: DNA vs. RNA */ q:'What’s a key difference between DNA and RNA?', choices:['DNA is usually double-stranded and uses thymine; RNA is usually single-stranded and uses uracil','DNA is single-stranded and RNA is double-stranded','DNA has no nitrogen bases','RNA can’t pair bases at all'], correct:0,
         explain:'DNA pairs into a double helix and uses thymine. RNA usually works as a single strand and swaps in uracil wherever DNA uses thymine.'},
       {lv:3, /* L3: genetic information */ q:'What is DNA’s main job?', choices:['Storing the genetic instructions for building every protein in an organism','Providing quick energy','Insulating the body','Speeding up reactions as an enzyme'], correct:0,
-        explain:'DNA is long-term storage for genetic information. The order of its bases spells out the instructions for building proteins.'}
+        explain:'DNA is long-term storage for genetic information. The order of its bases spells out the instructions for building proteins.'},
+      {lv:2, /* L2: hydrogen bonds vs. dehydration synthesis */ q:'Why doesn’t zipping two DNA strands into a double helix release any water?', choices:['Base pairs are held by hydrogen bonds, which form without dehydration synthesis','Water is released, but only at the 5′ end','DNA contains no oxygen','Zipping is a kind of hydrolysis'], correct:0,
+        explain:'Dehydration synthesis builds the strong covalent bonds of the sugar-phosphate backbone and releases water. Paired bases are held by weaker hydrogen bonds, so zipping and unzipping don’t release or use water.'}
     ]}
 };
 
@@ -1481,7 +1715,15 @@ const SHOWDOWN_ROUNDS = [
     explain:'Phosphate + sugar + base, every time — whether it’s DNA or RNA.'},
   {lv:3, /* L3: genetic information */ group:'nucleic', kind:'riddle', clues:['Billions of copies of me link up in a specific order,', 'and that order spells out your entire genetic code.'], q:'What am I?',
     choices:['A nucleotide','An amino acid','A monosaccharide','A fatty acid'], correct:0,
-    explain:'A nucleotide — the monomer of DNA and RNA.'}
+    explain:'A nucleotide — the monomer of DNA and RNA.'},
+  {lv:2, /* L2: hydrogen bonds vs. dehydration synthesis */ group:'nucleic', kind:'mc', q:'Why doesn’t zipping two DNA strands together release water?',
+    choices:['Base pairs are held by hydrogen bonds, not built by dehydration synthesis','Water is released, but it evaporates','DNA has no hydrogen','Zipping is hydrolysis'], correct:0,
+    explain:'Hydrogen bonds between paired bases form without dehydration synthesis, so no water is released or used.',
+    review:{tab:'nucleic', focus:'bench', text:'Try zipping two strands into a double helix in the Lab'}},
+  {lv:3, /* L3: energy transfer (ATP) */ group:'nucleic', kind:'mc', q:'Which molecule does your cell spend for quick energy?',
+    choices:['ATP','DNA','Cellulose','A phospholipid'], correct:0,
+    explain:'ATP, the cell’s energy currency. Spending it is hydrolysis: ATP + water → ADP + phosphate + energy.',
+    review:{tab:'nucleic', focus:'#atpStation', text:'Visit the ATP ⇄ ADP station in the Lab'}}
 ];
 
 /* ============================================================
@@ -1723,12 +1965,15 @@ const QUIZ_REVIEW = {
     {tab:'lipids', focus:'facts:Job', text:'Review cell membranes in the Lab'}],
   nucleotideknoll:[{tab:'nucleic', focus:'facts:Monomer', text:'Review the 3 parts of a nucleotide in the Lab'},
     {tab:'nucleic', focus:'hook', text:'Review DNA vs. RNA sugars in the Lab'},
-    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'}],
+    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'},
+    {tab:'nucleic', focus:'#atpStation', text:'Visit the ATP ⇄ ADP station in the Lab'}],
   backbonebay:[{tab:'nucleic', focus:'facts:Bond', text:'Review phosphodiester bonds in the Lab'},
-    {tab:'nucleic', focus:'bench', text:'Review how hydrolysis breaks the backbone in the Lab'}],
+    {tab:'nucleic', focus:'bench', text:'Review how hydrolysis breaks the backbone in the Lab'},
+    {tab:'nucleic', focus:'#atpStation', text:'Spend an ATP at the Lab’s ATP ⇄ ADP station'}],
   helixheights:[{tab:'nucleic', focus:'challenges', text:'Practice base pairing (“Show matching strand”) in the Lab'},
     {tab:'nucleic', focus:'hook', text:'Review DNA vs. RNA in the Lab'},
-    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'}]
+    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'},
+    {tab:'nucleic', focus:'bench', text:'Try zipping two strands into a double helix in the Lab'}]
 };
 const DENATURE_REVIEW = {tab:'proteins', focus:'hook', text:'Review how a protein’s shape decides its job in the Lab'};
 /* Every quiz question must have a review target: QUIZ_REVIEW[id][i] lines up with MODULES[id].quiz[i]. */
@@ -2078,7 +2323,7 @@ function boardCenterHTML(){
       '<p class="dice-note" id="diceNote" aria-live="polite">' + esc(UI.diceNote || 'Tap the dice or Roll to move.') + '</p>' +
     '</div>' +
     '<div class="bc-wallet" id="bcWallet">' +
-      '<div class="bcw-row">' + atpIcon(34) + '<span class="bcw-n" id="bcWalletN">' + shownATP() + '</span></div>' +
+      '<button class="bcw-row" id="bcWalletBtn" title="What is ATP?">' + atpIcon(34) + '<span class="bcw-n" id="bcWalletN">' + shownATP() + '</span></button>' +
       '<div class="bcw-rank" id="bcRank">' + esc(rankFor(shownATP())) + '</div>' +
       '<div class="bcw-deeds">' + ownedCount() + ' / 12 deeds' + (sets ? ' · ' + sets + ' full set' + (sets > 1 ? 's' : '') : '') + '</div>' +
       '<button class="bc-btn' + (ready ? ' gold' : '') + '" id="showdownBtn"' + (ready ? '' : ' disabled title="Own at least 1 property in every color group to unlock"') + '>Mogul Showdown' + (PLAYER.showdown.badge ? ' · best ' + '★'.repeat(PLAYER.showdown.bestStars) : ready ? '' : ' (locked)') + '</button>' +
@@ -2639,7 +2884,7 @@ function showdownAnswer(i){
   if(opts[i]){ opts[i].disabled = true; opts[i].classList.add('wrong'); }
   playSfx('wrong');
   const fb = $('sdFb');
-  if(fb) fb.innerHTML = '<div class="quiz-fb warn">Not quite. Try another answer.</div>' + nudgeHTML(SHOWDOWN_REVIEW[round.group + ':' + round.kind]);
+  if(fb) fb.innerHTML = '<div class="quiz-fb warn">Not quite. Try another answer.</div>' + nudgeHTML(round.review || SHOWDOWN_REVIEW[round.group + ':' + round.kind]);
 }
 function showdownRoundResolve(){
   const o = UI.overlay; if(!o || o.resolved) return;
@@ -2777,7 +3022,9 @@ function infoPanelHTML(){
     '<div class="deed-body card-center">' + deedArt(o.band, o.art) +
       '<p class="lo-hook" style="margin:0 auto">' + esc(o.body) + '</p>' +
       (o.atp ? '<p class="atp-pop">+' + o.atp + ' ATP</p>' : '') +
-      '<p style="margin-top:16px"><button class="btn btn-primary btn-big" id="backToBoardBtn">Back to the board</button></p>' +
+      '<p style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+        (o.art === 'spin' ? '<button class="btn btn-big" data-atplab="1">See ATP ⇄ ADP in the Lab</button>' : '') +
+        '<button class="btn btn-primary btn-big" id="backToBoardBtn">Back to the board</button></p>' +
     '</div>';
 }
 function denaturePanelHTML(){
@@ -2834,6 +3081,20 @@ function howtoBodyHTML(){
       '• Own all 3 properties in a color group for a bonus. Own one in every group to unlock the Mogul Showdown.' +
     '</p><div class="popup-actions"><button class="btn btn-primary" data-popact="closePopup">Got it</button></div>';
 }
+/* Tapping either ATP wallet explains what ATP actually is. */
+function atpInfoBodyHTML(){
+  return '<div class="card-center" style="margin-top:4px"><div class="deed-art" style="--gc:var(--atp);margin:0 auto 10px">' + artSVG('spin') + '</div></div>' +
+    '<h3 style="text-align:center">ATP: your cell’s energy currency</h3>' +
+    '<p class="popup-txt">ATP (adenosine triphosphate) is a nucleotide with <strong>3 phosphates</strong>. When a cell spends it, it runs <strong>hydrolysis</strong>: ATP + water → ADP + phosphate + energy.</p>' +
+    '<p class="popup-txt">Food recharges it. Cellular respiration powers the enzyme ATP synthase (the ATP Synthase Spin square!) to turn ADP back into ATP.</p>' +
+    '<p class="popup-txt" style="color:var(--muted)">In this game you earn ATP by learning.</p>' +
+    '<div class="popup-actions"><button class="btn" data-popact="atpLab">Try it in the Lab</button><button class="btn btn-primary" data-popact="closePopup">Got it</button></div>';
+}
+function goAtpLab(){
+  UI.popup = null; UI.overlay = null; LAB.onGoalProgress = null;
+  LAB.tab = 'nucleic'; LAB.focusRow = null; UI.reviewFocus = '#atpStation'; UI.screen = 'lab';
+  renderApp();
+}
 function popupHTML(){
   const p = UI.popup;
   let inner;
@@ -2841,6 +3102,7 @@ function popupHTML(){
   else if(p.mode === 'confirmReset') inner = confirmResetBodyHTML();
   else if(p.mode === 'howto') inner = howtoBodyHTML();
   else if(p.mode === 'settings') inner = settingsBodyHTML();
+  else if(p.mode === 'atpInfo') inner = atpInfoBodyHTML();
   else inner = infoBodyHTML(p);
   return '<div class="overlay-back" id="popupBack"><div class="overlay-card popup-card">' +
     '<button class="overlay-close" id="closePopupBtn" aria-label="Close">✕</button>' +
@@ -2861,7 +3123,7 @@ function headerHTML(active){
       '<button class="navpill' + (active==='board'?' active':'') + '" data-nav="board" aria-current="' + (active==='board') + '">🎲 Play MonoPoly</button>' +
     '</nav>' +
     '<div class="hdr-right">' +
-      '<div class="wallet" id="walletChip"><span class="ic">' + atpIcon(30) + '</span><div><div class="n" id="walletN">' + shownATP() + '</div><div class="l">ATP — the cell’s energy currency</div></div></div>' +
+      '<button class="wallet" id="walletChip" title="What is ATP?"><span class="ic">' + atpIcon(30) + '</span><div><div class="n" id="walletN">' + shownATP() + '</div><div class="l">ATP — the cell’s energy currency</div></div></button>' +
       '<button class="iconbtn" id="settingsBtn" title="Settings">⚙️</button>' +
       '<button class="iconbtn" id="menuBtn" title="Menu">☰</button>' +
     '</div>' +
@@ -2912,7 +3174,8 @@ function labScreenHTML(){
         '<section class="panel"><h2 class="pt">What just happened</h2><div id="logWrap" aria-live="polite"></div></section>' +
         challenges +
         '<section class="panel facts"><h2 class="pt" id="factsTitle">Cheat sheet</h2><dl id="facts"></dl><p class="factshook" id="factshook"></p></section>' +
-      '</div>';
+      '</div>' +
+      (LAB.tab === 'nucleic' ? '<section class="panel atp-station" id="atpStation"><h2 class="pt">ATP ⇄ ADP station</h2><div id="atpBody"></div></section>' : '');
   return '<div class="wrap">' + headerHTML('lab') + back +
     labTabsHTML() +
     '<div class="toast" id="labToast" aria-live="polite"></div>' +
@@ -3225,6 +3488,8 @@ document.addEventListener('click', e => {
 
   const menuBtn = t.closest('#menuBtn');
   if(menuBtn){ openMenu(); return; }
+  if(t.closest('#walletChip, #bcWalletBtn')){ openPopup({mode:'atpInfo'}); return; }
+  if(t.closest('[data-atplab]')){ goAtpLab(); return; }
   const settingsBtn = t.closest('#settingsBtn');
   if(settingsBtn){ openSettings(); return; }
   const navBtn = t.closest('[data-nav]');
@@ -3284,6 +3549,7 @@ document.addEventListener('click', e => {
     else if(a === 'doReset') doReset();
     else if(a === 'reportCard') openReportCard();
     else if(a === 'toggleSound'){ SOUND_ON = !SOUND_ON; saveSoundPref(SOUND_ON); if(SOUND_ON) ensureAudio(); openSettings(); }
+    else if(a === 'atpLab') goAtpLab();
     else if(a === 'toggleBlur'){ BLUR_ON = !BLUR_ON; saveBlurPref(BLUR_ON); openSettings(); }
     else if(a.indexOf('color:') === 0){ PLAYER.color = a.slice(6); persist(); openSettings(); }
     return;
@@ -3319,6 +3585,12 @@ document.addEventListener('click', e => {
   if(lb){ breakLipid(parseInt(lb.dataset.lbond, 10)); return; }
   const act = t.closest('[data-act]');
   if(act){ doLabAct(act.dataset.act); return; }
+  const pick = t.closest('[data-pick]');
+  if(pick){ togglePick(pick.dataset.pick); return; }
+  const unz = t.closest('[data-unzip]');
+  if(unz){ unzipStrands(unz.dataset.unzip); return; }
+  const atpBtn = t.closest('[data-atp]');
+  if(atpBtn && !atpBtn.disabled){ atpStationAct(atpBtn.dataset.atp); return; }
   const sel = t.closest('[data-sel]') || t.closest('[data-mol]');
   if(sel){
     const T = LAB.tabs[LAB.tab]; const id = sel.dataset.sel || sel.dataset.mol;
@@ -3343,8 +3615,9 @@ function doLabAct(a){
   }
   if(a === 'new'){ T.active = null; renderLab(); return; }
   if(a === 'breakall'){ breakAllLinear(); return; }
-  if(a === 'remove'){ T.mols = T.mols.filter(m => m.id !== T.active); T.active = T.mols.length ? T.mols[T.mols.length - 1].id : null; renderLab(); return; }
-  if(a === 'clear'){ T.mols = []; T.active = null; renderLab(); return; }
+  if(a === 'remove'){ T.mols = T.mols.filter(m => m.id !== T.active); if(T.pick) T.pick = T.pick.filter(id => id !== T.active); if(t === 'nucleic') T.mismatch = null; T.active = T.mols.length ? T.mols[T.mols.length - 1].id : null; renderLab(); return; }
+  if(a === 'clear'){ T.mols = []; T.active = null; if(t === 'nucleic'){ T.pick = []; T.mismatch = null; } renderLab(); return; }
+  if(a === 'zip'){ zipStrands(); return; }
   if(a === 'comp'){ T.complement = !T.complement; renderLab(); afterAction({type:'comp'}); }
 }
 

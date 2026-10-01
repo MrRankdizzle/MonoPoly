@@ -200,16 +200,36 @@ Big Four via `focus:'#b4-…'`).
    color swatches (`data-popact="toggleSound"`/`"toggleBlur"`/`"confirmReset"`/
    `"color:<hex>"`).
 9. **Mogul Showdown** (`SHOWDOWN_ROUNDS`, `openShowdown()` → `UI.overlay.mode ===
-   'showdown'`) — 12 rounds (3 per macromolecule: one `kind:'build'` reusing the
-   lab engine, one `kind:'mc'`, one `kind:'riddle'` — mc/riddle share one answer
-   path, `choices`+`correct`, riddles just add a `clues` array), order shuffled
+   'showdown'`) — 14 rounds (3 per macromolecule: one `kind:'build'` reusing the
+   lab engine, one `kind:'mc'`, one `kind:'riddle'`, plus 2 extra nucleic-acid
+   MC rounds from Phase C — mc/riddle share one answer path, `choices`+`correct`,
+   riddles just add a `clues` array; a round may carry its own `review` target,
+   otherwise `SHOWDOWN_REVIEW[group:kind]` is used), order shuffled
    per attempt in `openShowdown()`. No lives, untimed: a wrong MC/riddle answer
    disables that option, lets you retry, and shows a Lab review nudge;
    a build round just waits for the bench to satisfy `round.test()`. Stars are
    1-3 based only on rounds solved correct on the *first* attempt
-   (`CFG.SHOWDOWN_STARS_2`/`_3` thresholds out of 12), paid out as
+   (`CFG.SHOWDOWN_STARS_2`/`_3` thresholds, currently 7/12 out of 14 — retune
+   if rounds are added), paid out as
    `CFG.ATP_SHOWDOWN_BASE + CFG.ATP_SHOWDOWN_PER_STAR * stars`. Results persist
    to `PLAYER.showdown` (`bestStars`/`lastStars`/`badge`/`attempts`).
+**Nucleic acids extras (Phase C, PART 2):** the nucleic tab's bench can zip two
+   picked DNA strands (`T.pick`, `zipStrands()`/`unzipStrands()`) into a
+   double helix: `mol.zip = {partner, orient, orig}`, drawn by `duplexHTML()`
+   (H-bond ladder, 2 dashes for A–T, 3 for G–C) + `helixSVG()`. Strands pair
+   position by position with the bottom strand read 3′→5′ (same convention as
+   "Show matching strand"); a true reverse complement is also accepted and drawn
+   flipped. Mismatches render a live preview (`T.mismatch`) marking the partner
+   each base needs. Zipping/unzipping logs `type:'pair'|'unpair'` and **never
+   touches `LAB.water`** — hydrogen bonds, not dehydration synthesis/hydrolysis.
+   A zipped strand blocks adding/breaking until unzipped. The **ATP ⇄ ADP
+   station** (`#atpStation`, `renderAtpStation()`/`atpStationAct()`, state
+   `T.atpForm`) lives below the nucleic tab's lower row on the Lab screen only
+   (not in cards); it updates the water counters and logs `type:'atpHyd'|
+   'atpSyn'` — deliberately *not* `'hyd'`/`'syn'`, so spending ATP can't satisfy
+   backbone-breaking goals or Enzyme Cards. Both ATP wallets (`#walletChip`,
+   `#bcWalletBtn`) open the `atpInfo` popup; it and the ATP Synthase Spin card
+   link to the station (`goAtpLab()`).
 10. **Event wiring + init** — one delegated `click` listener; everything else is
     a plain function call, no framework.
 
