@@ -383,6 +383,39 @@ button.wallet:hover{box-shadow:0 0 0 3px color-mix(in srgb, var(--atp) 40%, tran
 .bcw-row:hover{background:rgba(255,255,255,.08)}
 @media (prefers-reduced-motion:reduce){ .duplex.zipping .hb, .helix-view.late, .free-p{animation:none} }
 
+/* ---------- Phase D1: tiers + question types ---------- */
+.sq-upg{position:absolute; top:max(8px, 15cqh); right:4px; height:max(16px, 24cqh); display:flex; padding:2px 4px; background:rgba(255,255,255,.92); border-radius:7px; box-shadow:0 1px 3px rgba(0,0,0,.35); z-index:1}
+.sq-upg svg{height:100%; width:auto}
+.sq-upg svg *{stroke:#1b2422}
+.tier-track{list-style:none; margin:12px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:8px}
+.tier-track li{display:flex; align-items:center; gap:6px; border:1.5px solid var(--line); border-radius:999px; padding:4px 12px 4px 6px; font-size:.85rem; font-weight:600; color:var(--muted); background:var(--panel)}
+.tier-track li.done{color:var(--good); border-color:var(--good); background:var(--good-bg)}
+.tier-track li.next{color:var(--ink); border-color:var(--brand-blue); box-shadow:0 0 0 2px color-mix(in srgb, var(--brand-blue) 30%, transparent)}
+.stage-head{display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 12px; margin-top:12px; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--brand-blue) 16%, transparent)}
+.stage-head span{color:var(--atp-ink); font-weight:700; font-size:.88rem}
+.rent-note{margin-top:6px; font-size:.9rem; color:var(--good)}
+.rc-tier{font-size:.75rem; font-weight:700; padding:0 8px; border-radius:999px; background:var(--bg); border:1px solid var(--line); margin-left:4px}
+.qtype{display:inline-block; font-size:.7rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--brand); margin-left:6px}
+.clues{margin:0 0 10px; padding-left:22px; display:flex; flex-direction:column; gap:4px; font-size:.95rem}
+.clues li{animation:tickIn .35s ease}
+.mof-q{font-size:1.15rem; font-style:italic}
+.mof-opts{display:grid; grid-template-columns:1fr 1fr}
+.mof-opts .qopt{text-align:center; font-weight:800; font-size:1.05rem; padding:.9rem}
+.sort-help{font-size:.82rem; color:var(--muted); margin:-6px 0 10px}
+.sort-pool{display:flex; flex-wrap:wrap; gap:8px; min-height:48px; padding:10px; border:2px dashed var(--line); border-radius:14px; background:var(--panel)}
+.sort-empty{color:var(--muted); font-size:.88rem; align-self:center}
+.sort-chip{border:1.5px solid var(--line); background:var(--panel); border-radius:999px; padding:.45rem .85rem; font-size:.88rem; cursor:grab; text-align:left}
+.sort-chip.sel{background:var(--brand); color:#fff; border-color:var(--brand); box-shadow:0 0 0 3px color-mix(in srgb, var(--brand-blue) 40%, transparent)}
+.sort-chip.bounced{border-color:var(--warn); background:var(--warn-bg); animation:bounceBack .4s ease}
+.sort-chip.right{border-color:var(--good); background:var(--good-bg); cursor:default}
+@keyframes bounceBack{30%{transform:translateY(-6px)} 60%{transform:translateY(2px)}}
+.sort-bins{display:grid; gap:10px; margin-top:10px}
+.sort-bin{min-height:96px; border:2px solid var(--line); border-radius:14px; padding:8px; display:flex; flex-direction:column; gap:6px; align-items:flex-start; background:var(--bg); cursor:pointer}
+.sort-bin p{font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+.sort-bin.ready{border-color:var(--brand-blue); border-style:dashed}
+@media (max-width:640px){ .sort-bins{grid-template-columns:1fr 1fr !important} }
+@media (prefers-reduced-motion:reduce){ .clues li, .sort-chip.bounced{animation:none} }
+
 /* ---------- ATP coins + confetti ---------- */
 .coin-fly{position:fixed; left:0; top:0; z-index:80; width:26px; height:26px; pointer-events:none; will-change:transform}
 .coin-fly svg{display:block}
@@ -1404,6 +1437,9 @@ const CFG = {
   ATP_MODULE_BONUS: 25, ATP_SET_BONUS: 50,
   ATP_ENZYME_WIN: 30, ATP_ENZYME_LOSE: 5,
   ATP_LAB_CHALLENGE: 20,
+  ATP_HOUSE_BONUS: 20, ATP_PLANT_BONUS: 30, // upgrade bonus on top of the question ATP
+  RENT: [0, 5, 10, 20],  // ATP collected when you land on your own property: [unowned, deed, house, Polymer Plant]
+  ATP_CLUE_BONUS: 5,     // "What am I?": per clue left unrevealed when solved on the first try
   ATP_SHOWDOWN_BASE: 200, ATP_SHOWDOWN_PER_STAR: 50, // total bonus = base + per_star * stars(1-3)
   SHOWDOWN_STARS_3: 12, // first-try-correct rounds (out of 14) needed for each star rating
   SHOWDOWN_STARS_2: 7
@@ -1506,7 +1542,11 @@ const MODULES = {
       {lv:1, /* L1: identify monomers */ q:'Which of these is NOT a monosaccharide?', choices:['Glucose','Fructose','Sucrose','Galactose'], correct:2,
         explain:'Sucrose is table sugar — glucose and fructose already bonded together, so it’s a disaccharide, not a monosaccharide.'},
       {lv:3, /* L3: quick energy */ q:'Why do runners eat pasta or bananas the day before a big race?', choices:['Carbohydrates are the body’s go-to source of quick, short-term energy','Carbohydrates store genetic information','Carbohydrates build the cell membrane','Carbohydrates speed up reactions like enzymes'], correct:0,
-        explain:'Carbs break down into glucose fast, so they’re the body’s quick, short-term energy source. Lipids are the long-term energy store.'}
+        explain:'Carbs break down into glucose fast, so they’re the body’s quick, short-term energy source. Lipids are the long-term energy store.'},
+      {lv:2, /* L2: dehydration synthesis vs. hydrolysis (D1-1) */ type:'sort', q:'Sort each change: does it release water or use water?',
+        groups:['Releases water (dehydration synthesis)','Uses water (hydrolysis)'],
+        items:[['Glucose + glucose → maltose',0],['Your liver links glucose into a glycogen chain',0],['Saliva breaks starch into maltose',1],['Digesting sucrose into glucose + fructose',1]],
+        explain:'Building a bond releases one water (dehydration synthesis). Breaking a bond uses one water (hydrolysis).'}
     ]},
   sucrosest:{tab:'carbs', title:'Sucrose Street', sub:'Disaccharides + dehydration synthesis',
     hook:'Table sugar isn’t a monomer at all — it’s glucose and fructose holding hands. Every time two sugars link together, a water molecule gets kicked out. That’s dehydration synthesis: molecular chemistry’s version of packing light.',
@@ -1515,7 +1555,9 @@ const MODULES = {
       {lv:2, /* L2: dehydration synthesis releases water */ q:'Building sucrose from glucose and fructose releases a...', choices:['Water molecule','Oxygen molecule','Glucose molecule','Nothing'], correct:0,
         explain:'Joining two monomers with a glycosidic bond is dehydration synthesis — “dehydration” because a water molecule is removed.'},
       {lv:1, /* L1: monomers of a disaccharide */ q:'Lactose (milk sugar) is made from which two monosaccharides?', choices:['Glucose + Fructose','Galactose + Glucose','Fructose + Fructose','Galactose + Fructose'], correct:1,
-        explain:'Lactose = galactose + glucose. Sucrose = glucose + fructose. Maltose = glucose + glucose.'}
+        explain:'Lactose = galactose + glucose. Sucrose = glucose + fructose. Maltose = glucose + glucose.'},
+      {lv:3, /* L3: energy transport in plants (D1-2) */ type:'mof', q:'Plants like sugar cane use sucrose to carry energy from their leaves to the rest of the plant.', choices:['Fact','Myth'], correct:0,
+        explain:'Fact. Leaves make glucose, link it with fructose into sucrose, and ship the sucrose through their sap to roots, fruit, and growing tips. It’s an energy delivery molecule.'}
     ]},
   starchblvd:{tab:'carbs', title:'Starch Boulevard', sub:'Polysaccharides + hydrolysis',
     hook:'Crackers taste bland at first — then chew one for 30 seconds and it turns sweet. Saliva enzymes are hydrolyzing the starch’s glycosidic bonds, snapping a giant glucose chain into sugary maltose right in your mouth.',
@@ -1538,7 +1580,13 @@ const MODULES = {
       {lv:1, /* L1: monomer structure */ q:'What part of an amino acid changes from one amino acid to the next?', choices:['The R group (side chain)','The central carbon','The amino group','The carboxyl group'], correct:0,
         explain:'Every amino acid shares the same core. The R group is the only part that differs, and it decides whether the amino acid is polar, nonpolar, or charged.'},
       {lv:1, /* L1: monomer properties */ q:'A nonpolar R group tends to...', choices:['Avoid water and hide inside a folded protein','Dissolve easily in water','Carry a permanent positive charge','Be identical to every other R group'], correct:0,
-        explain:'Nonpolar R groups are hydrophobic (water-fearing), so they usually end up tucked inside a protein’s folded core.'}
+        explain:'Nonpolar R groups are hydrophobic (water-fearing), so they usually end up tucked inside a protein’s folded core.'},
+      {lv:2, /* L2: water released per peptide bond (D1-3) */ q:'Building a chain of 4 amino acids releases how many water molecules?', choices:['3','4','1','0'], correct:0,
+        explain:'One water per peptide bond. 4 amino acids are joined by 3 bonds, so 3 waters.'},
+      {lv:3, /* L3: protein functions (D1-4) */ type:'sort', q:'Sort each protein by its job.',
+        groups:['Enzyme','Transport','Structure','Defense'],
+        items:[['Lactase',0],['Amylase',0],['Hemoglobin',1],['Keratin (hair and nails)',2],['Collagen (skin and tendons)',2],['Antibodies',3]],
+        explain:'Proteins do most of the cell’s work. Enzymes speed up reactions, transport proteins carry things (hemoglobin carries oxygen), structural proteins build tissues, and antibodies fight infection.'}
     ]},
   peptideplace:{tab:'proteins', title:'Peptide Place', sub:'Peptide bonds — order matters',
     hook:'A peptide bond is just one water molecule’s worth of chemistry, but line up thousands in the right order and you get spider silk or the antibodies fighting off your last cold. Get the order wrong, and the whole thing falls apart.',
@@ -1550,7 +1598,9 @@ const MODULES = {
       {lv:1, /* L1: naming */ q:'Two amino acids joined by a peptide bond form a...', choices:['Dipeptide','Disaccharide','Monoglyceride','Nucleotide'], correct:0,
         explain:'Two amino acids = a dipeptide, just like two sugars = a disaccharide.'},
       {lv:3, /* L3: order -> shape -> job */ q:'Met–Gly–Lys and Lys–Gly–Met use the same three amino acids. Are they the same protein?', choices:['No — the sequence changes the protein entirely','Yes, order never matters','Yes, they have the same mass','No, they’re made of different elements'], correct:0,
-        explain:'Sequence is everything — change the order and you change how the chain folds, which changes (or destroys) its function.'}
+        explain:'Sequence is everything — change the order and you change how the chain folds, which changes (or destroys) its function.'},
+      {lv:2, /* L2: hydrolysis vs. dehydration synthesis (D1-5) */ type:'odd', q:'Which one is NOT hydrolysis?', choices:['Digesting the protein in a steak into amino acids','Breaking a peptide bond with water','Linking two amino acids into a dipeptide','Stomach enzymes snipping a protein chain apart'], correct:2,
+        explain:'Linking amino acids is dehydration synthesis (it releases water). The other three break bonds with water, which is hydrolysis.'}
     ]},
   foldingfalls:{tab:'proteins', title:'Folding Falls', sub:'Shape = function, denaturation',
     hook:'Fry an egg and the clear, runny white turns opaque and firm — forever. That’s not cooking magic, it’s denaturation: heat ripping apart the folds that gave the protein its shape (and its job). Lose the fold, lose the function.',
@@ -1559,7 +1609,12 @@ const MODULES = {
       {lv:3, /* L3: shape = function */ q:'A protein’s function depends most directly on its...', choices:['3D shape','Color','Weight','Number of carbons'], correct:0,
         explain:'Structure determines function — a protein folds into a specific shape, and that shape is what lets it do its job.'},
       {lv:3, /* L3: denaturation destroys function */ q:'What is denaturation?', choices:['A protein losing its shape, usually from heat or pH','A protein gaining new amino acids','Two proteins bonding together','A protein turning into a carbohydrate'], correct:0,
-        explain:'Denaturation unfolds a protein’s shape without changing its amino acid sequence — and once unfolded, most proteins can’t do their job anymore.'}
+        explain:'Denaturation unfolds a protein’s shape without changing its amino acid sequence — and once unfolded, most proteins can’t do their job anymore.'},
+      {lv:1, /* L1: identify the polymer (D1-6) */ type:'riddle', q:'What am I?', clues:['Hemoglobin, keratin, and lactase are all examples of me.','I fold into a specific 3D shape.','I’m a long chain of amino acids.'],
+        choices:['A protein','A polysaccharide','A triglyceride','DNA'], correct:0,
+        explain:'Proteins are chains of amino acids that fold into a shape, and the shape decides the job.'},
+      {lv:2, /* L2: relative energy (D1-7) */ q:'Gram for gram, how much energy do proteins store compared with fats?', choices:['Less than half (about 4 vs. about 9 Calories/g)','About the same','More than fats','None, proteins never provide energy'], correct:0,
+        explain:'Fats are packed with energy-rich C–H bonds and store about 9 Calories/g. Proteins and carbs store about 4. Your body uses protein for fuel mostly as a backup.'}
     ]},
   glycerolgardens:{tab:'lipids', title:'Glycerol Gardens', sub:'Building a triglyceride',
     hook:'Every stick of butter and bottle of olive oil starts the exact same way: a 3-carbon glycerol backbone waiting for fatty acids to bond on. Attach one tail and you’ve got a monoglyceride.',
@@ -1582,7 +1637,11 @@ const MODULES = {
       {lv:1, /* L1: saturated vs. unsaturated structure */ q:'Why is butter solid at room temperature while olive oil is liquid?', choices:['Butter’s straight, saturated tails pack tightly; oil’s kinked tails can’t','Butter has no fatty acids','Oil has more glycerol than butter','Butter is a protein and oil is a carbohydrate'], correct:0,
         explain:'Saturated tails are straight and pack tightly together. Unsaturated tails have a kink from a double bond, so they can’t stack as neatly.'},
       {lv:1, /* L1: naming / structure */ q:'A “saturated” fatty acid is saturated with...', choices:['Hydrogen','Water','Oxygen','Nitrogen'], correct:0,
-        explain:'Saturated means saturated with hydrogen: no carbon-carbon double bonds, so every carbon holds as many hydrogens as possible.'}
+        explain:'Saturated means saturated with hydrogen: no carbon-carbon double bonds, so every carbon holds as many hydrogens as possible.'},
+      {lv:2, /* L2: relative energy (D1-8) */ type:'mof', q:'A gram of fat stores more than twice the energy of a gram of sugar.', choices:['Fact','Myth'], correct:0,
+        explain:'Fact. About 9 Calories/g for fat vs. about 4 for sugar. Fat’s long tails are full of C–H bonds and have very little oxygen.'},
+      {lv:3, /* L3: lipid functions (D1-9) */ type:'odd', q:'Which is NOT a job of lipids?', choices:['Long-term energy storage','Insulating the body (like a whale’s blubber)','Forming cell membranes','Carrying genetic instructions'], correct:3,
+        explain:'Lipids store energy, insulate, and build membranes (and some hormones). Genetic instructions are the job of nucleic acids.'}
     ]},
   membranemarina:{tab:'lipids', title:'Membrane Marina', sub:'Phospholipids + the bilayer',
     hook:'Every one of your trillions of cells is wrapped in a wall built from phospholipids: water-loving heads facing out, water-fearing tails hiding in the middle. Basically a self-assembling membrane made of molecular popsicles.',
@@ -1591,7 +1650,9 @@ const MODULES = {
       {lv:1, /* L1: naming the parts */ q:'A phospholipid has a water-loving head and water-fearing tails. What are those called?', choices:['Hydrophilic head, hydrophobic tails','Hydrophobic head, hydrophilic tails','Both hydrophilic','Both hydrophobic'], correct:0,
         explain:'The phosphate head is hydrophilic (water-loving) and the fatty acid tails are hydrophobic (water-fearing).'},
       {lv:3, /* L3: membranes */ q:'Why do phospholipids in water form a bilayer, tails inward?', choices:['So hydrophobic tails hide from water while hydrophilic heads face it','So the tails can face outward toward water','Glycerol pushes them apart','Phosphate groups repel each other'], correct:0,
-        explain:'Tails point inward, away from water, while heads face outward into the watery environment on both sides — that’s every cell membrane.'}
+        explain:'Tails point inward, away from water, while heads face outward into the watery environment on both sides — that’s every cell membrane.'},
+      {lv:2, /* L2: water released by dehydration synthesis (D1-10) */ q:'Building one phospholipid (glycerol + 2 fatty acids + 1 phosphate) releases how many water molecules?', choices:['3','1','2','0'], correct:0,
+        explain:'Each part bonded to glycerol releases one water by dehydration synthesis. Three parts attached means 3 waters.'}
     ]},
   nucleotideknoll:{tab:'nucleic', title:'Nucleotide Knoll', sub:'The 3 parts of a nucleotide',
     hook:'Your entire genetic blueprint is spelled out using just a handful of copies of one small molecule: the nucleotide. Phosphate, sugar, base — three parts, repeated billions of times, is the whole secret behind DNA.',
@@ -1604,7 +1665,11 @@ const MODULES = {
       {lv:3, /* L3: genetic information / building proteins */ q:'What is one job of RNA in your cells?', choices:['Carrying a working copy of a gene’s instructions to help build proteins','Storing long-term energy as fat','Forming the cell membrane','Making up most of your muscle'], correct:0,
         explain:'RNA copies the instructions in a gene and helps the cell build the protein those instructions describe.'},
       {lv:3, /* L3: energy transfer (ATP) */ q:'Which molecule does your cell spend for quick energy, like a rechargeable battery?', choices:['ATP (adenosine triphosphate), a nucleotide','DNA','Cellulose','A phospholipid'], correct:0,
-        explain:'ATP is a nucleotide with three phosphates. Cells spend it by breaking off one phosphate (hydrolysis), then recharge ADP back into ATP using energy from food.'}
+        explain:'ATP is a nucleotide with three phosphates. Cells spend it by breaking off one phosphate (hydrolysis), then recharge ADP back into ATP using energy from food.'},
+      {lv:2, /* L2: dehydration synthesis vs. hydrolysis (D1-11) */ type:'sort', q:'Sort each reaction: dehydration synthesis or hydrolysis?',
+        groups:['Dehydration synthesis','Hydrolysis'],
+        items:[['Adding a nucleotide to a DNA strand',0],['Recharging ADP back into ATP',0],['Spending ATP for energy',1],['Cutting a DNA strand’s backbone',1]],
+        explain:'Building a bond releases water (dehydration synthesis). Breaking one uses water (hydrolysis). ATP is a nucleotide, so the same rules apply.'}
     ]},
   backbonebay:{tab:'nucleic', title:'Backbone Bay', sub:'Phosphodiester bonds',
     hook:'Snip the sugar-phosphate backbone anywhere along a DNA strand and the whole structure falls apart. Phosphodiester bonds are the zipper teeth holding every strand of DNA and RNA together, one water molecule at a time.',
@@ -1618,7 +1683,9 @@ const MODULES = {
       {lv:2, /* L2: hydrolysis */ q:'Breaking a phosphodiester bond in a strand is an example of...', choices:['Hydrolysis — it uses a water molecule','Dehydration synthesis — it releases a water molecule','Denaturation','Saturation'], correct:0,
         explain:'Breaking any bond built by dehydration synthesis takes hydrolysis, which uses a water molecule to split it back apart.'},
       {lv:2, /* L2: hydrolysis of ATP */ q:'When your cell spends ATP, ATP + water → ADP + phosphate. What kind of reaction is that?', choices:['Hydrolysis','Dehydration synthesis','Base pairing','Denaturation'], correct:0,
-        explain:'Water is used to break a bond, so it’s hydrolysis. Recharging ADP back into ATP is the reverse: dehydration synthesis, which releases water.'}
+        explain:'Water is used to break a bond, so it’s hydrolysis. Recharging ADP back into ATP is the reverse: dehydration synthesis, which releases water.'},
+      {lv:3, /* L3: genetic information (D1-12) */ type:'mof', q:'If the bases in a gene were rearranged into a different order, it would still store the same instructions.', choices:['Fact','Myth'], correct:1,
+        explain:'Myth. The order of the bases is the message, like letters in a word. The sugar-phosphate backbone holds them in order so the instructions stay intact.'}
     ]},
   helixheights:{tab:'nucleic', title:'Helix Heights', sub:'Base pairing, DNA vs. RNA',
     hook:'A always finds T, and G always finds C — a pairing rule so reliable your cells use it to copy your entire genome every time a cell divides. Miss the pattern and you’ve basically got a genetic dropped call.',
@@ -1686,7 +1753,7 @@ const SHOWDOWN_ROUNDS = [
   {lv:1, /* L1: naming the polymer */ group:'carbs', kind:'mc', q:'What do we call a long chain of glucose monomers, like starch or glycogen?',
     choices:['Polysaccharide','Polypeptide','Phospholipid','Nucleotide strand'], correct:0,
     explain:'Poly- (many) + saccharide (sugar) — a long sugar chain.'},
-  {lv:2, /* L2: digestion / hydrolysis */ group:'carbs', kind:'riddle', clues:['I’m made of glucose and galactose,', 'and some people lack the enzyme to break me apart.'], q:'What am I?',
+  {lv:2, /* L2: digestion / hydrolysis */ group:'carbs', kind:'riddle', clues:['Some people lack the enzyme that breaks me apart.', 'I’m made of glucose and galactose.', 'You’ll find me in milk.'], q:'What am I?',
     choices:['Lactose','Sucrose','Maltose','Fructose'], correct:0,
     explain:'Lactose — milk sugar. Without enough lactase to hydrolyze it, that’s lactose intolerance.'},
   {lv:1, /* L1: build */ group:'proteins', kind:'build', tab:'proteins', prompt:'Build any dipeptide — bond two amino acids together.',
@@ -1695,7 +1762,7 @@ const SHOWDOWN_ROUNDS = [
   {lv:1, /* L1: naming the bond */ group:'proteins', kind:'mc', q:'What bond links amino acids together in a chain?',
     choices:['A peptide bond','A glycosidic bond','An ester bond','A phosphodiester bond'], correct:0,
     explain:'Peptide bonds link amino acids into polypeptides, which fold into proteins.'},
-  {lv:3, /* L3: order -> shape -> job */ group:'proteins', kind:'riddle', clues:['I’m a chain of amino acids,', 'and if you change my order, you change my shape — and my job.'], q:'What am I?',
+  {lv:3, /* L3: order -> shape -> job */ group:'proteins', kind:'riddle', clues:['Change my order and you change my shape and my job.', 'My building blocks are joined by peptide bonds.', 'I’m a chain of amino acids.'], q:'What am I?',
     choices:['A polypeptide','A polysaccharide','A triglyceride','A DNA strand'], correct:0,
     explain:'A polypeptide — sequence decides how it folds, and shape decides function.'},
   {lv:3, /* L3: membrane building block */ group:'lipids', kind:'build', tab:'lipids', prompt:'Build a phospholipid: glycerol + 2 fatty acid tails + a phosphate.',
@@ -1704,7 +1771,7 @@ const SHOWDOWN_ROUNDS = [
   {lv:1, /* L1: structure of unsaturated tails */ group:'lipids', kind:'mc', q:'What causes the "kink" in an unsaturated fatty acid tail?',
     choices:['A carbon-carbon double bond','An extra phosphate group','A missing glycerol','An amino acid side chain'], correct:0,
     explain:'A double bond bends the tail, which is why unsaturated fats stay liquid at room temperature.'},
-  {lv:3, /* L3: membranes */ group:'lipids', kind:'riddle', clues:['I have a water-loving head and two water-fearing tails,', 'and two layers of me make up your cell’s outer wall.'], q:'What am I?',
+  {lv:3, /* L3: membranes */ group:'lipids', kind:'riddle', clues:['Two layers of me make up your cell’s outer boundary.', 'I have a phosphate group on my glycerol.', 'I have a water-loving head and two water-fearing tails.'], q:'What am I?',
     choices:['A phospholipid','A triglyceride','A nucleotide','An amino acid'], correct:0,
     explain:'A phospholipid — hydrophilic head out, hydrophobic tails in, forming the membrane bilayer.'},
   {lv:1, /* L1: build */ group:'nucleic', kind:'build', tab:'nucleic', prompt:'Build a DNA strand of 4 or more nucleotides.',
@@ -1713,7 +1780,7 @@ const SHOWDOWN_ROUNDS = [
   {lv:1, /* L1: monomer parts */ group:'nucleic', kind:'mc', q:'What are the three parts of every nucleotide?',
     choices:['Phosphate, sugar, nitrogen base','Glycerol, fatty acid, phosphate','Amino group, carboxyl group, R group','Two sugars and a bond'], correct:0,
     explain:'Phosphate + sugar + base, every time — whether it’s DNA or RNA.'},
-  {lv:3, /* L3: genetic information */ group:'nucleic', kind:'riddle', clues:['Billions of copies of me link up in a specific order,', 'and that order spells out your entire genetic code.'], q:'What am I?',
+  {lv:3, /* L3: genetic information */ group:'nucleic', kind:'riddle', clues:['Billions of copies of me link up in a specific order.', 'That order spells out your genetic code.', 'I’m made of a phosphate, a sugar, and a nitrogen base.'], q:'What am I?',
     choices:['A nucleotide','An amino acid','A monosaccharide','A fatty acid'], correct:0,
     explain:'A nucleotide — the monomer of DNA and RNA.'},
   {lv:2, /* L2: hydrogen bonds vs. dehydration synthesis */ group:'nucleic', kind:'mc', q:'Why doesn’t zipping two DNA strands together release water?',
@@ -1898,10 +1965,25 @@ const ART = {
       '<rect x="28" y="40" width="8" height="10" fill="#e2a52a"' + K + '/><rect x="18" y="50" width="28" height="8" rx="2" fill="#233766"' + K + '/>' +
       '<polygon points="' + ptsStr([0,1,2,3,4,5,6,7,8,9].map(k => { const r = k % 2 ? 3.2 : 7.5, a = -Math.PI / 2 + k * Math.PI / 5; return [32 + r * Math.cos(a), 22 + r * Math.sin(a)]; })) + '" fill="#fff"' + Kt(1.6) + '/>';
   },
+  plant(){
+    // Polymer Plant: a little factory whose chimney puffs out a chain of beads (a polymer).
+    return '<path d="M6 58 V34 L18 26 V34 L30 26 V34 L42 26 V58 Z" fill="#c9d4f5"' + K + '/>' +
+      '<rect x="44" y="14" width="10" height="44" fill="#8d99a6"' + K + '/>' +
+      '<rect x="12" y="42" width="7" height="7" fill="#f2c14e"' + Kt(1.8) + '/><rect x="25" y="42" width="7" height="7" fill="#f2c14e"' + Kt(1.8) + '/>' +
+      '<line x1="2" y1="58" x2="62" y2="58" stroke="' + INK + '" stroke-width="2.4"/>' +
+      [[49,8,'#e8a33d'],[56,5,'#d94f6a'],[62,8,'#7c5cd6']].map(c => '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="3.6" fill="' + c[2] + '"' + Kt(1.6) + '/>').join('');
+  },
   house(){
     return '<polygon points="32,8 56,30 50,30 50,56 14,56 14,30 8,30" fill="#fff"' + K + '/><rect x="27" y="38" width="10" height="18" fill="#f2c14e"' + Kt(2) + '/>';
   }
 };
+/* Tiny upgrade markers for the board's color bands, in the player's color. */
+function houseIcon(color){
+  return '<svg viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,2 19,10 16,10 16,18 4,18 4,10 1,10" fill="' + color + '" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+}
+function plantIcon(color){
+  return '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M1 19 V9 L7 5 V9 L13 5 V9 L19 5 V19 Z" fill="' + color + '" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><rect x="20" y="2" width="5" height="17" fill="' + color + '" stroke="#fff" stroke-width="1.6"/></svg>';
+}
 function artSVG(key, cls){
   const f = ART[key]; if(!f) return '';
   return '<svg viewBox="0 0 64 64"' + (cls ? ' class="' + cls + '"' : '') + ' aria-hidden="true" focusable="false">' + f() + '</svg>';
@@ -1944,32 +2026,44 @@ const PLAYER_COLORS = [
 const QUIZ_REVIEW = {
   glugrove:[{tab:'carbs', focus:'facts:Monomer', text:'Review what a monosaccharide is in the Lab'},
     {tab:'carbs', focus:'shelf', text:'See the three monosaccharides on the Lab shelf'},
-    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'}],
+    {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'},
+    {tab:'carbs', focus:'bench', text:'Build and break sugars in the Lab and watch the water counters'}],
   sucrosest:[{tab:'carbs', focus:'bench', text:'Review how sucrose forms in the Lab'},
-    {tab:'carbs', focus:'challenges', text:'Practice building lactose in the Lab'}],
+    {tab:'carbs', focus:'challenges', text:'Practice building lactose in the Lab'},
+    {tab:'bigfour', focus:'#b4-table', text:'Review what carbohydrates do in Meet the Big Four'}],
   starchblvd:[{tab:'carbs', focus:'facts:Polymer', text:'Review polysaccharides in the Lab'},
     {tab:'carbs', focus:'hook', text:'Review how hydrolysis digests starch in the Lab'},
     {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'}],
   aminoave:[{tab:'proteins', focus:'shelf', text:'Review R groups (side chains) on the Lab shelf'},
-    {tab:'proteins', focus:'shelf', text:'Review nonpolar side chains in the Lab'}],
+    {tab:'proteins', focus:'shelf', text:'Review nonpolar side chains in the Lab'},
+    {tab:'proteins', focus:'bench', text:'Build a chain of amino acids and count the water in the Lab'},
+    {tab:'bigfour', focus:'#b4-table', text:'Review protein jobs in Meet the Big Four'}],
   peptideplace:[{tab:'proteins', focus:'facts:Bond', text:'Review peptide bonds in the Lab'},
-    {tab:'proteins', focus:'challenges', text:'Try the “same parts, new order” challenge in the Lab'}],
+    {tab:'proteins', focus:'challenges', text:'Try the “same parts, new order” challenge in the Lab'},
+    {tab:'proteins', focus:'challenges', text:'Practice digesting a protein chain in the Lab'}],
   foldingfalls:[{tab:'proteins', focus:'hook', text:'Review how shape decides a protein’s job in the Lab'},
-    {tab:'proteins', focus:'facts:Job', text:'Review protein shape and function in the Lab'}],
+    {tab:'proteins', focus:'facts:Job', text:'Review protein shape and function in the Lab'},
+    {tab:'proteins', focus:'facts:Monomer', text:'Review proteins and amino acids in the Lab'},
+    {tab:'bigfour', focus:'#b4-energy', text:'Compare energy per gram in Meet the Big Four'}],
   glycerolgardens:[{tab:'lipids', focus:'facts:Building blocks', text:'Review the glycerol backbone in the Lab'},
     {tab:'lipids', focus:'facts:Bond', text:'Review ester bonds in the Lab'},
     {tab:'bigfour', focus:'#b4-energy', text:'Compare energy per gram in Meet the Big Four'}],
   saturationsquare:[{tab:'lipids', focus:'hook', text:'Review why butter is solid and oil pours in the Lab'},
-    {tab:'bigfour', focus:'#b4-elements', text:'See why lipids are packed with C–H bonds in Meet the Big Four'}],
+    {tab:'bigfour', focus:'#b4-elements', text:'See why lipids are packed with C–H bonds in Meet the Big Four'},
+    {tab:'bigfour', focus:'#b4-energy', text:'Compare energy per gram in Meet the Big Four'},
+    {tab:'bigfour', focus:'#b4-table', text:'Review lipid jobs in Meet the Big Four'}],
   membranemarina:[{tab:'lipids', focus:'shelf', text:'Review the phospholipid head and tails in the Lab'},
-    {tab:'lipids', focus:'facts:Job', text:'Review cell membranes in the Lab'}],
+    {tab:'lipids', focus:'facts:Job', text:'Review cell membranes in the Lab'},
+    {tab:'lipids', focus:'bench', text:'Build a phospholipid and watch the water counter in the Lab'}],
   nucleotideknoll:[{tab:'nucleic', focus:'facts:Monomer', text:'Review the 3 parts of a nucleotide in the Lab'},
     {tab:'nucleic', focus:'hook', text:'Review DNA vs. RNA sugars in the Lab'},
     {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'},
-    {tab:'nucleic', focus:'#atpStation', text:'Visit the ATP ⇄ ADP station in the Lab'}],
+    {tab:'nucleic', focus:'#atpStation', text:'Visit the ATP ⇄ ADP station in the Lab'},
+    {tab:'nucleic', focus:'#atpStation', text:'Try the ATP ⇄ ADP station in the Lab'}],
   backbonebay:[{tab:'nucleic', focus:'facts:Bond', text:'Review phosphodiester bonds in the Lab'},
     {tab:'nucleic', focus:'bench', text:'Review how hydrolysis breaks the backbone in the Lab'},
-    {tab:'nucleic', focus:'#atpStation', text:'Spend an ATP at the Lab’s ATP ⇄ ADP station'}],
+    {tab:'nucleic', focus:'#atpStation', text:'Spend an ATP at the Lab’s ATP ⇄ ADP station'},
+    {tab:'nucleic', focus:'facts:Job', text:'Review how DNA stores instructions in the Lab'}],
   helixheights:[{tab:'nucleic', focus:'challenges', text:'Practice base pairing (“Show matching strand”) in the Lab'},
     {tab:'nucleic', focus:'hook', text:'Review DNA vs. RNA in the Lab'},
     {tab:'bigfour', focus:'#b4-table', text:'Review what each biomolecule does in Meet the Big Four'},
@@ -2034,6 +2128,7 @@ function freshPlayer(name){
     name, atp:0, pos:0, laps:0, color:PLAYER_COLORS[0].hex,
     owned:{}, goalsDone:{}, quizDone:{}, setBonus:{},
     labChallenges:{}, enzymeDone:{}, showdownDone:{}, denatureDone:{},
+    tier:{}, tierAt:{}, rolls:0,
     showdown:{bestStars:0, lastStars:0, badge:false, attempts:0},
     createdAt: Date.now(), lastPlayed: Date.now()
   };
@@ -2050,6 +2145,17 @@ function normalizePlayer(p){
   p.enzymeDone = p.enzymeDone || {};     // Enzyme Card id -> solved (for Report Card levels)
   p.showdownDone = p.showdownDone || {}; // SHOWDOWN_ROUNDS index -> solved at least once
   p.denatureDone = p.denatureDone || {}; // DENATURE_QUESTIONS index -> answered correctly
+  // Property tiers (Phase D1): migrate owned properties once. A property whose
+  // Level 2 checks are all answered already gets its house, and if its Level 3
+  // checks are too, its Polymer Plant. No bonus is paid for migrated tiers.
+  p.tier = p.tier || {}; p.tierAt = p.tierAt || {};
+  if(typeof p.rolls !== 'number') p.rolls = 0;
+  Object.keys(p.owned).forEach(id => {
+    const m = MODULES[id]; if(!m || p.tier[id]) return;
+    const qd = p.quizDone[id] || [], all = lv => m.quiz.every((q, i) => q.lv !== lv || qd[i]);
+    p.tier[id] = all(2) ? (all(3) ? 3 : 2) : 1;
+    p.tierAt[id] = 0;
+  });
   // Quiz/goal arrays grow when a module gains questions; pad, never overwrite.
   Object.keys(p.quizDone).forEach(id => { const m = MODULES[id]; if(m) while(p.quizDone[id].length < m.quiz.length) p.quizDone[id].push(false); });
   if(!p.showdown || typeof p.showdown.bestStars !== 'number') p.showdown = {bestStars:0, lastStars:0, badge:false, attempts:0};
@@ -2285,10 +2391,12 @@ function squareHTML(sq, i){
   if(sq.group) style += '--gc:var(--' + sq.group + ');';
   if(tints[sq.type]) style += '--tint:' + tints[sq.type] + ';';
   const cls = 'sq sq-' + sq.type + (tints[sq.type] ? ' tint' : '') + (owned ? ' owned' : '');
+  const tier = owned ? tierOf(sq.id) : 0;
+  const upg = tier >= 2 ? '<span class="sq-upg" title="' + TIER_NAMES[tier] + '">' + (tier === 3 ? plantIcon(PLAYER.color) : houseIcon(PLAYER.color)) + '</span>' : '';
   const band = sq.type === 'prop' ? '<span class="sq-band"></span>' : sq.type === 'enzyme' ? '<span class="sq-band enz"></span>' : '';
-  return '<button class="' + cls + '" data-idx="' + i + '" data-sqid="' + sq.id + '" style="' + style + '" aria-label="' + esc(squareLabel(sq)) + (sq.group && sq.type === 'enzyme' ? ' (' + esc(GROUPS[sq.group].label) + ')' : '') + (owned ? ', owned by you' : '') + '">' +
+  return '<button class="' + cls + '" data-idx="' + i + '" data-sqid="' + sq.id + '" style="' + style + '" aria-label="' + esc(squareLabel(sq)) + (sq.group && sq.type === 'enzyme' ? ' (' + esc(GROUPS[sq.group].label) + ')' : '') + (owned ? ', owned by you' + (tier >= 2 ? ', with a ' + TIER_NAMES[tier] : '') : '') + '">' +
     band + '<span class="sq-inner"><span class="sq-art">' + artSVG(squareArtKey(sq)) + '</span><span class="sq-name">' + esc(squareLabel(sq)) + '</span></span>' +
-    (owned ? '<span class="sq-deed" aria-hidden="true"><span>&#9733; ' + esc(PLAYER.name) + '</span></span>' : '') +
+    upg + (owned ? '<span class="sq-deed" aria-hidden="true"><span>&#9733; ' + esc(PLAYER.name) + '</span></span>' : '') +
   '</button>';
 }
 function boardScreenHTML(){
@@ -2370,6 +2478,7 @@ function setRollingUI(on){
 function rollDice(){
   if(UI.rolling || UI.overlay || UI.popup) return;
   UI.rolling = true; setRollingUI(true);
+  PLAYER.rolls = (PLAYER.rolls || 0) + 1;
   const a = 1 + Math.floor(Math.random() * 6), b = 1 + Math.floor(Math.random() * 6);
   UI.dice = [a, b];
   UI.diceRot = [spinTo(UI.diceRot[0], a, 0), spinTo(UI.diceRot[1], b, 1)];
@@ -2450,6 +2559,13 @@ function landOn(idx){
     awardATP(CFG.ATP_LAND_GO_BONUS, '.sq[data-idx="0"]'); persist();
     logActivity('Landed right on GO (+' + CFG.ATP_LAND_GO_BONUS + ' ATP bonus)');
     showCard({mode:'info', band:'go', art:'go', kicker:'Bonus', title:'Welcome to the ATP Hub!', body:'Landing right on GO powers you up with a bonus, on top of the ' + CFG.ATP_PASS_GO + ' ATP you get for passing it.', atp:CFG.ATP_LAND_GO_BONUS}, 'sq-' + idx);
+    return;
+  }
+  if(sq.type === 'prop' && PLAYER.owned[sq.id]){
+    const t = tierOf(sq.id), rent = CFG.RENT[t];
+    awardATP(rent, '.sq[data-idx="' + idx + '"]'); persist();
+    logActivity('Collected rent at ' + MODULES[sq.id].title + ' (+' + rent + ' ATP)');
+    showCard({mode:'module', squareId:sq.id, tab:MODULES[sq.id].tab, rent}, 'deck-prop');
     return;
   }
   openSquare(sq, idx);
@@ -2615,23 +2731,60 @@ function labBenchHTML(){
   return '<div class="lab-wrap">' + ledgerHTML() + shelfBenchHTML() + readoutFactsHTML() + '</div>';
 }
 
+/* ---------- property tiers ----------
+   Deed (tier 1) is bought with the property's Level 1 checks after the guided
+   build. On a later visit (after at least one more roll — spaced practice),
+   its Level 2 checks add a House (tier 2), then its Level 3 checks upgrade it
+   to a Polymer Plant (tier 3). PLAYER.tier[id] stores the tier and
+   PLAYER.tierAt[id] the roll count when it was last raised. */
+const TIER_NAMES = ['', 'Deed', 'House', 'Polymer Plant'];
+const STAGE_LV = {buy:1, bonus:1, house:2, plant:3};
+function tierOf(id){ return PLAYER.owned[id] ? (PLAYER.tier[id] || 1) : 0; }
+function stageIdxs(id, stage){ return MODULES[id].quiz.map((q, i) => q.lv === STAGE_LV[stage] ? i : -1).filter(i => i >= 0); }
+function stageNextIdx(id, stage){ const qd = PLAYER.quizDone[id] || []; const xs = stageIdxs(id, stage).filter(i => !qd[i]); return xs.length ? xs[0] : -1; }
+/* Which stage this property is at. 'bonus' = Level 1 checks added after the
+   student already bought it (answer them anytime, no upgrade). */
+function propStage(id){
+  if(!PLAYER.owned[id]) return 'buy';
+  if(stageNextIdx(id, 'bonus') >= 0) return 'bonus';
+  const t = tierOf(id);
+  if(t < 2) return 'house';
+  if(t < 3) return 'plant';
+  return 'max';
+}
+function upgradeReady(id){ return (PLAYER.rolls || 0) > (PLAYER.tierAt[id] || 0); }
+function tierTrackHTML(id){
+  const t = tierOf(id);
+  return '<ol class="tier-track" aria-label="Property upgrades">' + [1, 2, 3].map(n =>
+    '<li class="' + (t >= n ? 'done' : t + 1 === n ? 'next' : '') + '">' + lvlChip(n) + '<span>' + TIER_NAMES[n] + '</span>' + (t >= n ? ' ✓' : '') + '</li>').join('') + '</ol>';
+}
+function stagePanelHTML(id, stage){
+  const mod = MODULES[id];
+  if(stage === 'max') return '<p class="quiz-fb good" style="margin-top:12px">Fully upgraded: this is a Polymer Plant! It collects ' + CFG.RENT[3] + ' ATP rent whenever you land here. Keep experimenting in the lab below.</p>';
+  if((stage === 'house' || stage === 'plant') && !upgradeReady(id))
+    return '<p class="quiz-fb good" style="margin-top:12px">Come back after your next roll to ' + (stage === 'house' ? 'add a house with a Level 2 check' : 'build a Polymer Plant with a Level 3 check') + '. Spacing out practice helps it stick!</p>';
+  const label = stage === 'bonus' ? 'New check for your deed' : stage === 'house' ? 'Add a house: Level 2 check' : 'Upgrade to a Polymer Plant: Level 3 check';
+  const bonus = stage === 'house' ? CFG.ATP_HOUSE_BONUS : stage === 'plant' ? CFG.ATP_PLANT_BONUS : 0;
+  return '<div class="stage-head"><strong>' + esc(label) + '</strong>' + (bonus ? '<span>+' + bonus + ' ATP upgrade bonus</span>' : '') + '</div>';
+}
 function moduleOverlayHTML(){
-  const o = UI.overlay, mod = MODULES[o.squareId], owned = !!PLAYER.owned[o.squareId];
-  const qd = PLAYER.quizDone[o.squareId];
-  const newChecks = owned && mod.quiz.some((q, i) => !(qd && qd[i])); // questions added after the student bought it
-  const goalsArr = PLAYER.goalsDone[o.squareId] || mod.goals.map(()=>false);
+  const o = UI.overlay, id = o.squareId, mod = MODULES[id], owned = !!PLAYER.owned[id];
+  const stage = o.stage = propStage(id);
+  const goalsArr = PLAYER.goalsDone[id] || mod.goals.map(()=>false);
   const goalsHtml = '<ul class="lo-goals" id="loGoals">' + mod.goals.map((g,i) =>
     '<li class="' + (goalsArr[i] ? 'done' : '') + '"><span class="box">' + (goalsArr[i] ? '✓' : '') + '</span><span class="tx">' + esc(g.text) + '</span></li>'
   ).join('') + '</ul>';
-  return deedHead(mod.tab, 'Property deed · ' + TABS[mod.tab].label, esc(mod.title) + (owned ? ' <span style="font-size:.6em;opacity:.85">· yours ✓</span>' : '')) +
+  const quizBlock = '<div class="quiz hidden" id="quizBlock"><div id="quizBody"></div></div>';
+  const t = tierOf(id);
+  return deedHead(mod.tab, 'Property deed · ' + TABS[mod.tab].label + (owned ? ' · ' + TIER_NAMES[t] : ''), esc(mod.title) + (owned ? ' <span style="font-size:.6em;opacity:.85">· yours ✓</span>' : '')) +
     '<div class="deed-body">' +
-      '<div class="deed-intro">' + deedArt(mod.tab, o.squareId) + '<div>' +
+      '<div class="deed-intro">' + deedArt(mod.tab, id) + '<div>' +
         '<p class="deed-sub">' + esc(mod.sub) + '</p>' +
+        (o.rent ? '<p class="rent-note">Rent collected: <strong>+' + o.rent + ' ATP</strong> from your ' + TIER_NAMES[t] + '.</p>' : '') +
         '<p class="lo-hook">' + esc(mod.hook) + '</p>' +
-        (owned ? '<p class="quiz-fb good" style="margin-top:12px">' + (newChecks ? 'You own this property, and it has a new check waiting below. Answer it for bonus ATP.' : 'You already own this property. Keep experimenting in the lab below, or head back to the board.') + '</p>' : goalsHtml) +
+        (owned ? tierTrackHTML(id) + stagePanelHTML(id, stage) : goalsHtml) +
       '</div></div>' +
-      labBenchHTML() +
-      (owned && !newChecks ? '' : '<div class="quiz hidden" id="quizBlock"><div id="quizBody"></div></div>') +
+      (owned ? quizBlock + labBenchHTML() : labBenchHTML() + quizBlock) +
     '</div>';
 }
 function challengeOverlayHTML(){
@@ -2648,24 +2801,36 @@ function challengeOverlayHTML(){
 }
 
 function mountModuleDom(){
-  const o = UI.overlay, mod = MODULES[o.squareId];
+  const o = UI.overlay, id = o.squareId, mod = MODULES[id];
   LAB.tab = mod.tab; o.tab = mod.tab;
   renderLab(); playSfx('open');
-  if(!PLAYER.goalsDone[o.squareId]) PLAYER.goalsDone[o.squareId] = mod.goals.map(()=>false);
-  if(!PLAYER.quizDone[o.squareId]) PLAYER.quizDone[o.squareId] = mod.quiz.map(()=>false);
-  while(PLAYER.quizDone[o.squareId].length < mod.quiz.length) PLAYER.quizDone[o.squareId].push(false);
-  if(PLAYER.owned[o.squareId]){
+  if(!PLAYER.goalsDone[id]) PLAYER.goalsDone[id] = mod.goals.map(()=>false);
+  if(!PLAYER.quizDone[id]) PLAYER.quizDone[id] = mod.quiz.map(()=>false);
+  while(PLAYER.quizDone[id].length < mod.quiz.length) PLAYER.quizDone[id].push(false);
+  if(PLAYER.owned[id]){
     LAB.onGoalProgress = null;
-    const undone = PLAYER.quizDone[o.squareId].indexOf(false), qb = $('quizBlock');
-    if(undone === -1 || !qb) return;
-    qb.classList.remove('hidden');
-    if(!o.quiz || o.quiz.idx !== undone) o.quiz = {idx:undone, attempts:0, wrong:[]};
-    renderQuizQuestion();
+    const stage = o.stage;
+    if(stage === 'max' || ((stage === 'house' || stage === 'plant') && !upgradeReady(id))) return;
+    openStageQuiz(false);
     return;
   }
   LAB.onGoalProgress = refreshModuleGoals;
   refreshModuleGoals();
 }
+/* Shows the quiz block on the next unanswered question of the current stage.
+   Keeps attempts/wrong picks/revealed clues/sort placements when coming back
+   from a Lab review, so "first try" stays honest. */
+function openStageQuiz(scroll){
+  const o = UI.overlay, qb = $('quizBlock'); if(!qb) return;
+  const nextIdx = stageNextIdx(o.squareId, o.stage);
+  if(nextIdx === -1){ stageComplete(); return; }
+  qb.classList.remove('hidden');
+  if(!o.quiz || o.quiz.idx !== nextIdx) o.quiz = newQuizState(nextIdx);
+  else if(o.quiz.attempts) o.quiz.welcome = true; // resuming after a Lab review
+  renderQuizQuestion();
+  if(scroll) qb.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'nearest'});
+}
+function newQuizState(idx){ return {idx, attempts:0, wrong:[], shown:1, place:{}, sel:null, bounced:[]}; }
 function refreshModuleGoals(){
   const o = UI.overlay; if(!o || o.mode !== 'module') return;
   const mod = MODULES[o.squareId], T = LAB.tabs[mod.tab];
@@ -2681,29 +2846,79 @@ function refreshModuleGoals(){
   ).join('');
   if(arr.every(Boolean)){
     const qb = $('quizBlock');
-    if(qb && qb.classList.contains('hidden')){
-      qb.classList.remove('hidden');
-      const doneArr = PLAYER.quizDone[o.squareId];
-      const nextIdx = doneArr.indexOf(false);
-      if(nextIdx === -1){ completeModule(); return; }
-      // Keep attempts + wrong picks when coming back from a Lab review, so the
-      // student lands on the same question and "first try" stays honest.
-      if(!o.quiz || o.quiz.idx !== nextIdx) o.quiz = {idx:nextIdx, attempts:0, wrong:[]};
-      renderQuizQuestion();
-      qb.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'nearest'});
-    }
+    if(qb && qb.classList.contains('hidden')) openStageQuiz(true);
   }
 }
 
-/* ---------- quiz ---------- */
+/* ---------- questions: mc | mof (Myth or Fact) | odd (Odd One Out) | riddle (What am I?) | sort ---------- */
+const QTYPE_LABEL = {mc:'', mof:'Myth or Fact?', odd:'Odd one out', riddle:'What am I?', sort:'Sort it'};
 function renderQuizQuestion(){
-  const o = UI.overlay, mod = MODULES[o.squareId], q = mod.quiz[o.quiz.idx];
+  const o = UI.overlay, mod = MODULES[o.squareId], q = mod.quiz[o.quiz.idx], z = o.quiz;
   const body = $('quizBody'); if(!body) return;
-  const wrong = o.quiz.wrong || (o.quiz.wrong = []);
-  body.innerHTML = '<p class="quiz-prog">Check ' + (o.quiz.idx+1) + ' of ' + mod.quiz.length + ' ' + lvlChip(q.lv) + '</p>' +
-    '<p class="quiz-q">' + esc(q.q) + '</p>' +
-    '<div class="quiz-opts" id="quizOpts">' + q.choices.map((c,i) => '<button class="qopt' + (wrong.includes(i) ? ' wrong' : '') + '" data-qopt="' + i + '"' + (wrong.includes(i) ? ' disabled' : '') + '>' + esc(c) + '</button>').join('') + '</div>' +
-    '<div id="quizFb">' + (wrong.length ? '<div class="quiz-fb good">Welcome back. Give it another try.</div>' : '') + '</div>';
+  const type = q.type || 'mc', ids = stageIdxs(o.squareId, o.stage);
+  const k = ids.indexOf(z.idx) + 1;
+  let h = '<p class="quiz-prog">Check ' + k + ' of ' + ids.length + ' ' + lvlChip(q.lv) + (QTYPE_LABEL[type] ? ' <span class="qtype">' + QTYPE_LABEL[type] + '</span>' : '') + '</p>';
+  if(type === 'sort') h += sortHTML(q, z);
+  else {
+    if(type === 'riddle'){
+      h += '<ol class="clues">' + q.clues.slice(0, z.shown).map(c => '<li>' + esc(c) + '</li>').join('') + '</ol>' +
+        (z.shown < q.clues.length ? '<button class="btn" data-qclue="1">Reveal another clue (' + (q.clues.length - z.shown) + ' left · each unused clue is +' + CFG.ATP_CLUE_BONUS + ' ATP)</button>' : '');
+    }
+    h += '<p class="quiz-q' + (type === 'mof' ? ' mof-q' : '') + '">' + (type === 'mof' ? '“' + esc(q.q) + '”' : esc(q.q)) + '</p>' +
+      '<div class="quiz-opts' + (type === 'mof' ? ' mof-opts' : '') + '" id="quizOpts">' + q.choices.map((c,i) => '<button class="qopt' + (z.wrong.includes(i) ? ' wrong' : '') + '" data-qopt="' + i + '"' + (z.wrong.includes(i) ? ' disabled' : '') + '>' + esc(c) + '</button>').join('') + '</div>';
+  }
+  h += '<div id="quizFb">' + (z.welcome ? '<div class="quiz-fb good">Welcome back. Give it another try.</div>' : '') + '</div>';
+  body.innerHTML = h;
+  z.welcome = false;
+}
+function sortHTML(q, z){
+  const pool = q.items.map((it, i) => i).filter(i => z.place[i] === undefined);
+  const chip = i => '<button class="sort-chip' + (z.sel === i ? ' sel' : '') + (z.bounced.includes(i) ? ' bounced' : '') + '" data-sortchip="' + i + '" draggable="true" aria-pressed="' + (z.sel === i) + '">' + esc(q.items[i][0]) + '</button>';
+  return '<p class="quiz-q">' + esc(q.q) + '</p>' +
+    '<p class="sort-help">Tap an item, then tap the group it belongs in (or drag it there). Tap a placed item to send it back.</p>' +
+    '<div class="sort-pool" aria-label="Items to sort">' + (pool.length ? pool.map(chip).join('') : '<span class="sort-empty">All placed. Check your sort!</span>') + '</div>' +
+    '<div class="sort-bins" style="grid-template-columns:repeat(' + Math.min(q.groups.length, 4) + ', minmax(0,1fr))">' + q.groups.map((g, gi) =>
+      '<div class="sort-bin' + (z.sel !== null ? ' ready' : '') + '" data-sortbin="' + gi + '"><p>' + esc(g) + '</p>' +
+        q.items.map((it, i) => z.place[i] === gi ? chip(i) : '').join('') + '</div>').join('') + '</div>' +
+    '<button class="btn btn-primary quiz-next" id="sortCheck"' + (pool.length ? ' disabled' : '') + '>Check my sort</button>';
+}
+function sortPick(i){
+  const z = UI.overlay.quiz;
+  if(z.place[i] !== undefined){ delete z.place[i]; z.sel = i; }
+  else z.sel = z.sel === i ? null : i;
+  z.bounced = z.bounced.filter(x => x !== i);
+  renderQuizQuestion();
+}
+function sortDrop(gi, i){
+  const z = UI.overlay.quiz;
+  if(i === undefined || i === null) i = z.sel;
+  if(i === null || i === undefined) return;
+  z.place[i] = gi; z.sel = null; z.bounced = z.bounced.filter(x => x !== i);
+  renderQuizQuestion();
+}
+function sortCheck(){
+  const o = UI.overlay, q = MODULES[o.squareId].quiz[o.quiz.idx], z = o.quiz;
+  const bad = q.items.map((it, i) => z.place[i] === it[1] ? -1 : i).filter(i => i >= 0);
+  if(!bad.length){
+    renderQuizQuestion();
+    document.querySelectorAll('.sort-chip').forEach(c => { c.disabled = true; c.classList.add('right'); });
+    const btn = $('sortCheck'); if(btn) btn.remove();
+    quizCorrect(q, 0, document.querySelector('.sort-bins'));
+    return;
+  }
+  bad.forEach(i => { delete z.place[i]; });
+  z.bounced = bad; z.attempts++;
+  playSfx('wrong');
+  renderQuizQuestion();
+  $('quizFb').innerHTML = '<div class="quiz-fb warn">' + bad.length + ' item' + (bad.length > 1 ? 's' : '') + ' bounced back. Your correct ones stayed put. ' + esc(q.explain) + '</div>' + quizNudge();
+}
+function quizNudge(){
+  const o = UI.overlay, mod = MODULES[o.squareId];
+  return nudgeHTML((QUIZ_REVIEW[o.squareId] || [])[o.quiz.idx] || {tab:mod.tab, focus:'facts:Monomer', text:'Review ' + TABS[mod.tab].label.toLowerCase() + ' in the Lab'});
+}
+function revealClue(){
+  const z = UI.overlay.quiz, q = MODULES[UI.overlay.squareId].quiz[z.idx];
+  if(z.shown < q.clues.length){ z.shown++; renderQuizQuestion(); }
 }
 /* Wrong-answer nudge: a short explanation plus a button to the exact Lab spot. */
 function nudgeHTML(review){
@@ -2712,56 +2927,79 @@ function nudgeHTML(review){
   return '<button class="nudge" data-review="1"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 5 Q8 3 12 6 Q16 3 21 5 V19 Q16 17 12 20 Q8 17 3 19 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 6 V20" stroke="currentColor" stroke-width="2"/></svg>' + esc(review.text) + ' &rarr;</button>';
 }
 function quizAnswer(i){
-  const o = UI.overlay, mod = MODULES[o.squareId], q = mod.quiz[o.quiz.idx];
+  const o = UI.overlay, q = MODULES[o.squareId].quiz[o.quiz.idx];
   const opts = document.querySelectorAll('#quizOpts .qopt');
-  const fb = $('quizFb');
   if(i === q.correct){
     opts.forEach((el,idx) => { el.disabled = true; if(idx===i) el.classList.add('correct'); });
-    const earned = o.quiz.attempts === 0 ? CFG.ATP_QUIZ_FIRST : CFG.ATP_QUIZ_RETRY;
-    awardATP(earned, opts[i]);
-    PLAYER.quizDone[o.squareId][o.quiz.idx] = true;
-    persist(); playSfx('correct');
-    const isLast = PLAYER.quizDone[o.squareId].every(Boolean);
-    fb.innerHTML = '<div class="quiz-fb good">Correct! ' + esc(q.explain) + '</div>' +
-      '<button class="btn btn-primary quiz-next" id="quizNextBtn">' + (isLast ? (PLAYER.owned[o.squareId] ? 'Done' : 'Finish this property') : 'Next question') + '</button>';
+    const cb = $('quizBody') && $('quizBody').querySelector('[data-qclue]'); if(cb) cb.remove();
+    const clueBonus = q.type === 'riddle' && o.quiz.attempts === 0 ? CFG.ATP_CLUE_BONUS * (q.clues.length - o.quiz.shown) : 0;
+    quizCorrect(q, clueBonus, opts[i]);
   } else {
     opts[i].disabled = true; opts[i].classList.add('wrong');
     o.quiz.attempts++; o.quiz.wrong.push(i);
     playSfx('wrong');
-    fb.innerHTML = '<div class="quiz-fb warn">Not quite. ' + esc(q.explain) + ' Try another answer.</div>' +
-      nudgeHTML((QUIZ_REVIEW[o.squareId] || [])[o.quiz.idx] || {tab:mod.tab, focus:'facts:Monomer', text:'Review ' + TABS[mod.tab].label.toLowerCase() + ' in the Lab'});
+    $('quizFb').innerHTML = '<div class="quiz-fb warn">Not quite. ' + esc(q.explain) + ' Try another answer.</div>' + quizNudge();
   }
+}
+function quizCorrect(q, extra, srcEl){
+  const o = UI.overlay, id = o.squareId;
+  const earned = (o.quiz.attempts === 0 ? CFG.ATP_QUIZ_FIRST : CFG.ATP_QUIZ_RETRY) + (extra || 0);
+  awardATP(earned, srcEl);
+  PLAYER.quizDone[id][o.quiz.idx] = true;
+  persist(); playSfx('correct');
+  const isLast = stageNextIdx(id, o.stage) === -1;
+  const label = !isLast ? 'Next question' : o.stage === 'buy' ? 'Finish this property' : o.stage === 'house' ? 'Build the house' : o.stage === 'plant' ? 'Build the Polymer Plant' : 'Done';
+  $('quizFb').innerHTML = '<div class="quiz-fb good">Correct! ' + (extra ? '<strong>+' + extra + ' ATP clue bonus.</strong> ' : '') + esc(q.explain) + '</div>' +
+    '<button class="btn btn-primary quiz-next" id="quizNextBtn">' + label + '</button>';
 }
 function quizNext(){
-  const o = UI.overlay, mod = MODULES[o.squareId];
-  const doneArr = PLAYER.quizDone[o.squareId];
-  const nextIdx = doneArr.indexOf(false);
-  if(nextIdx === -1){
-    if(PLAYER.owned[o.squareId]){
-      const body = $('quizBody');
-      if(body) body.innerHTML = '<div class="quiz-fb good">Every check on this property is done.</div><button class="btn btn-primary quiz-next" id="backToBoardBtn">Back to the board</button>';
-      return;
-    }
-    completeModule(); return;
+  const o = UI.overlay, nextIdx = stageNextIdx(o.squareId, o.stage);
+  if(nextIdx === -1){ stageComplete(); return; }
+  o.quiz = newQuizState(nextIdx); renderQuizQuestion();
+}
+/* All checks for the current stage are answered: buy, add the next tier, or
+   (for a bonus Level 1 check on an owned deed) roll straight on to the next stage. */
+function stageComplete(){
+  const o = UI.overlay, id = o.squareId, mod = MODULES[id];
+  if(o.stage === 'buy'){ completeModule(); return; }
+  if(o.stage === 'bonus'){
+    o.stage = propStage(id); o.quiz = null;
+    const body = $('quizBody'), qb = $('quizBlock');
+    const ready = (o.stage === 'house' || o.stage === 'plant') && upgradeReady(id);
+    if(ready && qb){ qb.insertAdjacentHTML('beforebegin', stagePanelHTML(id, o.stage)); openStageQuiz(true); return; }
+    if(body) body.innerHTML = '<div class="quiz-fb good">Every check for your deed is done.</div>' + stagePanelHTML(id, o.stage) + '<button class="btn btn-primary quiz-next" id="backToBoardBtn">Back to the board</button>';
+    return;
   }
-  o.quiz = {idx:nextIdx, attempts:0, wrong:[]}; renderQuizQuestion();
+  const tier = o.stage === 'house' ? 2 : 3, bonus = tier === 2 ? CFG.ATP_HOUSE_BONUS : CFG.ATP_PLANT_BONUS;
+  PLAYER.tier[id] = tier; PLAYER.tierAt[id] = PLAYER.rolls || 0;
+  persist(); playSfx('buy'); celebrate();
+  logActivity((tier === 2 ? 'Added a house to ' : 'Built a Polymer Plant on ') + mod.title + ' (+' + bonus + ' ATP)');
+  const qb = $('quizBlock');
+  if(qb) qb.innerHTML = '<div class="module-done card-center" id="moduleDone"><div class="deed-art" style="--gc:var(--' + mod.tab + ');margin:4px auto 10px">' + artSVG(tier === 2 ? 'house' : 'plant') + '</div>' +
+    '<h3>' + (tier === 2 ? 'House built on ' : 'Polymer Plant built on ') + esc(mod.title) + '!</h3>' +
+    '<p>Rent here is now ' + CFG.RENT[tier] + ' ATP every time you land on it.' + (tier === 2 ? ' Come back after another roll for a Level 3 check and a Polymer Plant.' : ' That’s the top upgrade.') + '</p>' +
+    '<p class="atp-pop">+' + bonus + ' ATP upgrade bonus</p>' +
+    '<button class="btn btn-primary btn-big" id="backToBoardBtn" style="margin-top:16px">Back to the board</button></div>';
+  const done = $('moduleDone');
+  if(done) done.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'center'});
+  awardATP(bonus, done);
 }
 function completeModule(){
-  const o = UI.overlay, mod = MODULES[o.squareId];
-  PLAYER.owned[o.squareId] = true;
+  const o = UI.overlay, id = o.squareId, mod = MODULES[id];
+  PLAYER.owned[id] = true; PLAYER.tier[id] = 1; PLAYER.tierAt[id] = PLAYER.rolls || 0;
   persist(); playSfx('buy');
   celebrate();
   logActivity('Bought ' + mod.title + ' (+' + CFG.ATP_MODULE_BONUS + ' ATP)');
   const card = document.querySelector('#cardMain .deed-body');
-  if(card) card.insertAdjacentHTML('beforeend', '<div class="module-done card-center" id="moduleDone">' + deedArt(mod.tab, o.squareId) + '<h3>' + esc(mod.title) + ': the deed is yours!</h3>' +
-    '<p>Goal ATP + check ATP + a ' + CFG.ATP_MODULE_BONUS + ' ATP purchase bonus, all banked.</p>' +
+  if(card) card.insertAdjacentHTML('beforeend', '<div class="module-done card-center" id="moduleDone">' + deedArt(mod.tab, id) + '<h3>' + esc(mod.title) + ': the deed is yours!</h3>' +
+    '<p>Goal ATP + check ATP + a ' + CFG.ATP_MODULE_BONUS + ' ATP purchase bonus, all banked. You’ll collect ' + CFG.RENT[1] + ' ATP rent whenever you land here, and you can add a house with a Level 2 check after your next roll.</p>' +
     '<p class="atp-pop">+' + CFG.ATP_MODULE_BONUS + ' ATP bonus</p>' +
     '<button class="btn btn-primary btn-big" id="backToBoardBtn" style="margin-top:16px">Back to the board</button></div>');
   const qBlock = $('quizBlock'); if(qBlock) qBlock.remove();
   const done = $('moduleDone');
   if(done) done.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'center'});
   awardATP(CFG.ATP_MODULE_BONUS, done);
-  checkGroupBonus(mod.tab === 'nucleic' ? 'nucleic' : mod.tab);
+  checkGroupBonus(mod.tab);
 }
 /* ---------- enzyme challenge ---------- */
 function openChallenge(squareId){
@@ -2826,7 +3064,9 @@ function showdownOverlayHTML(){
   if(round.kind === 'build'){
     body = '<p class="lo-hook">' + esc(round.prompt) + '</p>' + labBenchHTML() + '<div id="sdFb">' + fb + '</div>';
   } else {
-    const cluesHtml = round.clues ? '<ul style="margin:0 0 10px;padding-left:18px">' + round.clues.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>' : '';
+    const shown = o.resolved ? (round.clues || []).length : (o.shown || 1);
+    const cluesHtml = round.clues ? '<ol class="clues">' + round.clues.slice(0, shown).map(c => '<li>' + esc(c) + '</li>').join('') + '</ol>' +
+      (shown < round.clues.length ? '<button class="btn" data-sdclue="1" style="margin-bottom:10px">Reveal another clue (' + (round.clues.length - shown) + ' left)</button>' : '') : '';
     body = cluesHtml +
       '<p class="quiz-q">' + esc(round.q) + '</p>' +
       '<div class="quiz-opts" id="sdOpts">' + round.choices.map((c,i) => {
@@ -2860,7 +3100,7 @@ function mountShowdownDom(){
   const round = currentShowdownRound();
   // Only a brand-new round resets first-try/resolved; re-mounting the same round
   // (e.g. back from a Lab review) keeps the student's place and honesty flags.
-  if(o.mountedIdx !== o.idx){ o.mountedIdx = o.idx; o.firstTry = true; o.resolved = false; o.wrong = []; }
+  if(o.mountedIdx !== o.idx){ o.mountedIdx = o.idx; o.firstTry = true; o.resolved = false; o.wrong = []; o.shown = 1; }
   if(o.resolved){ LAB.onGoalProgress = null; if(round.kind === 'build'){ LAB.tab = round.tab; renderLab(); } return; }
   if(round.kind === 'build'){
     LAB.tab = round.tab; renderLab(); playSfx('open');
@@ -2875,6 +3115,7 @@ function checkShowdownBuildWin(){
   const round = currentShowdownRound();
   if(round.test(LAB.tabs[round.tab])) showdownRoundResolve();
 }
+function showdownClue(){ const o = UI.overlay; o.shown = (o.shown || 1) + 1; renderApp(); }
 function showdownAnswer(i){
   const o = UI.overlay; if(!o || o.resolved) return;
   const round = currentShowdownRound();
@@ -3365,6 +3606,7 @@ function bodyGuess(g){
 }
 
 /* ---------- Report Card: progress by proficiency level ---------- */
+function plural(n, word){ return n + ' ' + word + (n === 1 ? '' : 's'); }
 function levelItems(){
   const P = PLAYER, items = [];
   Object.keys(CHALLENGES).forEach(t => CHALLENGES[t].forEach((c, i) => items.push({lv:c.lv, g:t, done:(P.labChallenges[t] || []).includes(i)})));
@@ -3395,9 +3637,11 @@ function openReportCard(){ UI.popup = null; UI.screen = 'report'; renderApp(); }
 function reportCardHTML(){
   const groupRows = Object.keys(GROUPS).map(g => {
     const done = (PLAYER.labChallenges[g] || []).length, total = CHALLENGES[g].length;
-    const propsHtml = GROUPS[g].props.map(id => (PLAYER.owned[id] ? '✓ ' : '– ') + MODULES[id].title).join('<br>');
+    const props = GROUPS[g].props, tiers = props.map(tierOf);
+    const propsHtml = props.map((id, k) => (tiers[k] ? '✓ ' : '– ') + MODULES[id].title + (tiers[k] ? ' <span class="rc-tier">' + TIER_NAMES[tiers[k]] + '</span>' : '')).join('<br>');
     return '<section class="panel" style="border-top:4px solid var(--' + g + ')">' +
       '<h2 class="pt">' + esc(GROUPS[g].label) + '</h2>' +
+      '<p class="popup-txt" style="text-align:left">Deeds: ' + tiers.filter(t => t >= 1).length + ' / 3 · Houses (Level 2): ' + tiers.filter(t => t >= 2).length + ' · Polymer Plants (Level 3): ' + tiers.filter(t => t >= 3).length + '</p>' +
       '<p class="popup-txt" style="text-align:left">Lab challenges: ' + done + ' / ' + total + '</p>' +
       '<p class="popup-txt" style="text-align:left;margin-top:8px">' + propsHtml + '</p>' +
     '</section>';
@@ -3408,7 +3652,8 @@ function reportCardHTML(){
     : '<p class="popup-txt" style="text-align:left">Best run: ' + '★'.repeat(sd.bestStars) + '☆'.repeat(3 - sd.bestStars) + ' &nbsp; Last run: ' + '★'.repeat(sd.lastStars) + '☆'.repeat(3 - sd.lastStars) + '<br>Attempts: ' + sd.attempts + (sd.badge ? '<br><strong>🏅 Macromolecule Mogul badge earned</strong>' : '') + '</p>';
   return '<div class="wrap">' + headerHTML('report') +
     '<h1 style="font-size:1.6rem;margin:8px 0 4px">Report Card — ' + esc(PLAYER.name) + '</h1>' +
-    '<p class="popup-txt" style="text-align:left;margin-bottom:16px">' + PLAYER.atp + ' ATP total · ' + ownedCount() + ' of 12 properties owned</p>' +
+    '<p class="popup-txt" style="text-align:left;margin-bottom:16px">' + PLAYER.atp + ' ATP total · ' + ownedCount() + ' of 12 deeds · ' +
+      plural(Object.keys(MODULES).filter(id => tierOf(id) >= 2).length, 'house') + ' · ' + plural(Object.keys(MODULES).filter(id => tierOf(id) >= 3).length, 'Polymer Plant') + '</p>' +
     levelReportHTML() +
     '<div class="lower" style="grid-template-columns:1fr 1fr">' + groupRows + '</div>' +
     '<section class="panel" style="margin-top:16px"><h2 class="pt">⚔️ Mogul Showdown</h2>' + showdownBlock + '</section>' +
@@ -3523,6 +3768,14 @@ document.addEventListener('click', e => {
   const giveUp = t.closest('#giveUpBtn');
   if(giveUp){ resolveChallenge(false); return; }
 
+  if(t.closest('[data-qclue]')){ revealClue(); return; }
+  const schip = t.closest('[data-sortchip]');
+  if(schip && !schip.disabled){ sortPick(parseInt(schip.dataset.sortchip, 10)); return; }
+  const sbin = t.closest('[data-sortbin]');
+  if(sbin){ sortDrop(parseInt(sbin.dataset.sortbin, 10)); return; }
+  const sck = t.closest('#sortCheck');
+  if(sck && !sck.disabled){ sortCheck(); return; }
+  if(t.closest('[data-sdclue]')){ showdownClue(); return; }
   const qopt = t.closest('[data-qopt]');
   if(qopt && !qopt.disabled){ quizAnswer(parseInt(qopt.dataset.qopt,10)); return; }
   const qnext = t.closest('#quizNextBtn');
@@ -3596,6 +3849,21 @@ document.addEventListener('click', e => {
     const T = LAB.tabs[LAB.tab]; const id = sel.dataset.sel || sel.dataset.mol;
     if(T.active !== id){ T.active = id; renderLab(); }
   }
+});
+/* Sort-it drag and drop (tap-to-place works everywhere; drag is a bonus for mouse/trackpad). */
+document.addEventListener('dragstart', e => {
+  const c = e.target.closest && e.target.closest('[data-sortchip]');
+  if(c && e.dataTransfer){ e.dataTransfer.setData('text/plain', c.dataset.sortchip); e.dataTransfer.effectAllowed = 'move'; }
+});
+document.addEventListener('dragover', e => { if(e.target.closest && e.target.closest('[data-sortbin], .sort-pool')) e.preventDefault(); });
+document.addEventListener('drop', e => {
+  const bin = e.target.closest && e.target.closest('[data-sortbin]');
+  const pool = e.target.closest && e.target.closest('.sort-pool');
+  if(!bin && !pool) return;
+  e.preventDefault();
+  const i = parseInt(e.dataTransfer.getData('text/plain'), 10); if(isNaN(i)) return;
+  if(bin) sortDrop(parseInt(bin.dataset.sortbin, 10), i);
+  else { const z = UI.overlay && UI.overlay.quiz; if(z){ delete z.place[i]; z.sel = null; renderQuizQuestion(); } }
 });
 document.addEventListener('keydown', e => {
   if(e.key === 'Enter' && document.activeElement && document.activeElement.id === 'nameInput'){ startGame(document.activeElement.value); return; }

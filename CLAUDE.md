@@ -118,6 +118,29 @@ screen/overlay/popup change (cheap enough at this DOM size).
   per-group ownership + Lab-challenge counts, and Mogul Showdown best/last
   stars + badge.
 
+## Property tiers + question types (Phase D1)
+
+Each property has three tiers, each tied to a proficiency level and drawn from
+its own `MODULES[id].quiz` items: **Deed** (bought with its Level 1 checks after
+the guided build), **House** (its Level 2 checks), **Polymer Plant** (its Level
+3 checks). `propStage(id)` → `'buy'|'bonus'|'house'|'plant'|'max'`; `'bonus'`
+covers Level 1 checks added after a student already owns the deed. House and
+plant upgrades need a *later visit*: `upgradeReady(id)` requires at least one
+roll since the last tier change (`PLAYER.rolls` vs. `PLAYER.tierAt[id]`) —
+spaced practice. `PLAYER.tier[id]` stores 1|2|3; `normalizePlayer()` migrates
+owned properties once (all L2 answered → house, all L2+L3 → plant, no bonus).
+Landing on your own property (dice only, not tapping) collects
+`CFG.RENT[tier]` before the card opens. Upgrade badges sit on the square's
+top-right (`houseIcon`/`plantIcon` in `PLAYER.color`). Every property must keep
+at least one question at each level.
+Question `type`s (default `'mc'`): `'mof'` Myth or Fact (`choices:['Fact','Myth']`),
+`'odd'` Odd One Out, `'riddle'` What am I? (`clues` revealed one at a time,
+`CFG.ATP_CLUE_BONUS` per unused clue on a first-try solve; Showdown riddles
+reveal the same way but score stars only), and `'sort'` Sort-it (`groups` +
+`items:[[text, groupIdx]]`; tap a chip then a bin, or drag; wrong chips bounce
+back on "Check", first try = all correct on the first check). All share
+`o.quiz = newQuizState(idx)` so a Lab-review round trip resumes exactly.
+
 ## Proficiency levels (standard 1.2)
 
 Every Lab challenge, module quiz question, Enzyme Card, Showdown round, and
@@ -259,6 +282,9 @@ locked-in design. Adjust freely in `CFG`:
 - Each guided-build goal completed: 10
 - Each quiz question: 15 first-try, 5 on a later try (unlimited retries either way)
 - Buying a property (finishing its module): +25 bonus on top of the above
+- House / Polymer Plant upgrade: +20 / +30 bonus on top of the question ATP
+- Rent when you land on your own property: 5 / 10 / 20 (deed / house / plant)
+- "What am I?": +5 per clue left unrevealed (first try only)
 - Owning all 3 properties in a color group: +50
 - Water Break / ATP Synthase Spin corner: 20 each, unlimited revisits
 - Denaturation Station: 15 (must answer correctly — retries are free and unlimited)

@@ -8,7 +8,8 @@ only committed once Mr. Rankin approves it. Update this file as phases finish.
 | A2 | Full-width board, property art, 3D dice, card system, Lab review nudges | ✅ Done |
 | B | Our standard, proficiency levels, "Meet the Big Four" | ✅ Done |
 | C | Nucleic acids upgrades: double helix, ATP/ADP station | ✅ Done |
-| D | Gamified questions | ⏳ Next |
+| D1 | Property tiers, rent, new question types + questions, save migration, Report Card | ✅ Done |
+| D2 | Streak meter, lifelines, confidence wagers | ⏳ Next |
 
 ---
 
@@ -153,17 +154,171 @@ Notes from the build:
 
 ---
 
-## Phase D — gamified questions (after Phase B's level tags exist)
+## Phase D — gamified questions (split into D1 and D2)
 
-- **Property upgrades tied to proficiency levels:** a Level 1 question buys a
-  property; returning later and answering a Level 2 question adds a house; a
-  Level 3 question upgrades it to a Polymer Plant (hotel). Show houses and
-  plants on the board squares (on the color band). Owning the property also
-  charges "rent" in ATP when landed on again.
-- **More question types:** multiple choice; quick builds on the card using the
-  lab engine; sort-it (drag molecules or monomers into the correct group);
-  Myth or Fact; Odd One Out; and "What am I?" riddles where clues reveal one at
-  a time, with fewer clues used earning more ATP.
+### D1 — tiers, rent, question types, new questions, migration, Report Card ✅
+
+Build notes:
+- Question bank built exactly as approved below. Level totals are now 44 at
+  Level 1, 26 at Level 2, 26 at Level 3, and every property has all three.
+- Houses and plants need a later visit: at least one roll since the last
+  upgrade (or since buying). Tapping a property before then shows "Come back
+  after your next roll".
+- Rent is collected only when the dice land you there, not when you tap.
+- Migrated saves start at 0 rolls, so their first upgrade comes after one
+  roll.
+
+**Decisions so far**
+- Rent: you collect rent when you land on your own property (5 ATP for the deed,
+  10 with a house, 20 with a Polymer Plant).
+- Each property's tiers draw from its own questions: **Buy** = its Level 1
+  questions (after the hook + guided build, as now), **House** = its Level 2
+  questions, **Polymer Plant** = its Level 3 questions. Existing L2/L3 questions
+  move into the house/plant tiers.
+- Save migration: a student who already answered a property's L2 (or L3)
+  questions gets that house (or plant) automatically.
+- "What am I?" clues reveal one at a time, and solving with fewer clues pays
+  more.
+- Sort-it works by tap (tap a chip, tap its group), and drag also works.
+
+**Tier map** (✱ = new question, see the question bank below)
+
+| Property | Buy (L1) | House (L2) | Polymer Plant (L3) |
+|---|---|---|---|
+| Glucose Grove | 2 existing | ✱ D1-1 | 1 existing |
+| Sucrose Street | 1 existing | 1 existing | ✱ D1-2 |
+| Starch Boulevard | 1 existing | 1 existing | 1 existing |
+| Amino Avenue | 2 existing | ✱ D1-3 | ✱ D1-4 |
+| Peptide Place | 1 existing | ✱ D1-5 | 1 existing |
+| Folding Falls | ✱ D1-6 | ✱ D1-7 | 2 existing |
+| Glycerol Gardens | 1 existing | 1 existing | 1 existing |
+| Saturation Square | 2 existing | ✱ D1-8 | ✱ D1-9 |
+| Membrane Marina | 1 existing | ✱ D1-10 | 1 existing |
+| Nucleotide Knoll | 2 existing | ✱ D1-11 | 2 existing |
+| Backbone Bay | 1 existing | 2 existing | ✱ D1-12 |
+| Helix Heights | 2 existing | 2 existing | 1 existing |
+
+**Question bank: new questions** (edit freely; correct answers marked ✔)
+
+**D1-1 · Glucose Grove · House · L2 · Sort-it**
+Sort each change: does it release water or use water?
+- Glucose + glucose → maltose → *Releases water (dehydration synthesis)*
+- Your liver links glucose into a glycogen chain → *Releases water*
+- Saliva breaks starch into maltose → *Uses water (hydrolysis)*
+- Digesting sucrose into glucose + fructose → *Uses water*
+Explanation: Building a bond releases one water (dehydration synthesis).
+Breaking a bond uses one water (hydrolysis).
+
+**D1-2 · Sucrose Street · Polymer Plant · L3 · Myth or Fact**
+"Plants like sugar cane use sucrose to carry energy from their leaves to the
+rest of the plant." ✔ Fact
+Explanation: Leaves make glucose, link it with fructose into sucrose, and ship
+the sucrose through their sap to roots, fruit, and growing tips. It's an energy
+delivery molecule.
+
+**D1-3 · Amino Avenue · House · L2 · Multiple choice**
+Building a chain of 4 amino acids releases how many water molecules?
+✔ 3 · 4 · 1 · 0
+Explanation: One water per peptide bond. 4 amino acids are joined by 3 bonds,
+so 3 waters.
+
+**D1-4 · Amino Avenue · Polymer Plant · L3 · Sort-it**
+Sort each protein by its job.
+- Lactase → *Enzyme*
+- Amylase → *Enzyme*
+- Hemoglobin → *Transport*
+- Keratin (hair and nails) → *Structure*
+- Collagen (skin and tendons) → *Structure*
+- Antibodies → *Defense*
+Explanation: Proteins do most of the cell's work. Enzymes speed up reactions,
+transport proteins carry things (hemoglobin carries oxygen), structural
+proteins build tissues, and antibodies fight infection.
+
+**D1-5 · Peptide Place · House · L2 · Odd One Out**
+Which one is NOT hydrolysis?
+- Digesting the protein in a steak into amino acids
+- Breaking a peptide bond with water
+- ✔ Linking two amino acids into a dipeptide
+- Stomach enzymes snipping a protein chain apart
+Explanation: Linking amino acids is dehydration synthesis (it releases water).
+The other three break bonds with water, which is hydrolysis.
+
+**D1-6 · Folding Falls · Buy · L1 · What am I?** (clues reveal one at a time)
+1. Hemoglobin, keratin, and lactase are all examples of me.
+2. I fold into a specific 3D shape.
+3. I'm a long chain of amino acids.
+✔ A protein · A polysaccharide · A triglyceride · DNA
+Explanation: Proteins are chains of amino acids that fold into a shape, and the
+shape decides the job.
+
+**D1-7 · Folding Falls · House · L2 · Multiple choice**
+Gram for gram, how much energy do proteins store compared with fats?
+✔ Less than half (about 4 vs. about 9 Calories/g) · About the same · More than
+fats · None, proteins never provide energy
+Explanation: Fats are packed with energy-rich C–H bonds and store about
+9 Calories/g. Proteins and carbs store about 4. Your body uses protein for fuel
+mostly as a backup.
+
+**D1-8 · Saturation Square · House · L2 · Myth or Fact**
+"A gram of fat stores more than twice the energy of a gram of sugar." ✔ Fact
+Explanation: About 9 Calories/g for fat vs. about 4 for sugar. Fat's long tails
+are full of C–H bonds and have very little oxygen.
+
+**D1-9 · Saturation Square · Polymer Plant · L3 · Odd One Out**
+Which is NOT a job of lipids?
+- Long-term energy storage
+- Insulating the body (like a whale's blubber)
+- Forming cell membranes
+- ✔ Carrying genetic instructions
+Explanation: Lipids store energy, insulate, and build membranes (and some
+hormones). Genetic instructions are the job of nucleic acids.
+
+**D1-10 · Membrane Marina · House · L2 · Multiple choice**
+Building one phospholipid (glycerol + 2 fatty acids + 1 phosphate) releases how
+many water molecules?
+✔ 3 · 1 · 2 · 0
+Explanation: Each part bonded to glycerol releases one water by dehydration
+synthesis. Three parts attached means 3 waters.
+
+**D1-11 · Nucleotide Knoll · House · L2 · Sort-it**
+Sort each reaction: dehydration synthesis or hydrolysis?
+- Adding a nucleotide to a DNA strand → *Dehydration synthesis*
+- Recharging ADP back into ATP → *Dehydration synthesis*
+- Spending ATP for energy → *Hydrolysis*
+- Cutting a DNA strand's backbone → *Hydrolysis*
+Explanation: Building a bond releases water (dehydration synthesis). Breaking
+one uses water (hydrolysis). ATP is a nucleotide, so the same rules apply.
+
+**D1-12 · Backbone Bay · Polymer Plant · L3 · Myth or Fact**
+"If the bases in a gene were rearranged into a different order, it would still
+store the same instructions." ✔ Myth
+Explanation: The order of the bases *is* the message, like letters in a word.
+The sugar-phosphate backbone holds them in order so the instructions stay
+intact.
+
+**Showdown riddles: third clue for one-at-a-time reveal** (hardest clue first)
+- Carbs (answer: lactose): 1. Some people lack the enzyme that breaks me apart.
+  2. I'm made of glucose and galactose. 3. ✱ You'll find me in milk.
+- Proteins (answer: a polypeptide): 1. Change my order and you change my shape
+  and my job. 2. My building blocks are joined by peptide bonds. 3. ✱ I'm a
+  chain of amino acids.
+- Lipids (answer: a phospholipid): 1. Two layers of me make up your cell's
+  outer boundary. 2. ✱ I have a phosphate group on my glycerol. 3. I have a
+  water-loving head and two water-fearing tails.
+- Nucleic acids (answer: a nucleotide): 1. Billions of copies of me link up in
+  a specific order. 2. That order spells out your genetic code. 3. ✱ I'm made
+  of a phosphate, a sugar, and a nitrogen base.
+
+**Report Card (D1):** houses and Polymer Plants owned, per color group.
+
+**Proposed D1 payouts** (all tunable in `CFG`)
+- House bonus +20, Polymer Plant bonus +30, on top of the normal question ATP.
+- What am I?: normal question ATP, plus 5 for each clue left unrevealed.
+- Sort-it: counts as first-try correct only if every chip is placed right on
+  the first check. Wrong chips bounce back with a hint.
+
+### D2 — streak meter, lifelines, confidence wagers (after D1)
+
 - **Streak meter:** consecutive first-try correct answers build a multiplier
   (x2, x3), with a visible flame that resets gently on a miss.
 - **Lifelines,** each usable once per lap: "Enzyme Cut" removes two wrong
@@ -172,4 +327,6 @@ Notes from the build:
 - **Optional confidence wager** before answering (Low, Medium, or High, with a
   small cap) to reward students who know they know it. Losses stay small; this
   should feel encouraging.
-- **Report Card stats:** houses and Polymer Plants owned per level.
+- Open D2 decisions: wager size (and whether a wrong answer loses ATP), and
+  whether the streak, lifelines, and wager apply in the Mogul Showdown or only
+  to board questions.
