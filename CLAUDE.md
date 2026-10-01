@@ -141,6 +141,31 @@ reveal the same way but score stars only), and `'sort'` Sort-it (`groups` +
 back on "Check", first try = all correct on the first check). All share
 `o.quiz = newQuizState(idx)` so a Lab-review round trip resumes exactly.
 
+## Streak, wagers, lifelines (Phase D2, PART 6c)
+
+- **Streak** (`PLAYER.streak`, persisted): first-try correct answers in a row on
+  board questions (property checks of every type + Denaturation) *and* Showdown
+  MC/riddle rounds (build rounds can't be missed, so they don't count). x2 at
+  `CFG.STREAK_X2` (3), x3 at `CFG.STREAK_X3` (5) — the multiplier applies only to
+  the first-try question ATP (`ATP_QUIZ_FIRST` / `ATP_DENATURE`), not to clue
+  bonuses or wagers. The first miss on a question resets it with a gentle note
+  (`streakMiss()`); retries never grow it. Shown via `streakChipHTML()` (board
+  center, question cards, Showdown); `refreshStreakUI()` swaps every chip.
+- **Wagers** (`CFG.WAGERS`, board only): optional pick (`.wager`, default No
+  wager) visible only before the first attempt; settled on that first attempt by
+  `settleWager()`. Low +3/−0, Medium +6/−3, High +10/−5; a loss is capped at the
+  current wallet so ATP never goes below zero.
+- **Lifelines** (board only, never in the Showdown): Enzyme Cut (removes two
+  wrong choices; questions with 3+ choices only, not Myth or Fact/Sort-it) and
+  Peek at the Lab (`peekRow()` → the cheat-sheet row the question's review
+  target points at, shown 5 s). Each is once per lap: `PLAYER.lifeUsed[k]` holds
+  the lap it was used on, and passing GO bumps `PLAYER.laps`, which refreshes
+  both. Lifelines update the DOM in place so feedback/review buttons survive.
+- The Showdown deliberately has no wagers or lifelines so stars stay honest
+  first-try evidence; it shows the streak only.
+- `currentQ()` gives wagers/lifelines one shape for the open board question
+  (module quiz or Denaturation, whose body is now `renderDenature()`).
+
 ## Proficiency levels (standard 1.2)
 
 Every Lab challenge, module quiz question, Enzyme Card, Showdown round, and
@@ -285,6 +310,8 @@ locked-in design. Adjust freely in `CFG`:
 - House / Polymer Plant upgrade: +20 / +30 bonus on top of the question ATP
 - Rent when you land on your own property: 5 / 10 / 20 (deed / house / plant)
 - "What am I?": +5 per clue left unrevealed (first try only)
+- Streak: x2 / x3 on first-try question ATP at 3 / 5 in a row
+- Wagers (board, first try): Low +3/−0, Medium +6/−3, High +10/−5, never below 0 ATP
 - Owning all 3 properties in a color group: +50
 - Water Break / ATP Synthase Spin corner: 20 each, unlimited revisits
 - Denaturation Station: 15 (must answer correctly — retries are free and unlimited)

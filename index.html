@@ -416,6 +416,38 @@ button.wallet:hover{box-shadow:0 0 0 3px color-mix(in srgb, var(--atp) 40%, tran
 @media (max-width:640px){ .sort-bins{grid-template-columns:1fr 1fr !important} }
 @media (prefers-reduced-motion:reduce){ .clues li, .sort-chip.bounced{animation:none} }
 
+/* ---------- Phase D2: streak, wagers, lifelines ---------- */
+.streak{display:inline-flex; align-items:center; gap:3px; vertical-align:middle; font-weight:800; font-size:.8rem; padding:1px 8px 1px 4px; border-radius:999px; background:var(--bg); border:1.5px solid var(--line); color:var(--muted)}
+.streak svg{width:14px; height:16px}
+.streak.lit{color:#b4400f; border-color:#ffb27a; background:#fff1e6}
+.streak.x2 svg{width:17px; height:19px}
+.streak.x3{color:#8a1c00; border-color:#ff8a3d; background:#ffe3c9; box-shadow:0 0 0 3px rgba(255,138,61,.25)}
+.streak.x3 svg{width:20px; height:22px}
+.streak i{font-style:normal; background:#ff5a2e; color:#fff; border-radius:999px; padding:0 6px; font-size:.72rem}
+.streak.lit svg{animation:flicker 1.2s ease-in-out infinite; transform-origin:50% 90%}
+@keyframes flicker{50%{transform:scale(1.08) rotate(-3deg)}}
+.bc-status{display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center}
+.bc-status .streak{background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3); color:#fff}
+.bc-status .streak.lit{background:rgba(255,138,61,.25); border-color:#ffb27a}
+.life-pip{font-size:clamp(9px, 3.4cqh, 12px); font-weight:700; padding:1px 8px; border-radius:999px; border:1.5px dashed rgba(255,255,255,.35); color:rgba(255,255,255,.5)}
+.life-pip.on{border-style:solid; border-color:var(--atp); color:var(--atp)}
+.streak-note{display:flex; align-items:center; gap:6px; margin-top:8px; font-size:.88rem; font-weight:600; color:#b4400f}
+.streak-note svg{width:16px; height:18px; flex:none}
+.sd-note{font-size:.75rem; color:var(--muted); font-weight:500; margin-left:4px}
+.wager{display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin:4px 0 6px; font-size:.78rem}
+.wager span{color:var(--muted); font-weight:600; margin-right:2px}
+.wager button{border:1px solid var(--line); background:var(--panel); border-radius:999px; padding:.15rem .6rem; font-size:.76rem; cursor:pointer; color:var(--muted)}
+.wager button[aria-pressed="true"]{background:var(--brand); border-color:var(--brand); color:#fff; font-weight:700}
+.lifelines{display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px}
+.lifelines button{display:inline-flex; align-items:center; gap:5px; border:1.5px solid var(--brand-blue); background:color-mix(in srgb, var(--brand-blue) 10%, var(--panel)); color:var(--ink); border-radius:999px; padding:.2rem .7rem; font-size:.78rem; font-weight:700; cursor:pointer}
+.lifelines button svg{width:15px; height:15px}
+.lifelines button:disabled{opacity:.45; cursor:not-allowed; border-style:dashed}
+.qopt.cut{opacity:.35; text-decoration:line-through}
+.peek{position:relative; overflow:hidden; margin:6px 0; padding:10px 12px 14px; border-radius:12px; background:color-mix(in srgb, var(--brand-blue) 18%, var(--panel)); border:1.5px solid var(--brand-blue); font-size:.9rem}
+.peek-bar{position:absolute; left:0; bottom:0; height:4px; width:100%; background:var(--brand); transform-origin:left; animation:peekDrain 5s linear forwards}
+@keyframes peekDrain{to{transform:scaleX(0)}}
+@media (prefers-reduced-motion:reduce){ .streak.lit svg, .peek-bar{animation:none} }
+
 /* ---------- ATP coins + confetti ---------- */
 .coin-fly{position:fixed; left:0; top:0; z-index:80; width:26px; height:26px; pointer-events:none; will-change:transform}
 .coin-fly svg{display:block}
@@ -1439,7 +1471,9 @@ const CFG = {
   ATP_LAB_CHALLENGE: 20,
   ATP_HOUSE_BONUS: 20, ATP_PLANT_BONUS: 30, // upgrade bonus on top of the question ATP
   RENT: [0, 5, 10, 20],  // ATP collected when you land on your own property: [unowned, deed, house, Polymer Plant]
-  ATP_CLUE_BONUS: 5,     // "What am I?": per clue left unrevealed when solved on the first try
+  ATP_CLUE_BONUS: 5,
+  STREAK_X2: 3, STREAK_X3: 5, // first-try answers in a row for x2 / x3 question ATP
+  WAGERS: {low:{win:3, lose:0}, med:{win:6, lose:3}, high:{win:10, lose:5}}, // board questions only, first try only     // "What am I?": per clue left unrevealed when solved on the first try
   ATP_SHOWDOWN_BASE: 200, ATP_SHOWDOWN_PER_STAR: 50, // total bonus = base + per_star * stars(1-3)
   SHOWDOWN_STARS_3: 12, // first-try-correct rounds (out of 14) needed for each star rating
   SHOWDOWN_STARS_2: 7
@@ -2128,7 +2162,7 @@ function freshPlayer(name){
     name, atp:0, pos:0, laps:0, color:PLAYER_COLORS[0].hex,
     owned:{}, goalsDone:{}, quizDone:{}, setBonus:{},
     labChallenges:{}, enzymeDone:{}, showdownDone:{}, denatureDone:{},
-    tier:{}, tierAt:{}, rolls:0,
+    tier:{}, tierAt:{}, rolls:0, streak:0, lifeUsed:{},
     showdown:{bestStars:0, lastStars:0, badge:false, attempts:0},
     createdAt: Date.now(), lastPlayed: Date.now()
   };
@@ -2150,6 +2184,9 @@ function normalizePlayer(p){
   // checks are too, its Polymer Plant. No bonus is paid for migrated tiers.
   p.tier = p.tier || {}; p.tierAt = p.tierAt || {};
   if(typeof p.rolls !== 'number') p.rolls = 0;
+  if(typeof p.streak !== 'number') p.streak = 0; // D2: first-try answers in a row
+  p.lifeUsed = p.lifeUsed || {};                  // D2: lifeline -> lap number it was last used on
+  if(typeof p.laps !== 'number') p.laps = 0;
   Object.keys(p.owned).forEach(id => {
     const m = MODULES[id]; if(!m || p.tier[id]) return;
     const qd = p.quizDone[id] || [], all = lv => m.quiz.every((q, i) => q.lv !== lv || qd[i]);
@@ -2365,6 +2402,7 @@ function renderApp(){
     if(UI.overlay.mode === 'module') mountModuleDom();
     if(UI.overlay.mode === 'challenge') mountChallengeDom();
     if(UI.overlay.mode === 'showdown') mountShowdownDom();
+    if(UI.overlay.mode === 'denature') renderDenature();
     if(UI.cardAnim){ UI.cardAnim = false; animateCardOpen(); }
   }
 }
@@ -2434,6 +2472,9 @@ function boardCenterHTML(){
       '<button class="bcw-row" id="bcWalletBtn" title="What is ATP?">' + atpIcon(34) + '<span class="bcw-n" id="bcWalletN">' + shownATP() + '</span></button>' +
       '<div class="bcw-rank" id="bcRank">' + esc(rankFor(shownATP())) + '</div>' +
       '<div class="bcw-deeds">' + ownedCount() + ' / 12 deeds' + (sets ? ' · ' + sets + ' full set' + (sets > 1 ? 's' : '') : '') + '</div>' +
+      '<div class="bc-status">' + streakChipHTML() +
+        '<span class="life-pip' + (lifeAvail('cut') ? ' on' : '') + '" title="Enzyme Cut: ' + (lifeAvail('cut') ? 'ready' : 'used this lap') + '">Cut</span>' +
+        '<span class="life-pip' + (lifeAvail('peek') ? ' on' : '') + '" title="Peek at the Lab: ' + (lifeAvail('peek') ? 'ready' : 'used this lap') + '">Peek</span></div>' +
       '<button class="bc-btn' + (ready ? ' gold' : '') + '" id="showdownBtn"' + (ready ? '' : ' disabled title="Own at least 1 property in every color group to unlock"') + '>Mogul Showdown' + (PLAYER.showdown.badge ? ' · best ' + '★'.repeat(PLAYER.showdown.bestStars) : ready ? '' : ' (locked)') + '</button>' +
       '<button class="bc-btn" data-nav="lab"><span class="long">Need a refresher? Visit the Learn Lab</span><span class="short">Learn Lab</span></button>' +
     '</div>' +
@@ -2544,7 +2585,9 @@ function stepToken(remaining){
     // Passing (or landing on) GO pays out the moment the token touches it.
     PLAYER.laps = (PLAYER.laps || 0) + 1;
     awardATP(CFG.ATP_PASS_GO, '.sq[data-idx="0"]');
-    logActivity('Passed GO (+' + CFG.ATP_PASS_GO + ' ATP)');
+    const refreshed = Object.keys(PLAYER.lifeUsed).length ? ' · lifelines refreshed' : '';
+    logActivity('Passed GO (+' + CFG.ATP_PASS_GO + ' ATP)' + refreshed);
+    document.querySelectorAll('.life-pip').forEach(p => p.classList.add('on'));
   }
   if(reduceMotion){ stepToken(remaining - 1); return; }
   playSfx('move');
@@ -2857,7 +2900,9 @@ function renderQuizQuestion(){
   const body = $('quizBody'); if(!body) return;
   const type = q.type || 'mc', ids = stageIdxs(o.squareId, o.stage);
   const k = ids.indexOf(z.idx) + 1;
-  let h = '<p class="quiz-prog">Check ' + k + ' of ' + ids.length + ' ' + lvlChip(q.lv) + (QTYPE_LABEL[type] ? ' <span class="qtype">' + QTYPE_LABEL[type] + '</span>' : '') + '</p>';
+  z.cut = z.cut || [];
+  let h = '<p class="quiz-prog">Check ' + k + ' of ' + ids.length + ' ' + lvlChip(q.lv) + (QTYPE_LABEL[type] ? ' <span class="qtype">' + QTYPE_LABEL[type] + '</span>' : '') + ' ' + streakChipHTML() + '</p>' +
+    wagerHTML(z) + lifelinesHTML(currentQ());
   if(type === 'sort') h += sortHTML(q, z);
   else {
     if(type === 'riddle'){
@@ -2865,7 +2910,10 @@ function renderQuizQuestion(){
         (z.shown < q.clues.length ? '<button class="btn" data-qclue="1">Reveal another clue (' + (q.clues.length - z.shown) + ' left · each unused clue is +' + CFG.ATP_CLUE_BONUS + ' ATP)</button>' : '');
     }
     h += '<p class="quiz-q' + (type === 'mof' ? ' mof-q' : '') + '">' + (type === 'mof' ? '“' + esc(q.q) + '”' : esc(q.q)) + '</p>' +
-      '<div class="quiz-opts' + (type === 'mof' ? ' mof-opts' : '') + '" id="quizOpts">' + q.choices.map((c,i) => '<button class="qopt' + (z.wrong.includes(i) ? ' wrong' : '') + '" data-qopt="' + i + '"' + (z.wrong.includes(i) ? ' disabled' : '') + '>' + esc(c) + '</button>').join('') + '</div>';
+      '<div class="quiz-opts' + (type === 'mof' ? ' mof-opts' : '') + '" id="quizOpts">' + q.choices.map((c,i) => {
+        const off = z.wrong.includes(i) || z.cut.includes(i);
+        return '<button class="qopt' + (z.wrong.includes(i) ? ' wrong' : z.cut.includes(i) ? ' cut' : '') + '" data-qopt="' + i + '"' + (off ? ' disabled' : '') + '>' + esc(c) + '</button>';
+      }).join('') + '</div>';
   }
   h += '<div id="quizFb">' + (z.welcome ? '<div class="quiz-fb good">Welcome back. Give it another try.</div>' : '') + '</div>';
   body.innerHTML = h;
@@ -2900,6 +2948,7 @@ function sortCheck(){
   const o = UI.overlay, q = MODULES[o.squareId].quiz[o.quiz.idx], z = o.quiz;
   const bad = q.items.map((it, i) => z.place[i] === it[1] ? -1 : i).filter(i => i >= 0);
   if(!bad.length){
+    z.solved = true;
     renderQuizQuestion();
     document.querySelectorAll('.sort-chip').forEach(c => { c.disabled = true; c.classList.add('right'); });
     const btn = $('sortCheck'); if(btn) btn.remove();
@@ -2907,10 +2956,12 @@ function sortCheck(){
     return;
   }
   bad.forEach(i => { delete z.place[i]; });
+  const first = !z.attempts;
   z.bounced = bad; z.attempts++;
   playSfx('wrong');
+  const notes = first ? [settleWager(z, false), streakMiss()] : [];
   renderQuizQuestion();
-  $('quizFb').innerHTML = '<div class="quiz-fb warn">' + bad.length + ' item' + (bad.length > 1 ? 's' : '') + ' bounced back. Your correct ones stayed put. ' + esc(q.explain) + '</div>' + quizNudge();
+  $('quizFb').innerHTML = '<div class="quiz-fb warn">' + bad.length + ' item' + (bad.length > 1 ? 's' : '') + ' bounced back. Your correct ones stayed put. ' + esc(q.explain) + '</div>' + streakNoteHTML(notes.filter(Boolean).join(' ')) + quizNudge();
 }
 function quizNudge(){
   const o = UI.overlay, mod = MODULES[o.squareId];
@@ -2931,25 +2982,31 @@ function quizAnswer(i){
   const opts = document.querySelectorAll('#quizOpts .qopt');
   if(i === q.correct){
     opts.forEach((el,idx) => { el.disabled = true; if(idx===i) el.classList.add('correct'); });
-    const cb = $('quizBody') && $('quizBody').querySelector('[data-qclue]'); if(cb) cb.remove();
+    o.quiz.solved = true;
+    ['[data-qclue]', '.wager', '.lifelines'].forEach(sel => { const el = $('quizBody') && $('quizBody').querySelector(sel); if(el) el.remove(); });
     const clueBonus = q.type === 'riddle' && o.quiz.attempts === 0 ? CFG.ATP_CLUE_BONUS * (q.clues.length - o.quiz.shown) : 0;
     quizCorrect(q, clueBonus, opts[i]);
   } else {
-    opts[i].disabled = true; opts[i].classList.add('wrong');
+    const first = !o.quiz.attempts;
     o.quiz.attempts++; o.quiz.wrong.push(i);
     playSfx('wrong');
-    $('quizFb').innerHTML = '<div class="quiz-fb warn">Not quite. ' + esc(q.explain) + ' Try another answer.</div>' + quizNudge();
+    const notes = first ? [settleWager(o.quiz, false), streakMiss()] : [];
+    renderQuizQuestion(); // hides the wager row, refreshes the lifelines
+    $('quizFb').innerHTML = '<div class="quiz-fb warn">Not quite. ' + esc(q.explain) + ' Try another answer.</div>' + streakNoteHTML(notes.filter(Boolean).join(' ')) + quizNudge();
   }
 }
 function quizCorrect(q, extra, srcEl){
-  const o = UI.overlay, id = o.squareId;
-  const earned = (o.quiz.attempts === 0 ? CFG.ATP_QUIZ_FIRST : CFG.ATP_QUIZ_RETRY) + (extra || 0);
+  const o = UI.overlay, id = o.squareId, first = o.quiz.attempts === 0;
+  const st = first ? streakHit() : {mult:1, note:''};
+  const wagerNote = first ? settleWager(o.quiz, true) : '';
+  const earned = (first ? CFG.ATP_QUIZ_FIRST * st.mult : CFG.ATP_QUIZ_RETRY) + (extra || 0);
   awardATP(earned, srcEl);
   PLAYER.quizDone[id][o.quiz.idx] = true;
   persist(); playSfx('correct');
   const isLast = stageNextIdx(id, o.stage) === -1;
   const label = !isLast ? 'Next question' : o.stage === 'buy' ? 'Finish this property' : o.stage === 'house' ? 'Build the house' : o.stage === 'plant' ? 'Build the Polymer Plant' : 'Done';
-  $('quizFb').innerHTML = '<div class="quiz-fb good">Correct! ' + (extra ? '<strong>+' + extra + ' ATP clue bonus.</strong> ' : '') + esc(q.explain) + '</div>' +
+  $('quizFb').innerHTML = '<div class="quiz-fb good">Correct! ' + (st.mult > 1 ? '<strong>x' + st.mult + ' streak: +' + CFG.ATP_QUIZ_FIRST * st.mult + ' ATP.</strong> ' : '') + (extra ? '<strong>+' + extra + ' ATP clue bonus.</strong> ' : '') + (wagerNote ? '<strong>' + esc(wagerNote) + '</strong> ' : '') + esc(q.explain) + '</div>' +
+    streakNoteHTML(st.note) +
     '<button class="btn btn-primary quiz-next" id="quizNextBtn">' + label + '</button>';
 }
 function quizNext(){
@@ -3001,6 +3058,153 @@ function completeModule(){
   awardATP(CFG.ATP_MODULE_BONUS, done);
   checkGroupBonus(mod.tab);
 }
+/* ============================================================
+   PART 6c (Phase D2): streak meter, confidence wagers, lifelines.
+   Streak: board questions + Showdown MC/riddle rounds (persists in
+   PLAYER.streak, so it carries in and out of the Showdown). Wagers and
+   lifelines: board questions only (property checks + Denaturation),
+   never in the Showdown, so its stars stay honest first-try evidence.
+============================================================ */
+function streakMult(n){ return n >= CFG.STREAK_X3 ? 3 : n >= CFG.STREAK_X2 ? 2 : 1; }
+function flameSVG(n){
+  const m = streakMult(n), hot = ['#9aa6a3', '#ff8a3d', '#ff5a2e', '#ffb52e'][n ? m : 0], core = m === 3 ? '#fff6c2' : '#ffd79a';
+  return '<svg viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1 C14 7 21 10 21 18 A9 9 0 0 1 3 18 C3 13 6 11 8 7 C9 11 11 12 12 12 C12 8 11 5 12 1 Z" fill="' + hot + '" stroke="' + INK + '" stroke-width="1.8" stroke-linejoin="round"/>' +
+    (n ? '<path d="M12 13 C13 16 16 17 16 20 A4 4 0 0 1 8 20 C8 18 10 17 12 13 Z" fill="' + core + '"/>' : '') + '</svg>';
+}
+function streakChipHTML(){
+  const n = PLAYER.streak || 0, m = streakMult(n);
+  return '<span class="streak' + (n ? ' lit' : '') + (m > 1 ? ' x' + m : '') + '" data-streak="1" title="First-try answers in a row. x2 at ' + CFG.STREAK_X2 + ', x3 at ' + CFG.STREAK_X3 + '.">' +
+    flameSVG(n) + '<b>' + n + '</b>' + (m > 1 ? '<i>x' + m + '</i>' : '') + '<span class="sr"> first-try answers in a row</span></span>';
+}
+function refreshStreakUI(){ document.querySelectorAll('[data-streak]').forEach(el => { el.outerHTML = streakChipHTML(); }); }
+/* A first-try correct answer: grow the streak, return the multiplier + a note. */
+function streakHit(){
+  PLAYER.streak = (PLAYER.streak || 0) + 1;
+  const n = PLAYER.streak, m = streakMult(n);
+  persist(); refreshStreakUI();
+  let note = '';
+  if(n === CFG.STREAK_X2) note = 'Streak ' + n + '! First-try answers now earn x2 ATP.';
+  else if(n === CFG.STREAK_X3) note = 'Streak ' + n + '! You’re on fire: x3 ATP.';
+  else if(m > 1) note = 'Streak ' + n + ' · x' + m + ' ATP.';
+  return {mult:m, note};
+}
+/* The first miss on a question: reset gently. */
+function streakMiss(){
+  const was = PLAYER.streak || 0;
+  PLAYER.streak = 0; persist(); refreshStreakUI();
+  return was ? 'Your streak of ' + was + ' reset. No worries, a new one starts with your next first-try answer.' : '';
+}
+function streakNoteHTML(t){ return t ? '<p class="streak-note">' + flameSVG(PLAYER.streak || 0) + esc(t) + '</p>' : ''; }
+
+/* The question currently open on a board card, in one shape for wagers and lifelines. */
+function currentQ(){
+  const o = UI.overlay; if(!o) return null;
+  if(o.mode === 'module' && o.quiz){
+    const mod = MODULES[o.squareId];
+    return {q:mod.quiz[o.quiz.idx], z:o.quiz, tab:mod.tab, review:(QUIZ_REVIEW[o.squareId] || [])[o.quiz.idx], rerender:renderQuizQuestion, optsSel:'#quizOpts .qopt'};
+  }
+  if(o.mode === 'denature') return {q:DENATURE_QUESTIONS[o.qIdx], z:o, tab:'proteins', review:DENATURE_REVIEW, rerender:renderDenature, optsSel:'#denOpts .qopt'};
+  return null;
+}
+
+/* ---------- confidence wager (first try only, optional, default none) ---------- */
+function wagerHTML(z){
+  if(z.attempts || z.solved) return '';
+  const w = z.wager || 'none';
+  return '<div class="wager" role="group" aria-label="Optional confidence wager"><span>Feeling sure?</span>' +
+    [['none','No wager'], ['low','Low +' + CFG.WAGERS.low.win], ['med','Med ±' + CFG.WAGERS.med.win + '/' + CFG.WAGERS.med.lose], ['high','High ±' + CFG.WAGERS.high.win + '/' + CFG.WAGERS.high.lose]].map(([k, l]) =>
+      '<button data-wager="' + k + '" aria-pressed="' + (w === k) + '">' + l + '</button>').join('') + '</div>';
+}
+function pickWager(k){
+  const c = currentQ(); if(!c || c.z.attempts || c.z.solved) return;
+  c.z.wager = k === 'none' ? null : k;
+  document.querySelectorAll('[data-wager]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.wager === k)));
+}
+/* Settle a wager on the first attempt. Returns a short note (or ''). */
+function settleWager(z, right){
+  const w = z.wager && CFG.WAGERS[z.wager]; if(!w) return '';
+  z.wager = null;
+  if(right){ awardATP(w.win); return 'Wager won: +' + w.win + ' ATP.'; }
+  const loss = Math.min(w.lose, PLAYER.atp); // a wager can never push ATP below zero
+  if(!loss) return w.lose ? '' : 'Low wager: nothing lost.';
+  PLAYER.atp -= loss; persist(); refreshWallets();
+  return 'Wager lost: −' + loss + ' ATP.';
+}
+
+/* ---------- lifelines (once per lap each; refresh when you pass GO) ---------- */
+function lifeAvail(k){ return (PLAYER.lifeUsed[k] === undefined || PLAYER.lifeUsed[k] !== (PLAYER.laps || 0)); }
+function cutTargets(c){
+  const t = c.q.type || 'mc';
+  if(t === 'sort' || t === 'mof' || !c.q.choices) return [];
+  const gone = (c.z.wrong || []).concat(c.z.cut || []);
+  return c.q.choices.map((x, i) => i).filter(i => i !== c.q.correct && !gone.includes(i));
+}
+function lifelinesHTML(c){
+  if(c.z.solved) return '';
+  const cutOk = lifeAvail('cut') && cutTargets(c).length >= 2, peekOk = lifeAvail('peek');
+  const tip = 'Once per lap. Refreshes when you pass GO.';
+  return '<div class="lifelines" role="group" aria-label="Lifelines">' +
+    '<button data-life="cut"' + (cutOk ? '' : ' disabled') + ' title="Enzyme Cut: remove two wrong answers. ' + tip + '"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="5" cy="15" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="15" cy="15" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 13 L15 2 M13 13 L5 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Enzyme Cut' + (lifeAvail('cut') ? '' : ' (used)') + '</button>' +
+    '<button data-life="peek"' + (peekOk ? '' : ' disabled') + ' title="Peek at the Lab: see the cheat-sheet row for 5 seconds. ' + tip + '"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1 10 Q10 1 19 10 Q10 19 1 10 Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="10" r="3" fill="currentColor"/></svg>Peek at the Lab' + (lifeAvail('peek') ? '' : ' (used)') + '</button>' +
+  '</div><div id="peekBox"></div>';
+}
+function useCut(){
+  const c = currentQ(); if(!c || !lifeAvail('cut')) return;
+  const xs = cutTargets(c); if(xs.length < 2) return;
+  for(let i = xs.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [xs[i], xs[j]] = [xs[j], xs[i]]; }
+  const cut = xs.slice(0, 2);
+  c.z.cut = (c.z.cut || []).concat(cut);
+  PLAYER.lifeUsed.cut = PLAYER.laps || 0; persist();
+  playSfx('break');
+  // Update in place so any feedback/review button on screen stays put.
+  const opts = document.querySelectorAll(c.optsSel);
+  cut.forEach(i => { if(opts[i]){ opts[i].disabled = true; opts[i].classList.add('cut'); } });
+  markLifeUsed('cut');
+}
+/* The cheat-sheet row a question points at: its review target's row, a Big Four
+   stat line, or the tab's row for that level (L1 monomer, L2 bond, L3 job). */
+function peekRow(c){
+  const r = c.review || {}, f = r.focus || '', tab = TABS[r.tab] ? r.tab : c.tab;
+  const row = (t, label) => { const x = FACTS[t].rows.find(rw => rw[0] === label); return x ? {label:TABS[t].label + ' · ' + x[0], text:x[1]} : null; };
+  if(f.indexOf('facts:') === 0){ const x = row(tab, f.slice(6)); if(x) return x; }
+  if(f === '#atpStation') return row('nucleic', 'Energy transfer');
+  if(f === '#b4-energy') return {label:'Energy per gram', text:B4_ORDER.map(g => GROUPS[g].label + ' ' + (BIG_FOUR_STATS.groups[g].calPerG ? '~' + BIG_FOUR_STATS.groups[g].calPerG + ' Cal/g' : 'not a fuel')).join(' · ')};
+  if(f === '#b4-elements') return {label:'Elements', text:'Carbs and lipids are both C, H, O, but carbs have about 1 C : 2 H : 1 O and lipids have far less oxygen (lots of C–H bonds). Proteins add N, nucleic acids add N and P.'};
+  if(f === '#b4-table') return {label:GROUPS[c.tab].label + ' · Main jobs', text:B4_INFO[c.tab].jobs};
+  return row(c.tab, c.q.lv === 3 ? 'Job' : c.q.lv === 2 ? 'Bond' : 'Monomer') || row(c.tab, 'Monomer');
+}
+function markLifeUsed(k){
+  const b = document.querySelector('[data-life="' + k + '"]');
+  if(b){ b.disabled = true; b.lastChild.textContent += ' (used)'; }
+}
+let peekTimer = null;
+function usePeek(){
+  const c = currentQ(); if(!c || !lifeAvail('peek')) return;
+  PLAYER.lifeUsed.peek = PLAYER.laps || 0; persist();
+  markLifeUsed('peek');
+  const box = $('peekBox'), p = peekRow(c); if(!box || !p) return;
+  box.innerHTML = '<div class="peek"><p><strong>' + esc(p.label) + '</strong></p><p>' + esc(p.text) + '</p><span class="peek-bar"></span></div>';
+  playSfx('open');
+  clearTimeout(peekTimer);
+  peekTimer = setTimeout(() => { const b = $('peekBox'); if(b) b.innerHTML = ''; }, 5000);
+}
+
+/* ---------- Denaturation Station body (now re-renderable for wagers/lifelines) ---------- */
+function renderDenature(){
+  const box = $('denBody'); if(!box) return;
+  const o = UI.overlay, q = DENATURE_QUESTIONS[o.qIdx], c = currentQ();
+  o.wrong = o.wrong || []; o.cut = o.cut || [];
+  box.innerHTML = '<p class="quiz-prog">' + streakChipHTML() + '</p>' +
+    wagerHTML(o) + lifelinesHTML(c) +
+    '<p class="quiz-q" style="margin-top:12px">' + esc(q.q) + '</p>' +
+    '<div class="quiz-opts" id="denOpts">' + q.choices.map((ch, i) => {
+      const cls = o.solved && i === q.correct ? ' correct' : o.wrong.includes(i) ? ' wrong' : o.cut.includes(i) ? ' cut' : '';
+      return '<button class="qopt' + cls + '" data-danswer="' + i + '"' + (o.solved || o.wrong.includes(i) || o.cut.includes(i) ? ' disabled' : '') + '>' + esc(ch) + '</button>';
+    }).join('') + '</div>' +
+    '<div id="denFb">' + (o.fbHTML || (o.welcome ? '<div class="quiz-fb good">Welcome back. Give it another try.</div>' : '')) + '</div>';
+  o.welcome = false;
+}
+
 /* ---------- enzyme challenge ---------- */
 function openChallenge(squareId){
   const sq = SQUARES.find(s=>s.id===squareId);
@@ -3076,7 +3280,7 @@ function showdownOverlayHTML(){
       '<div id="sdFb">' + (fb || (wrong.length ? '<div class="quiz-fb good">Welcome back. Give it another try.</div>' : '')) + '</div>';
   }
   return deedHead('showdown', 'Mogul Showdown · Round ' + (o.idx + 1) + ' of ' + SHOWDOWN_ROUNDS.length + ' · ' + GROUPS[round.group].label + ' · Level ' + round.lv, kindLabel) +
-    '<div class="deed-body">' + body + '</div>';
+    '<div class="deed-body"><p class="quiz-prog">' + lvlChip(round.lv) + ' ' + streakChipHTML() + ' <span class="sd-note">No wagers or lifelines in the Showdown: stars count first tries only.</span></p>' + body + '</div>';
 }
 function showdownCorrectHTML(round){
   const o = UI.overlay;
@@ -3120,12 +3324,13 @@ function showdownAnswer(i){
   const o = UI.overlay; if(!o || o.resolved) return;
   const round = currentShowdownRound();
   if(i === round.correct){ showdownRoundResolve(); return; }
+  const missNote = o.firstTry ? streakMiss() : '';
   o.firstTry = false; o.wrong.push(i);
   const opts = document.querySelectorAll('#sdOpts .qopt');
   if(opts[i]){ opts[i].disabled = true; opts[i].classList.add('wrong'); }
   playSfx('wrong');
   const fb = $('sdFb');
-  if(fb) fb.innerHTML = '<div class="quiz-fb warn">Not quite. Try another answer.</div>' + nudgeHTML(round.review || SHOWDOWN_REVIEW[round.group + ':' + round.kind]);
+  if(fb) fb.innerHTML = '<div class="quiz-fb warn">Not quite. Try another answer.</div>' + streakNoteHTML(missNote) + nudgeHTML(round.review || SHOWDOWN_REVIEW[round.group + ':' + round.kind]);
 }
 function showdownRoundResolve(){
   const o = UI.overlay; if(!o || o.resolved) return;
@@ -3133,11 +3338,13 @@ function showdownRoundResolve(){
   const round = currentShowdownRound();
   o.results.push({correct:true, firstTry: !!o.firstTry});
   PLAYER.showdownDone[o.order[o.idx]] = true; persist();
+  // Streak counts MC/riddle rounds (a build round can't be missed, so it doesn't count either way).
+  o.streakNote = round.kind !== 'build' && o.firstTry ? streakHit().note : '';
   LAB.onGoalProgress = null;
   playSfx('correct');
   document.querySelectorAll('#sdOpts .qopt').forEach((el, k) => { el.disabled = true; if(k === round.correct) el.classList.add('correct'); });
   const fb = $('sdFb'); if(!fb) return;
-  fb.innerHTML = showdownCorrectHTML(round);
+  fb.innerHTML = showdownCorrectHTML(round) + streakNoteHTML(o.streakNote);
 }
 function showdownNext(){
   const o = UI.overlay;
@@ -3185,7 +3392,7 @@ function closeOverlay(){
 function openPopup(p){ UI.popup = p; renderApp(); }
 function closePopup(){ UI.popup = null; renderApp(); }
 
-function openDenature(idx){ showCard({mode:'denature', qIdx: Math.floor(Math.random()*DENATURE_QUESTIONS.length), wrong:[]}, 'sq-' + idx); }
+function openDenature(idx){ showCard({mode:'denature', qIdx: Math.floor(Math.random()*DENATURE_QUESTIONS.length), wrong:[], cut:[], attempts:0}, 'sq-' + idx); }
 function openWaterBreak(idx){
   const flavor = WATERBREAK_FLAVOR[Math.floor(Math.random()*WATERBREAK_FLAVOR.length)];
   logActivity('Water Break (+' + CFG.ATP_WATER_BREAK + ' ATP)');
@@ -3269,32 +3476,38 @@ function infoPanelHTML(){
     '</div>';
 }
 function denaturePanelHTML(){
-  const o = UI.overlay, q = DENATURE_QUESTIONS[o.qIdx], wrong = o.wrong || (o.wrong = []);
+  const o = UI.overlay, q = DENATURE_QUESTIONS[o.qIdx];
+  if(o.attempts && !o.solved){ o.welcome = true; o.fbHTML = null; } // back from a Lab review
   return deedHead('denature', 'Denaturation Station', 'Protein trouble!') +
     '<div class="deed-body">' +
       '<div class="deed-intro">' + deedArt('denature', 'denature') + '<div>' +
         '<p class="deed-sub">' + lvlChip(q.lv) + ' Refold your protein</p>' +
         '<p class="lo-hook">Answer correctly to refold. Wrong answers explain why, and you can try again as many times as you need.</p>' +
       '</div></div>' +
-      '<p class="quiz-q" style="margin-top:16px">' + esc(q.q) + '</p>' +
-      '<div class="quiz-opts" id="denOpts">' + q.choices.map((c,i) => '<button class="qopt' + (wrong.includes(i) ? ' wrong' : '') + '" data-danswer="' + i + '"' + (wrong.includes(i) ? ' disabled' : '') + '>' + esc(c) + '</button>').join('') + '</div>' +
-      '<div id="denFb">' + (wrong.length ? '<div class="quiz-fb good">Welcome back. Give it another try.</div>' : '') + '</div>' +
+      '<div id="denBody"></div>' +
     '</div>';
 }
 function denatureAnswer(i){
   const o = UI.overlay, q = DENATURE_QUESTIONS[o.qIdx];
-  const opts = document.querySelectorAll('#denOpts .qopt');
-  const fb = $('denFb');
+  if(o.solved) return;
+  const first = !o.attempts;
   if(i === q.correct){
-    opts.forEach((el,idx) => { el.disabled = true; if(idx===i) el.classList.add('correct'); });
+    o.solved = true;
+    const st = first ? streakHit() : {mult:1, note:''};
+    const wagerNote = first ? settleWager(o, true) : '';
+    const earned = first ? CFG.ATP_DENATURE * st.mult : CFG.ATP_DENATURE;
     PLAYER.denatureDone[o.qIdx] = true;
-    awardATP(CFG.ATP_DENATURE, opts[i]); persist(); playSfx('correct');
-    logActivity('Refolded at Denaturation Station (+' + CFG.ATP_DENATURE + ' ATP)');
-    fb.innerHTML = '<div class="quiz-fb good">Refolded! ' + esc(q.explain) + '</div>' +
-      '<button class="btn btn-primary quiz-next" id="backToBoardBtn">Back to the board</button>';
+    o.fbHTML = '<div class="quiz-fb good">Refolded! ' + (st.mult > 1 ? '<strong>x' + st.mult + ' streak: +' + earned + ' ATP.</strong> ' : '') + (wagerNote ? '<strong>' + esc(wagerNote) + '</strong> ' : '') + esc(q.explain) + '</div>' +
+      streakNoteHTML(st.note) + '<button class="btn btn-primary quiz-next" id="backToBoardBtn">Back to the board</button>';
+    renderDenature();
+    const opt = document.querySelector('#denOpts .qopt.correct');
+    awardATP(earned, opt); persist(); playSfx('correct');
+    logActivity('Refolded at Denaturation Station (+' + earned + ' ATP)');
   } else {
-    opts[i].disabled = true; opts[i].classList.add('wrong'); o.wrong.push(i); playSfx('wrong');
-    fb.innerHTML = '<div class="quiz-fb warn">Not yet. ' + esc(q.explain) + ' Try another answer.</div>' + nudgeHTML(DENATURE_REVIEW);
+    o.attempts = (o.attempts || 0) + 1; o.wrong.push(i); playSfx('wrong');
+    const notes = first ? [settleWager(o, false), streakMiss()] : [];
+    o.fbHTML = '<div class="quiz-fb warn">Not yet. ' + esc(q.explain) + ' Try another answer.</div>' + streakNoteHTML(notes.filter(Boolean).join(' ')) + nudgeHTML(DENATURE_REVIEW);
+    renderDenature();
   }
 }
 function menuBodyHTML(){
@@ -3769,6 +3982,10 @@ document.addEventListener('click', e => {
   if(giveUp){ resolveChallenge(false); return; }
 
   if(t.closest('[data-qclue]')){ revealClue(); return; }
+  const wg = t.closest('[data-wager]');
+  if(wg){ pickWager(wg.dataset.wager); return; }
+  const life = t.closest('[data-life]');
+  if(life && !life.disabled){ life.dataset.life === 'cut' ? useCut() : usePeek(); return; }
   const schip = t.closest('[data-sortchip]');
   if(schip && !schip.disabled){ sortPick(parseInt(schip.dataset.sortchip, 10)); return; }
   const sbin = t.closest('[data-sortbin]');

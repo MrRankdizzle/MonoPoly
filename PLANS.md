@@ -9,7 +9,7 @@ only committed once Mr. Rankin approves it. Update this file as phases finish.
 | B | Our standard, proficiency levels, "Meet the Big Four" | ✅ Done |
 | C | Nucleic acids upgrades: double helix, ATP/ADP station | ✅ Done |
 | D1 | Property tiers, rent, new question types + questions, save migration, Report Card | ✅ Done |
-| D2 | Streak meter, lifelines, confidence wagers | ⏳ Next |
+| D2 | Streak meter, lifelines, confidence wagers | ✅ Done |
 
 ---
 
@@ -317,7 +317,13 @@ intact.
 - Sort-it: counts as first-try correct only if every chip is placed right on
   the first check. Wrong chips bounce back with a hint.
 
-### D2 — streak meter, lifelines, confidence wagers (after D1)
+### D2 — streak meter, lifelines, confidence wagers ✅
+
+Full test suite green at 1366×657 and 390×760 (plus reduced motion).
+Decisions: wagers board-only, first try only (Low +3/−0, Med +6/−3, High
++10/−5, never below 0 ATP); streak on board + Showdown (x2 at 3, x3 at 5,
+carries in and out of the Showdown); lifelines board-only, once per lap,
+refreshed at GO; the Showdown has streak only.
 
 - **Streak meter:** consecutive first-try correct answers build a multiplier
   (x2, x3), with a visible flame that resets gently on a miss.
@@ -327,6 +333,4 @@ intact.
 - **Optional confidence wager** before answering (Low, Medium, or High, with a
   small cap) to reward students who know they know it. Losses stay small; this
   should feel encouraging.
-- Open D2 decisions: wager size (and whether a wrong answer loses ATP), and
-  whether the streak, lifelines, and wager apply in the Mogul Showdown or only
-  to board questions.
+
